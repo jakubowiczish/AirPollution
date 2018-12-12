@@ -1,5 +1,15 @@
-# Ignore Gradle project-specific cache directory
+# gradle
 .gradle
+/build/
 
-# Ignore Gradle build output directory
-build
+gradle-app.setting
+
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Idea Intelij
+.idea
+*.iml
+
+# Java
+out
