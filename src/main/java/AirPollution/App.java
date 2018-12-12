@@ -3,13 +3,19 @@
  */
 package AirPollution;
 
+import com.google.gson.Gson;
+
 public class App {
 
     public static void main(String[] args) {
-        try {
-            System.out.println(URLReader.getHTML());
-        } catch (Exception e) {
-            e.printStackTrace();
+        String stationsJson = "";
+
+        Gson gson = new Gson();
+
+        DataStation[] stations = gson.fromJson(stationsJson, DataStation[].class);
+
+        for(DataStation station : stations) {
+            System.out.println(station.id + ": " + station.stationName);
         }
     }
 
