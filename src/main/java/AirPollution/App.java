@@ -5,18 +5,22 @@ package AirPollution;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
+
 public class App {
 
-    public static void main(String[] args) {
-        String stationsJson = "";
+    public static void main(String[] args) throws IOException {
+        Factory factory = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
 
-        Gson gson = new Gson();
-
-        DataStation[] stations = gson.fromJson(stationsJson, DataStation[].class);
-
-        for(DataStation station : stations) {
-            System.out.println(station.id + ": " + station.stationName);
+//        DataStation[] stations = factory.createStations(jsonFetcher.getAllStations());
+//
+//        for (DataStation station : stations) {
+//            System.out.println(station.id + ": " + station.stationName);
+//        }
+        AirIndex[] indices = factory.createIndices(jsonFetcher.getQualityIndex(52));
+        for (AirIndex index : indices) {
+            System.out.println(index.toString());
         }
     }
-
 }
