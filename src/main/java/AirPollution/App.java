@@ -3,9 +3,9 @@
  */
 package AirPollution;
 
-import com.google.gson.Gson;
-
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Calendar;
 
 public class App {
 
@@ -18,9 +18,14 @@ public class App {
 //        for (DataStation station : stations) {
 //            System.out.println(station.id + ": " + station.stationName);
 //        }
-        AirIndex[] indices = factory.createIndices(jsonFetcher.getQualityIndex(52));
-        for (AirIndex index : indices) {
-            System.out.println(index.toString());
+        JsonAirIndex index = factory.createIndices(jsonFetcher.getQualityIndex(52));
+        AirIndex realIndex = new AirIndex();
+        try {
+            realIndex = index.convertJsonAirIndex();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+        System.out.println(realIndex);
+        System.out.println(realIndex.stCalcDate.get(Calendar.DAY_OF_MONTH));
     }
 }

@@ -9,11 +9,9 @@ public class Factory {
         return gson.fromJson(stationsString, DataStation[].class);
     }
 
-
-
-    public AirIndex[] createIndices(String stationsString) {
+    public JsonAirIndex createIndices(String stationsString) {
         Gson gson = new Gson();
-        return gson.fromJson(stationsString, AirIndex[].class);
+        return gson.fromJson(stationsString, JsonAirIndex.class);
     }
 
 
