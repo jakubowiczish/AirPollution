@@ -4,14 +4,17 @@ import com.google.gson.Gson;
 
 public class Factory {
 
-    public DataStation[] createStations(String stationsString) {
+    public Station[] createStations(String stationsString) {
         Gson gson = new Gson();
-        return gson.fromJson(stationsString, DataStation[].class);
+        return gson.fromJson(stationsString, Station[].class);
     }
 
-    public JsonAirIndex createIndex(String stationsString) {
+
+
+
+    public AirIndex createIndex(String stationsString) {
         Gson gson = new Gson();
-        return gson.fromJson(stationsString, JsonAirIndex.class);
+        return gson.fromJson(stationsString, AirIndex.class);
 
     }
 
