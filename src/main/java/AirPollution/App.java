@@ -1,8 +1,5 @@
 package AirPollution;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -16,8 +13,14 @@ import picocli.CommandLine.Option;
         )
 public class App implements Runnable {
 
-    @Option(names = {"--station"}, description = "Station name for Air Index")
+    @Option(names = {"--stationName"}, description = "Station name for Air Index")
     private String stationName;
+
+    @Option(names = {"--date"}, description = "Date of measurement")
+    private String date;
+
+    @Option(names = {"--parameterName"}, description = "Name of the parameter")
+    private String parameterName;
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -28,35 +31,17 @@ public class App implements Runnable {
 
     @Override
     public void run() {
-        if (stationName != null) {
-            System.out.println(airIndexForStation());
-        }
-    }
-
-
-    public String airIndexForStation() {
-//      args = new String[] {"--station=Katowice, ul. Kossutha 6"};
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-        Station[] allStations = null;
+        OptionsHandler optionsHandler = new OptionsHandler();
 
         if (stationName != null) {
-            try {
-                allStations = factory.createStations(jsonFetcher.getAllStations());
-
-                int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-
-                AirIndex airIndex = factory.createIndex(jsonFetcher.getQualityIndex(stationID));
-
-                if (airIndex != null) {
-                    return airIndex.toString();
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            System.out.println(optionsHandler.airIndexForStation(stationName));
         }
-        return null;
+
+        // --station="Tarnów, ul. Bitwy pod Studziankami", --parameterName="O3", --date="2018-12-15 21:00:00"
+        if (stationName != null && date != null && parameterName != null) {
+            System.out.println(optionsHandler.currentParameterValue(date, stationName, parameterName));
+        }
+
+
     }
 }
