@@ -12,12 +12,14 @@ plugins {
 
     // Apply the application plugin to add support for building an application
     id 'application'
+    // for handling building shadowJar (supposedly confict between gradle and picocli) 
+    id 'com.github.johnrengelman.shadow' version '4.0.3'
 }
 
 
 // Define the main class for the application
 mainClassName = 'AirPollution.App'
-
+version = '1.0'
 
 repositories {
     // Use jcenter for resolving your dependencies.
@@ -35,11 +37,24 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.23.4'
 }
 
-//noinspection GroovyAssignabilityCheck
-jar {
-    manifest {
-        attributes 'Main-Class': 'AirPollution.App'
-    }
-}
-
-
+//jar {
+//    manifest {
+//        attributes 'Main-Class': 'com.plotnikowski.bibparser.Main'
+//    }
+//
+//    from {
+//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//}
+//
+////noinspection GroovyAssignabilityCheck
+//task fatJar(type: Jar) {
+//    manifest {
+//        attributes 'Implementation-Title': 'Gradle Jar File Example',
+//                'Implementation-Version': version,
+//                'Main-Class': 'AirPollution.App'
+//    }
+//    baseName = project.name + '-all'
+//    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+//    with jar
+//}
