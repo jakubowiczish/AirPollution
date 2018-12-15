@@ -1,6 +1,9 @@
 package AirPollution;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class OptionsHandler {
 
@@ -66,4 +69,125 @@ public class OptionsHandler {
 
         return currentValue;
     }
+
+    public double averagePollutionValue(String startDate, String endDate, String parameterName) {
+        double sumOfValues = 0;
+        int valuesCounter = 0;
+
+        double averageValue = 0;
+
+        SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date realStartDate = null;
+        Date realEndDate = null;
+        try {
+            realStartDate = usedDateFormat.parse(startDate);
+            realEndDate = usedDateFormat.parse(endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (realStartDate == null || realEndDate == null) {
+            throw new IllegalArgumentException("This dates are not valid");
+        }
+
+        Factory factory = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
+        Station[] allStations = null;
+        if (parameterName != null) {
+            try {
+                allStations = factory.createStations(jsonFetcher.getAllStations());
+
+                for (Station station : allStations) {
+                    int id = station.id;
+                    SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(id));
+                    if (sensorData.key.equals(parameterName)) {
+                        valuesCounter++;
+                        for (SensorData.Value value : sensorData.values) {
+                            try {
+                                if (value.date.contains("-")) {
+                                    Date actualDate = usedDateFormat.parse(value.date);
+                                    // if date is between given period of time
+                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) && (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                                        sumOfValues += value.value;
+                                    }
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        averageValue = sumOfValues / valuesCounter;
+        return averageValue;
+    }
+
+
+    public double averagePollutionValueForConcreteStation(String startDate, String endDate, String parameterName, String stationName) {
+        double sumOfValues = 0;
+        int valuesCounter = 0;
+
+        double averageValue = 0;
+
+        SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date realStartDate = null;
+        Date realEndDate = null;
+        try {
+            realStartDate = usedDateFormat.parse(startDate);
+            realEndDate = usedDateFormat.parse(endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (realStartDate == null || realEndDate == null) {
+            throw new IllegalArgumentException("This dates are not valid");
+        }
+
+        Factory factory = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
+
+        int id = -1;
+        try {
+            Station[] allStations = factory.createStations(jsonFetcher.getAllStations());
+            for (Station station : allStations) {
+                if (station.stationName.equals(stationName)) {
+                    id = station.id;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (parameterName != null) {
+            try {
+                SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(id));
+                if (sensorData.key.equals(parameterName)) {
+                    valuesCounter++;
+                    for (SensorData.Value value : sensorData.values) {
+                        try {
+                            if (value.date.contains("-")) {
+                                Date actualDate = usedDateFormat.parse(value.date);
+                                // if date is between given period of time
+                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) && (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                                    sumOfValues += value.value;
+                                }
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        averageValue = sumOfValues / valuesCounter;
+        return averageValue;
+
+    }
 }
+
