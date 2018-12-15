@@ -33,9 +33,9 @@ public class App implements Runnable {
     public void run() {
         OptionsHandler optionsHandler = new OptionsHandler();
 
-        if (stationName != null) {
-            System.out.println(optionsHandler.airIndexForStation(stationName));
-        }
+//        if (stationName != null) {
+//            System.out.println(optionsHandler.airIndexForStation(stationName));
+//        }
 
         // --station="Tarnów, ul. Bitwy pod Studziankami", --parameterName="O3", --date="2018-12-15 21:00:00"
         if (stationName != null && date != null && parameterName != null) {

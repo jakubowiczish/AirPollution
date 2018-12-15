@@ -42,7 +42,7 @@ public class OptionsHandler {
             try {
                 allStations = factory.createStations(jsonFetcher.getAllStations());
                 int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-                SensorData sensorData = factory.createSensorData(jsonFetcher.getSensor(stationID));
+                SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(stationID));
 
                 if (sensorData.key.equals(parameterName)) {
                     boolean validDate = false;
