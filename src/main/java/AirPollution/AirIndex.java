@@ -1,33 +1,54 @@
 package AirPollution;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 public class AirIndex {
 
-
-
     JsonAirIndex.IndexLevel stIndexLevel;
-    Calendar stCalcDate;
-    Calendar stSourceDataDate;
+    Date stCalcDate;
+    Date stSourceDataDate;
 
     JsonAirIndex.IndexLevel so2IndexLevel;
-    Calendar so2CalcDate;
+    Date so2CalcDate;
+    Date so2SourceDataDate;
+
+    JsonAirIndex.IndexLevel no2IndexLevel;
+    Date no2CalcDate;
+    Date no2SourceDataDate;
+
+    JsonAirIndex.IndexLevel coIndexLevel;
+    Date coCalcDate;
+    Date coSourceDataDate;
+
+    JsonAirIndex.IndexLevel pm10IndexLevel;
+    Date pm10CalcDate;
+    Date pm10SourceDataDate;
+
+    JsonAirIndex.IndexLevel pm25IndexLevel;
+    Date pm25CalcDate;
+    Date pm25SourceDataDate;
+
+    JsonAirIndex.IndexLevel o3IndexLevel;
+    Date o3CalcDate;
+    Date o3SourceDataDate;
+
+    JsonAirIndex.IndexLevel c6h6IndexLevel;
+    Date c6h6CalcDate;
+    Date c6h6SourceDataDate;
+
 
     @Override
     public String toString() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "AirIndex{" +
                 "stIndexLevel=" + stIndexLevel +
-                ", stCalcDate=" + df.format(stCalcDate.getTime()) +
-                ", stSourceDataDate=" + df.format(stSourceDataDate.getTime()) +
+                ", stCalcDate=" + stCalcDate +
+                ", stSourceDataDate=" + stSourceDataDate +
                 ", so2IndexLevel=" + so2IndexLevel +
-                ", so2CalcDate=" + df.format(so2CalcDate.getTime()) +
-                ", so2SourceDataDate=" + df.format(so2SourceDataDate.getTime()) +
+                ", so2CalcDate=" + so2CalcDate +
+                ", so2SourceDataDate=" + so2SourceDataDate +
                 ", no2IndexLevel=" + no2IndexLevel +
-                ", no2CalcDate=" + df.format(no2CalcDate.getTime()) +
-                ", no2SourceDataDate=" + df.format(no2SourceDataDate.getTime()) +
+                ", no2CalcDate=" + no2CalcDate +
+                ", no2SourceDataDate=" + no2SourceDataDate +
                 ", coIndexLevel=" + coIndexLevel +
                 ", coCalcDate=" + coCalcDate +
                 ", coSourceDataDate=" + coSourceDataDate +
@@ -45,35 +66,4 @@ public class AirIndex {
                 ", c6h6SourceDataDate=" + c6h6SourceDataDate +
                 '}';
     }
-
-    Calendar so2SourceDataDate;
-
-    JsonAirIndex.IndexLevel no2IndexLevel;
-    Calendar no2CalcDate;
-    Calendar no2SourceDataDate;
-
-    JsonAirIndex.IndexLevel coIndexLevel;
-    Calendar coCalcDate;
-    Calendar coSourceDataDate;
-
-    JsonAirIndex.IndexLevel pm10IndexLevel;
-    Calendar pm10CalcDate;
-    Calendar pm10SourceDataDate;
-
-    JsonAirIndex.IndexLevel pm25IndexLevel;
-    Calendar pm25CalcDate;
-    Calendar pm25SourceDataDate;
-
-    JsonAirIndex.IndexLevel o3IndexLevel;
-    Calendar o3CalcDate;
-    Calendar o3SourceDataDate;
-
-    JsonAirIndex.IndexLevel c6h6IndexLevel;
-    Calendar c6h6CalcDate;
-    Calendar c6h6SourceDataDate;
-
-//    class IndexLevel {
-//        int id;
-//        String indexLevelName;
-//    }
 }
