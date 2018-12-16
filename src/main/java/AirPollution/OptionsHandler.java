@@ -57,6 +57,8 @@ public class OptionsHandler {
                         foundParameter = true;
                         SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.id));
 
+                        System.out.println(sensor);
+                        System.out.println(sensorData);
                         if (sensorData.key.equals(parameterName)) {
                             boolean validDate = false;
                             for (SensorData.Value value : sensorData.values) {
@@ -71,7 +73,6 @@ public class OptionsHandler {
                         }
                     }
                 }
-
                 if (!foundParameter) {
                     throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
                 }
@@ -80,7 +81,6 @@ public class OptionsHandler {
                 e.printStackTrace();
             }
         }
-
         return currentValue;
     }
 
