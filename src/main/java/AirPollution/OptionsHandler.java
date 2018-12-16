@@ -14,23 +14,17 @@ public class OptionsHandler {
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
         Station[] allStations = null;
-
         if (stationName != null) {
             try {
                 allStations = factory.createStations(jsonFetcher.getAllStations());
-
                 int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-
                 AirIndex airIndex = factory.createAirIndex(jsonFetcher.getQualityIndex(stationID));
-
                 if (airIndex != null) {
                     return airIndex.toString();
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
         return null;
     }
@@ -126,8 +120,11 @@ public class OptionsHandler {
                                                 // if date is between given period of time
                                                 if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
                                                         (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-                                                    valuesCounter++;
-                                                    sumOfValues += value.value;
+
+                                                    if (value.value != null) {
+                                                        valuesCounter++;
+                                                        sumOfValues += value.value;
+                                                    }
                                                 }
                                             }
                                         } catch (ParseException e) {
@@ -137,7 +134,6 @@ public class OptionsHandler {
                                 }
                             }
                         }
-
                     }
                 }
             } catch (IOException e) {
@@ -196,8 +192,11 @@ public class OptionsHandler {
                                     // if date is between given period of time
                                     if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
                                             (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-                                        valuesCounter++;
-                                        sumOfValues += value.value;
+
+                                        if (value.value != null) {
+                                            valuesCounter++;
+                                            sumOfValues += value.value;
+                                        }
                                     }
                                 }
                             } catch (ParseException e) {
