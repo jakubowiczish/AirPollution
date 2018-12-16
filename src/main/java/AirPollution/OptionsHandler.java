@@ -1,9 +1,12 @@
 package AirPollution;
 
+import com.google.common.util.concurrent.AtomicDouble;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class OptionsHandler {
@@ -106,6 +109,15 @@ public class OptionsHandler {
         return countAveragePollution(realStartDate, realEndDate, parameterName);
     }
 
+    public double multiThreadAveragePollutionValue(String startDate, String endDate, String parameterName) {
+        Date realStartDate = parseStringToDate(startDate);
+        Date realEndDate = parseStringToDate(endDate);
+        if (realStartDate == null || realEndDate == null) {
+            throw new IllegalArgumentException("These dates are not valid");
+        }
+        return multiThreadCountAveragePollution(realStartDate, realEndDate, parameterName);
+    }
+
     private double countAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
         double sumOfValues = 0;
         int valuesCounter = 0;
@@ -158,6 +170,73 @@ public class OptionsHandler {
         }
         averageValue = sumOfValues / valuesCounter;
         return averageValue;
+    }
+
+
+    private double multiThreadCountAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
+        final AtomicInteger valuesCounter = new AtomicInteger();
+        final AtomicDouble sumOfValues = new AtomicDouble();
+        final AtomicInteger numberOfThreads = new AtomicInteger();
+
+        Factory factory2 = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
+        Station[] allStations;
+
+        if (parameterName != null) {
+            try {
+                allStations = factory2.createStations(jsonFetcher.getAllStations());
+                System.out.println(allStations.length + " stations found\n");
+
+                for (Station station : allStations) {
+                    if (station != null) {
+                        numberOfThreads.incrementAndGet();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Factory factory = new Factory();
+                                    Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(station.id));
+                                    System.out.println(sensors.length + " sensors found for station: \"" + station.stationName + "\"\n");
+                                    for (Sensor sensor : sensors) {
+                                        if (sensor != null) {
+                                            SensorData sensorData = factory.
+                                                    createSensorData(jsonFetcher.getSensorData(sensor.id));
+                                            if (sensorData != null) {
+                                                if (sensorData.key.equals(parameterName)) {
+                                                    for (SensorData.Value value : sensorData.values) {
+                                                        if (value.date.contains("-")) {
+                                                            Date actualDate = parseStringToDate(value.date);
+                                                            // if date is between given period of time
+                                                            if (actualDate != null) {
+                                                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+                                                                        (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                                                                    if (value.value != null) {
+                                                                        valuesCounter.incrementAndGet();
+                                                                        sumOfValues.addAndGet(value.value);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                }
+                                numberOfThreads.decrementAndGet();
+                            }
+                        }).start();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        while(numberOfThreads.get() != 0) {
+
+        }
+        return sumOfValues.get() / valuesCounter.get();
     }
 
 
