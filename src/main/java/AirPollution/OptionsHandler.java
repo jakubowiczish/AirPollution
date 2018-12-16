@@ -88,6 +88,15 @@ public class OptionsHandler {
         }
         return currentValue;
     }
+    private Date multiThreadParseStringToDate(String date) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+        } catch (ParseException e) {
+            System.out.println("The date: " + date + " could not be parsed");
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
     private Date parseStringToDate(String date) {
@@ -100,14 +109,14 @@ public class OptionsHandler {
         return null;
     }
 
-    public double averagePollutionValue(String startDate, String endDate, String parameterName) {
-        Date realStartDate = parseStringToDate(startDate);
-        Date realEndDate = parseStringToDate(endDate);
-        if (realStartDate == null || realEndDate == null) {
-            throw new IllegalArgumentException("These dates are not valid");
-        }
-        return countAveragePollution(realStartDate, realEndDate, parameterName);
-    }
+//    public double averagePollutionValue(String startDate, String endDate, String parameterName) {
+//        Date realStartDate = parseStringToDate(startDate);
+//        Date realEndDate = parseStringToDate(endDate);
+//        if (realStartDate == null || realEndDate == null) {
+//            throw new IllegalArgumentException("These dates are not valid");
+//        }
+//        return countAveragePollution(realStartDate, realEndDate, parameterName);
+//    }
 
     public double multiThreadAveragePollutionValue(String startDate, String endDate, String parameterName) {
         Date realStartDate = parseStringToDate(startDate);
@@ -118,59 +127,60 @@ public class OptionsHandler {
         return multiThreadCountAveragePollution(realStartDate, realEndDate, parameterName);
     }
 
-    private double countAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
-        double sumOfValues = 0;
-        int valuesCounter = 0;
-        double averageValue = 0;
-
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-        Station[] allStations;
-
-        if (parameterName != null) {
-            try {
-                allStations = factory.createStations(jsonFetcher.getAllStations());
-                System.out.println(allStations.length + " stations found\n");
-
-                for (Station station : allStations) {
-                    if (station != null) {
-                        Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(station.id));
-                        System.out.println(sensors.length + " sensors found for station: \"" + station.stationName + "\"\n");
-                        for (Sensor sensor : sensors) {
-                            if (sensor != null) {
-                                SensorData sensorData = factory.
-                                        createSensorData(jsonFetcher.getSensorData(sensor.id));
-                                if (sensorData != null) {
-                                    if (sensorData.key.equals(parameterName)) {
-                                        for (SensorData.Value value : sensorData.values) {
-                                            if (value.date.contains("-")) {
-                                                Date actualDate = parseStringToDate(value.date);
-                                                // if date is between given period of time
-                                                if (actualDate != null) {
-                                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-                                                            (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-                                                        if (value.value != null) {
-                                                            valuesCounter++;
-                                                            sumOfValues += value.value;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        averageValue = sumOfValues / valuesCounter;
-        return averageValue;
-    }
+//    private double countAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
+//        double sumOfValues = 0;
+//        int valuesCounter = 0;
+//        double averageValue = 0;
+//
+//        Factory factory = new Factory();
+//        JsonFetcher jsonFetcher = new JsonFetcher();
+//        Station[] allStations;
+//
+//        if (parameterName != null) {
+//            try {
+//                allStations = factory.createStations(jsonFetcher.getAllStations());
+//                System.out.println(allStations.length + " stations found\n");
+//
+//                for (Station station : allStations) {
+//                    if (station != null) {
+//                        Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(station.id));
+//                        System.out.println(sensors.length + " sensors found for station: \"" + station.stationName + "\"\n");
+//                        for (Sensor sensor : sensors) {
+//                            if (sensor != null) {
+//                                SensorData sensorData = factory.
+//                                        createSensorData(jsonFetcher.getSensorData(sensor.id));
+//                                if (sensorData != null) {
+//                                    if (sensorData.key.equals(parameterName)) {
+//                                        for (SensorData.Value value : sensorData.values) {
+//                                            if (value.date.contains("-")) {
+//                                                Date actualDate = parseStringToDate(value.date);
+//                                                // if date is between given period of time
+//                                                if (actualDate != null) {
+//                                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+//                                                            (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+//                                                        if (value.value != null) {
+//                                                            valuesCounter++;
+//                                                            sumOfValues += value.value;
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        System.out.println("COUNTER: " + valuesCounter);
+//        averageValue = sumOfValues / valuesCounter;
+//        return averageValue;
+//    }
 
 
     private double multiThreadCountAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
@@ -205,7 +215,7 @@ public class OptionsHandler {
                                                 if (sensorData.key.equals(parameterName)) {
                                                     for (SensorData.Value value : sensorData.values) {
                                                         if (value.date.contains("-")) {
-                                                            Date actualDate = parseStringToDate(value.date);
+                                                            Date actualDate = multiThreadParseStringToDate(value.date);
                                                             // if date is between given period of time
                                                             if (actualDate != null) {
                                                                 if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
@@ -223,6 +233,7 @@ public class OptionsHandler {
                                         }
                                     }
                                 } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                                 numberOfThreads.decrementAndGet();
                             }
@@ -236,6 +247,7 @@ public class OptionsHandler {
         while(numberOfThreads.get() != 0) {
 
         }
+        System.out.println("COUNTER: " + valuesCounter.get());
         return sumOfValues.get() / valuesCounter.get();
     }
 
