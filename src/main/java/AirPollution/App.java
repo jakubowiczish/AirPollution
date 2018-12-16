@@ -73,7 +73,7 @@ public class App implements Runnable {
 
 //        java -jar AirPollution-1.0-all.jar -sw "2018-12-16 07:00:00"
         if (sinceWhenDate != null) {
-            System.out.println(optionsHandler.mostFluctuatingParameter(sinceWhenDate));
+            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
         }
     }
 }
