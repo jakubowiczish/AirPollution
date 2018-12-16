@@ -7,7 +7,7 @@ public class JsonFetcher {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/station/findAll");
     }
 
-    public String getSensor(int stationID) throws IOException {
+    public String getSensors(int stationID) throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/station/sensors/" + stationID);
     }
 

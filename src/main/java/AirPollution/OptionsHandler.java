@@ -48,23 +48,26 @@ public class OptionsHandler {
             try {
                 allStations = factory.createStations(jsonFetcher.getAllStations());
                 int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-                SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(stationID));
 
-                if (sensorData.key.equals(parameterName)) {
-                    boolean validDate = false;
-                    for (SensorData.Value value : sensorData.values) {
-                        if (value.date.equals(date)) {
-                            validDate = true;
-                            currentValue = value.value;
+                Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(stationID));
+                for (Sensor sensor : sensors){
+                    SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.stationId));
+
+                    if (sensorData.key.equals(parameterName)) {
+                        boolean validDate = false;
+                        for (SensorData.Value value : sensorData.values) {
+                            if (value.date.equals(date)) {
+                                validDate = true;
+                                currentValue = value.value;
+                            }
                         }
+                        if (!validDate) {
+                            throw new IllegalArgumentException("There is no such date as " + date + " in system");
+                        }
+                    } else {
+                        throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
                     }
-                    if (!validDate) {
-                        throw new IllegalArgumentException("There is no such date as " + date + " in system");
-                    }
-                } else {
-                    throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -194,7 +197,6 @@ public class OptionsHandler {
 
 
     public String mostFluctuatingParameter(String sinceWhenString) {
-        String resultParameter = null;
 
         SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
         Date sinceWhenDate = null;

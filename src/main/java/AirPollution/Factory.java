@@ -9,16 +9,15 @@ public class Factory {
         return gson.fromJson(stationsString, Station[].class);
     }
 
+    public Sensor[] createSensors(String stationsString) {
+        Gson gson = new Gson();
+        return gson.fromJson(stationsString, Sensor[].class);
+    }
+
     public SensorData createSensorData(String stationsString) {
         Gson gson = new Gson();
         return gson.fromJson(stationsString, SensorData.class);
     }
-
-    public Sensor createSensor(String stationsString) {
-        Gson gson = new Gson();
-        return gson.fromJson(stationsString, Sensor.class);
-    }
-
 
     public AirIndex createAirIndex(String stationsString) {
         Gson gson = new Gson();
