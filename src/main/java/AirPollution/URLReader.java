@@ -20,5 +20,4 @@ public class URLReader {
         rd.close();
         return result.toString();
     }
-
 }

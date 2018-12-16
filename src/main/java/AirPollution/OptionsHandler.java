@@ -47,20 +47,24 @@ public class OptionsHandler {
                 boolean foundParameter = false;
 
                 for (Sensor sensor : sensors) {
-                    if (sensor.param.paramFormula.equals(parameterName)) {
-                        foundParameter = true;
-                        SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.id));
+                    if (sensor != null) {
+                        if (sensor.param.paramFormula.equals(parameterName)) {
+                            foundParameter = true;
+                            SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.id));
 
-                        if (sensorData.key.equals(parameterName)) {
-                            boolean validDate = false;
-                            for (SensorData.Value value : sensorData.values) {
-                                if (value.date.equals(date)) {
-                                    validDate = true;
-                                    currentValue = value.value;
+                            if (sensorData.key.equals(parameterName)) {
+                                boolean validDate = false;
+                                for (SensorData.Value value : sensorData.values) {
+                                    if (value != null) {
+                                        if (value.date.equals(date)) {
+                                            validDate = true;
+                                            currentValue = value.value;
+                                        }
+                                    }
                                 }
-                            }
-                            if (!validDate) {
-                                throw new IllegalArgumentException("There is no such date as " + date + " in system");
+                                if (!validDate) {
+                                    throw new IllegalArgumentException("There is no such date as " + date + " in system");
+                                }
                             }
                         }
                     }
@@ -76,29 +80,35 @@ public class OptionsHandler {
         return currentValue;
     }
 
-    public double averagePollutionValue(String startDate, String endDate, String parameterName) {
-        double sumOfValues = 0;
-        int valuesCounter = 0;
 
-        double averageValue = 0;
-
-        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
-        Date realStartDate = null;
-        Date realEndDate = null;
+    private Date parseStringToDate(String date) {
         try {
-            realStartDate = usedDateFormat.parse(startDate);
-            realEndDate = usedDateFormat.parse(endDate);
+            return usedDateFormat.parse(date);
         } catch (ParseException e) {
+            System.out.println("The date: " + date + " could not be parsed");
             e.printStackTrace();
         }
+        return null;
+    }
 
+    public double averagePollutionValue(String startDate, String endDate, String parameterName) {
+        Date realStartDate = parseStringToDate(startDate);
+        Date realEndDate = parseStringToDate(endDate);
         if (realStartDate == null || realEndDate == null) {
             throw new IllegalArgumentException("These dates are not valid");
         }
+        return countAveragePollution(realStartDate, realEndDate, parameterName);
+    }
+
+    private double countAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
+        double sumOfValues = 0;
+        int valuesCounter = 0;
+        double averageValue = 0;
 
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
-        Station[] allStations = null;
+        Station[] allStations;
+
         if (parameterName != null) {
             try {
                 allStations = factory.createStations(jsonFetcher.getAllStations());
@@ -106,101 +116,29 @@ public class OptionsHandler {
                 for (Station station : allStations) {
                     if (station != null) {
                         Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(station.id));
-
                         for (Sensor sensor : sensors) {
                             if (sensor != null) {
                                 SensorData sensorData = factory.
                                         createSensorData(jsonFetcher.getSensorData(sensor.id));
-
-                                if (sensorData.key.equals(parameterName)) {
-                                    for (SensorData.Value value : sensorData.values) {
-                                        try {
+                                if (sensorData != null) {
+                                    if (sensorData.key.equals(parameterName)) {
+                                        for (SensorData.Value value : sensorData.values) {
                                             if (value.date.contains("-")) {
-                                                Date actualDate = usedDateFormat.parse(value.date);
+                                                Date actualDate = parseStringToDate(value.date);
                                                 // if date is between given period of time
-                                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-                                                        (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-
-                                                    if (value.value != null) {
-                                                        valuesCounter++;
-                                                        sumOfValues += value.value;
+                                                if (actualDate != null) {
+                                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+                                                            (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                                                        if (value.value != null) {
+                                                            valuesCounter++;
+                                                            sumOfValues += value.value;
+                                                        }
                                                     }
                                                 }
                                             }
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
                                         }
                                     }
                                 }
-                            }
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        averageValue = sumOfValues / valuesCounter;
-        return averageValue;
-    }
-
-
-    public double averagePollutionValueForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
-        double sumOfValues = 0;
-        int valuesCounter = 0;
-
-        double averageValue = 0;
-
-        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
-        Date realStartDate = null;
-        Date realEndDate = null;
-        try {
-            realStartDate = usedDateFormat.parse(startDate);
-            realEndDate = usedDateFormat.parse(endDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if (realStartDate == null || realEndDate == null) {
-            throw new IllegalArgumentException("These dates are not valid");
-        }
-
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-
-        Sensor[] sensors = null;
-        try {
-            Station[] allStations = factory.createStations(jsonFetcher.getAllStations());
-            for (Station station : allStations) {
-                if (station.stationName.equals(stationName)) {
-                    sensors = factory.createSensors(jsonFetcher.getSensors(station.id));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (parameterName != null && sensors != null) {
-            try {
-                for (Sensor sensor : sensors) {
-                    SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.id));
-                    if (sensorData.key.equals(parameterName)) {
-                        for (SensorData.Value value : sensorData.values) {
-                            try {
-                                if (value.date.contains("-")) {
-                                    Date actualDate = usedDateFormat.parse(value.date);
-                                    // if date is between given period of time
-                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-                                            (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-
-                                        if (value.value != null) {
-                                            valuesCounter++;
-                                            sumOfValues += value.value;
-                                        }
-                                    }
-                                }
-                            } catch (ParseException e) {
-                                e.printStackTrace();
                             }
                         }
                     }
@@ -210,7 +148,6 @@ public class OptionsHandler {
                 e.printStackTrace();
             }
         }
-
         averageValue = sumOfValues / valuesCounter;
         return averageValue;
     }
@@ -218,15 +155,7 @@ public class OptionsHandler {
 
     public String mostFluctuatingParameter(String sinceWhenString) {
 
-        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
-        Date sinceWhenDate = null;
-
-        try {
-            sinceWhenDate = usedDateFormat.parse(sinceWhenString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
+        Date sinceWhenDate = parseStringToDate(sinceWhenString);
         if (sinceWhenDate == null) {
             throw new IllegalArgumentException("This date is not valid");
         }
@@ -234,7 +163,7 @@ public class OptionsHandler {
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
 
-        Station[] allStations = null;
+        Station[] allStations;
         HashMap<String, StationFluctuation> fluctuations = new HashMap<>();
         try {
             allStations = factory.createStations(jsonFetcher.getAllStations());
@@ -244,9 +173,9 @@ public class OptionsHandler {
 
             for (Station station : allStations) {
                 if (station != null) {
-                    int id = station.id;
-                    try {
-                        SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(id));
+                    Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(station.id));
+                    for (Sensor sensor : sensors) {
+                        SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.id));
                         maxValue = 0;
                         minValue = 1000;
 
@@ -254,9 +183,10 @@ public class OptionsHandler {
 
                         for (SensorData.Value value : sensorData.values) {
                             if (value.value != null) {
-                                try {
-                                    if (value.date.contains("-")) {
-                                        Date actualDate = usedDateFormat.parse(value.date);
+
+                                if (value.date.contains("-")) {
+                                    Date actualDate = parseStringToDate(value.date);
+                                    if (actualDate != null) {
                                         if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
                                             if (value.value < minValue) {
                                                 minValue = value.value;
@@ -265,10 +195,8 @@ public class OptionsHandler {
                                                 maxValue = value.value;
                                             }
                                         }
-
                                     }
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
+
                                 }
                             }
                         }
@@ -280,12 +208,9 @@ public class OptionsHandler {
                         } else {
                             fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
                         }
-                    } catch (IOException e) {
                     }
                 }
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -293,5 +218,69 @@ public class OptionsHandler {
         System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
         return "Parameter name: " + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
     }
+
+//    public double averagePollutionValueForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
+//        double sumOfValues = 0;
+//        int valuesCounter = 0;
+//
+//        double averageValue = 0;
+//
+//        Date realStartDate = parseStringToDate(startDate);
+//        Date realEndDate = parseStringToDate(endDate);
+//
+//        if (realStartDate == null || realEndDate == null) {
+//            throw new IllegalArgumentException("These dates are not valid");
+//        }
+//
+//        Factory factory = new Factory();
+//        JsonFetcher jsonFetcher = new JsonFetcher();
+//
+//        Sensor[] sensors = null;
+//        try {
+//            Station[] allStations = factory.createStations(jsonFetcher.getAllStations());
+//            for (Station station : allStations) {
+//                if (station.stationName.equals(stationName)) {
+//                    sensors = factory.createSensors(jsonFetcher.getSensors(station.id));
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        if (parameterName != null && sensors != null) {
+//            try {
+//                for (Sensor sensor : sensors) {
+//                    if (sensor != null) {
+//                        SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.id));
+//                        if (sensorData.key.equals(parameterName)) {
+//                            for (SensorData.Value value : sensorData.values) {
+//                                try {
+//                                    if (value.date.contains("-")) {
+//                                        Date actualDate = usedDateFormat.parse(value.date);
+//                                        // if date is between given period of time
+//                                        if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+//                                                (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+//
+//                                            if (value.value != null) {
+//                                                valuesCounter++;
+//                                                sumOfValues += value.value;
+//                                            }
+//                                        }
+//                                    }
+//                                } catch (ParseException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        averageValue = sumOfValues / valuesCounter;
+//        return averageValue;
+//    }
+
 }
 
