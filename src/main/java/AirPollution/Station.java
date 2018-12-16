@@ -13,10 +13,26 @@ public class Station {
         String name;
         Commune commune;
 
+        @Override
+        public String toString() {
+            return  "           id:" + id + "\n" +
+                    "           name:'" + name + '\'' + "\n" +
+                    "           commune: {" + "\n" + commune + "\n" +
+                    "       }";
+        }
+
         class Commune {
             String communeName;
             String districtName;
             String provinceName;
+
+            @Override
+            public String toString() {
+                return  "               communeName:'" + communeName + '\'' + "\n" +
+                        "               districtName:'" + districtName + '\'' + "\n" +
+                        "               provinceName:'"  + provinceName + '\'' + "\n" +
+                        "           }";
+            }
         }
     }
 
@@ -42,13 +58,13 @@ public class Station {
 
     @Override
     public String toString() {
-        return "Station{" +
-                "id=" + id +
-                ", stationName='" + stationName + '\'' +
-                ", gegrLat=" + gegrLat +
-                ", gegrLon=" + gegrLon +
-                ", city=" + city +
-                ", addressStreet='" + addressStreet + '\'' +
+        return "Station {" + "\n" +
+                "       id:" + id + "\n" +
+                "       stationName:'" + stationName + '\'' + "\n" +
+                "       gegrLat:" + gegrLat + "\n" +
+                "       gegrLon:" + gegrLon + "\n" +
+                "       city: {" + "\n" + city + "\n" +
+                "       addressStreet:'" + addressStreet + '\'' + "\n" +
                 '}';
     }
 }

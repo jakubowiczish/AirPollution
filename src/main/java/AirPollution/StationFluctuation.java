@@ -16,9 +16,6 @@ public class StationFluctuation {
 
     @Override
     public String toString() {
-        return "StationFluctuation{" +
-                "difference=" + difference +
-                ", station=" + station +
-                '}';
+        return "Difference between maximum and minimum pollution: " + difference + "\n" + station;
     }
 }

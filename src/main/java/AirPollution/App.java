@@ -28,6 +28,11 @@ public class App implements Runnable {
     @Option(names = {"-end", "--endDate"}, description = "End date of measurement")
     private String endDate;
 
+    @Option(names = {"-sw", "--sinceWhen"},
+            description = "Since when we want to have information about which parameter " +
+                    "has biggest difference between maximum and minimum value of pollution")
+    private String sinceWhenDate;
+
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Try adding -h for more information");
@@ -56,8 +61,10 @@ public class App implements Runnable {
 //        if(startDate != null && endDate != null && parameterName != null && stationName != null) {
 //            System.out.println(optionsHandler.averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName));
 //        }
-        System.out.println(optionsHandler.mostFluctuatingParameter("2018-12-16 07:00:00"));
-
+//        java -jar AirPollution-1.0-all.jar -sw "2018-12-16 07:00:00"
+        if (sinceWhenDate != null) {
+            System.out.println(optionsHandler.mostFluctuatingParameter(sinceWhenDate));
+        }
 
     }
 }
