@@ -3,9 +3,12 @@ package AirPollution;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
+
 
 public class OptionsHandler {
+
+    private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public String airIndexForStation(String stationName) {
         Factory factory = new Factory();
@@ -76,7 +79,7 @@ public class OptionsHandler {
 
         double averageValue = 0;
 
-        SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
         Date realStartDate = null;
         Date realEndDate = null;
         try {
@@ -87,7 +90,7 @@ public class OptionsHandler {
         }
 
         if (realStartDate == null || realEndDate == null) {
-            throw new IllegalArgumentException("This dates are not valid");
+            throw new IllegalArgumentException("These dates are not valid");
         }
 
         Factory factory = new Factory();
@@ -127,13 +130,13 @@ public class OptionsHandler {
     }
 
 
-    public double averagePollutionValueForConcreteStation(String startDate, String endDate, String parameterName, String stationName) {
+    public double averagePollutionValueForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
         double sumOfValues = 0;
         int valuesCounter = 0;
 
         double averageValue = 0;
 
-        SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
         Date realStartDate = null;
         Date realEndDate = null;
         try {
@@ -144,7 +147,7 @@ public class OptionsHandler {
         }
 
         if (realStartDate == null || realEndDate == null) {
-            throw new IllegalArgumentException("This dates are not valid");
+            throw new IllegalArgumentException("These dates are not valid");
         }
 
         Factory factory = new Factory();
@@ -187,7 +190,86 @@ public class OptionsHandler {
 
         averageValue = sumOfValues / valuesCounter;
         return averageValue;
+    }
 
+
+    public String mostFluctuatingParameter(String sinceWhenString) {
+        String resultParameter = null;
+
+        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
+        Date sinceWhenDate = null;
+
+        try {
+            sinceWhenDate = usedDateFormat.parse(sinceWhenString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (sinceWhenDate == null) {
+            throw new IllegalArgumentException("This date is not valid");
+        }
+
+        Factory factory = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
+
+        Station[] allStations = null;
+        HashMap<String, StationFluctuation> fluctuations = new HashMap<>();
+        try {
+            allStations = factory.createStations(jsonFetcher.getAllStations());
+
+            double maxValue;
+            double minValue;
+
+            for (Station station : allStations) {
+                if (station != null) {
+                    int id = station.id;
+                    try {
+                        SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(id));
+                        maxValue = 0;
+                        minValue = 1000;
+
+                        if (sensorData.values.length == 0) continue;
+
+                        for (SensorData.Value value : sensorData.values) {
+                            if (value.value != null) {
+                                try {
+                                    if (value.date.contains("-")) {
+                                        Date actualDate = usedDateFormat.parse(value.date);
+                                        if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
+                                            if (value.value < minValue) {
+                                                minValue = value.value;
+                                            }
+                                            if (value.value > maxValue) {
+                                                maxValue = value.value;
+                                            }
+                                        }
+
+                                    }
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                        Double difference = maxValue - minValue;
+
+                        if (fluctuations.get(sensorData.key) != null) {
+                            if (fluctuations.get(sensorData.key).getDifference() < difference)
+                                fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
+                        } else {
+                            fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
+                        }
+                    } catch (IOException e) {
+                    }
+                }
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
+        return Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
     }
 }
 

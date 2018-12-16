@@ -22,10 +22,10 @@ public class App implements Runnable {
     @Option(names = {"-par", "--parameterName"}, description = "Name of the parameter")
     private String parameterName;
 
-    @Option(names = {"-st", "--startDate"}, description = "Start date")
+    @Option(names = {"-st", "--startDate"}, description = "Start date of measurement")
     private String startDate;
 
-    @Option(names = {"-end", "--endDate"}, description = "End date")
+    @Option(names = {"-end", "--endDate"}, description = "End date of measurement")
     private String endDate;
 
     public static void main(String[] args) {
@@ -53,9 +53,10 @@ public class App implements Runnable {
 //        }
 //        java -jar AirPollution-1.0-all.jar --startDate="2018-12-15 19:00:00" --endDate="2018-12-15 21:00:00" --parameterName="O3" --stationName="Tarnów, ul. Bitwy pod Studziankami"
 //        java -jar AirPollution-1.0-all.jar -st "2018-12-15 19:00:00" -end "2018-12-15 21:00:00" -par "O3" -s "Tarnów, ul. Bitwy pod Studziankami"
-        if(startDate != null && endDate != null && parameterName != null && stationName != null) {
-            System.out.println(optionsHandler.averagePollutionValueForConcreteStation(startDate, endDate, parameterName, stationName));
-        }
+//        if(startDate != null && endDate != null && parameterName != null && stationName != null) {
+//            System.out.println(optionsHandler.averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName));
+//        }
+        System.out.println(optionsHandler.mostFluctuatingParameter("2018-12-16 07:00:00"));
 
 
     }

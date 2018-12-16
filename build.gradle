@@ -12,7 +12,7 @@ plugins {
 
     // Apply the application plugin to add support for building an application
     id 'application'
-    // for handling building shadowJar (supposedly confict between gradle and picocli) 
+    // helps making valid jar file
     id 'com.github.johnrengelman.shadow' version '4.0.3'
 }
 

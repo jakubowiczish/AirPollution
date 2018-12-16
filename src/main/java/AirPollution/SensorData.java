@@ -8,7 +8,7 @@ public class SensorData {
 
     class Value {
         String date;
-        double value;
+        Double value;
 
         @Override
         public String toString() {
