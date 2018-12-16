@@ -50,24 +50,32 @@ public class OptionsHandler {
                 int stationID = Station.returnIdOfGivenStation(allStations, stationName);
 
                 Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(stationID));
-                for (Sensor sensor : sensors){
-                    SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.stationId));
+                boolean foundParameter = false;
 
-                    if (sensorData.key.equals(parameterName)) {
-                        boolean validDate = false;
-                        for (SensorData.Value value : sensorData.values) {
-                            if (value.date.equals(date)) {
-                                validDate = true;
-                                currentValue = value.value;
+                for (Sensor sensor : sensors) {
+                    if (sensor.param.paramFormula.equals(parameterName)) {
+                        foundParameter = true;
+                        SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.id));
+
+                        if (sensorData.key.equals(parameterName)) {
+                            boolean validDate = false;
+                            for (SensorData.Value value : sensorData.values) {
+                                if (value.date.equals(date)) {
+                                    validDate = true;
+                                    currentValue = value.value;
+                                }
+                            }
+                            if (!validDate) {
+                                throw new IllegalArgumentException("There is no such date as " + date + " in system");
                             }
                         }
-                        if (!validDate) {
-                            throw new IllegalArgumentException("There is no such date as " + date + " in system");
-                        }
-                    } else {
-                        throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
                     }
                 }
+
+                if (!foundParameter) {
+                    throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -105,23 +113,30 @@ public class OptionsHandler {
 
                 for (Station station : allStations) {
                     int id = station.id;
-                    SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(id));
-                    if (sensorData.key.equals(parameterName)) {
-                        valuesCounter++;
-                        for (SensorData.Value value : sensorData.values) {
-                            try {
-                                if (value.date.contains("-")) {
-                                    Date actualDate = usedDateFormat.parse(value.date);
-                                    // if date is between given period of time
-                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) && (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-                                        sumOfValues += value.value;
+
+                    Sensor[] sensors = factory.createSensors(jsonFetcher.getSensors(id));
+                    for (Sensor sensor : sensors) {
+                        if (sensor != null) {
+                            SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensor.stationId));
+                            if (sensorData.key.equals(parameterName)) {
+                                valuesCounter++;
+                                for (SensorData.Value value : sensorData.values) {
+                                    try {
+                                        if (value.date.contains("-")) {
+                                            Date actualDate = usedDateFormat.parse(value.date);
+                                            // if date is between given period of time
+                                            if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) && (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                                                sumOfValues += value.value;
+                                            }
+                                        }
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
                                     }
                                 }
-                            } catch (ParseException e) {
-                                e.printStackTrace();
                             }
                         }
                     }
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -133,67 +148,67 @@ public class OptionsHandler {
     }
 
 
-    public double averagePollutionValueForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
-        double sumOfValues = 0;
-        int valuesCounter = 0;
-
-        double averageValue = 0;
-
-        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
-        Date realStartDate = null;
-        Date realEndDate = null;
-        try {
-            realStartDate = usedDateFormat.parse(startDate);
-            realEndDate = usedDateFormat.parse(endDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        if (realStartDate == null || realEndDate == null) {
-            throw new IllegalArgumentException("These dates are not valid");
-        }
-
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-
-        int id = -1;
-        try {
-            Station[] allStations = factory.createStations(jsonFetcher.getAllStations());
-            for (Station station : allStations) {
-                if (station.stationName.equals(stationName)) {
-                    id = station.id;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (parameterName != null) {
-            try {
-                SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(id));
-                if (sensorData.key.equals(parameterName)) {
-                    valuesCounter++;
-                    for (SensorData.Value value : sensorData.values) {
-                        try {
-                            if (value.date.contains("-")) {
-                                Date actualDate = usedDateFormat.parse(value.date);
-                                // if date is between given period of time
-                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) && (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-                                    sumOfValues += value.value;
-                                }
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        averageValue = sumOfValues / valuesCounter;
-        return averageValue;
-    }
+//    public double averagePollutionValueForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
+//        double sumOfValues = 0;
+//        int valuesCounter = 0;
+//
+//        double averageValue = 0;
+//
+//        SimpleDateFormat usedDateFormat = OptionsHandler.usedDateFormat;
+//        Date realStartDate = null;
+//        Date realEndDate = null;
+//        try {
+//            realStartDate = usedDateFormat.parse(startDate);
+//            realEndDate = usedDateFormat.parse(endDate);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (realStartDate == null || realEndDate == null) {
+//            throw new IllegalArgumentException("These dates are not valid");
+//        }
+//
+//        Factory factory = new Factory();
+//        JsonFetcher jsonFetcher = new JsonFetcher();
+//
+//        int id = -1;
+//        try {
+//            Station[] allStations = factory.createStations(jsonFetcher.getAllStations());
+//            for (Station station : allStations) {
+//                if (station.stationName.equals(stationName)) {
+//                    id = station.id;
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        if (parameterName != null) {
+//            try {
+//                SensorData sensorData = factory.createSensorData(jsonFetcher.getSensorData(id));
+//                if (sensorData.key.equals(parameterName)) {
+//                    valuesCounter++;
+//                    for (SensorData.Value value : sensorData.values) {
+//                        try {
+//                            if (value.date.contains("-")) {
+//                                Date actualDate = usedDateFormat.parse(value.date);
+//                                // if date is between given period of time
+//                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) && (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+//                                    sumOfValues += value.value;
+//                                }
+//                            }
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        averageValue = sumOfValues / valuesCounter;
+//        return averageValue;
+//    }
 
 
     public String mostFluctuatingParameter(String sinceWhenString) {
