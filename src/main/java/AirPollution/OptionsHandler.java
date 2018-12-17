@@ -89,6 +89,7 @@ public class OptionsHandler {
         }
         return currentValue;
     }
+
     private Date multiThreadParseStringToDate(String date) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
@@ -305,13 +306,50 @@ public class OptionsHandler {
                 e.printStackTrace();
             }
         }
-        while(numberOfThreads.get() != 0) {
+        while (numberOfThreads.get() != 0) {
 
         }
 //        System.out.println("COUNTER: " + valuesCounter.get());
         return sumOfValues.get() / valuesCounter.get();
     }
 
+    private Station[] getAllStations() {
+        Factory factory = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
+        Station[] allStations = new Station[0];
+        try {
+            allStations = factory.createStations(jsonFetcher.getAllStations());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(allStations.length + " stations found\n");
+        return allStations;
+    }
+
+    private Sensor[] getAllSensorsForSpecificStation(int stationID, String stationName) {
+        Factory factory = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
+        Sensor[] allSensors = new Sensor[0];
+        try {
+            allSensors = factory.createSensors(jsonFetcher.getSensors(stationID));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(allSensors.length + " sensors found for station: \"" + stationName + "\"\n");
+        return allSensors;
+    }
+
+    private SensorData getSensorDataForSpecificSensor(int sensorID) {
+        Factory factory = new Factory();
+        JsonFetcher jsonFetcher = new JsonFetcher();
+        SensorData sensorData = null;
+        try {
+            sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensorID));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sensorData;
+    }
 
     public String multiThreadMostFluctuatingParameter(String sinceWhenString) {
         final AtomicInteger numberOfThreads = new AtomicInteger();
@@ -462,6 +500,21 @@ public class OptionsHandler {
 
 //    public String parameterWithLowestValueAtSpecificTime(String date) {
 //        Date specificDate = parseStringToDate(date);
+//        if (specificDate == null) {
+//            throw new IllegalArgumentException("This date is not valid");
+//        }
+//        Factory factory = new Factory();
+//        JsonFetcher jsonFetcher = new JsonFetcher();
+//
+//        Station[] allStations;
+//        try {
+//            allStations = factory.createStations(jsonFetcher.getAllStations());
+//
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
 //
 //    }
 }
