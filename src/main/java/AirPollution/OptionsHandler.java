@@ -45,9 +45,17 @@ public class OptionsHandler {
             e.printStackTrace();
         }
 
-        Station[] validStations = getNoNullArray(Station.class, allStations);
-//        System.out.println(validStations.length + " stations found\n");
-        return validStations;
+        //        System.out.println(validStations.length + " stations found\n");
+        return getNoNullArray(Station.class, allStations);
+    }
+
+    public String printerNamesOfAllStations() {
+        Station[] stations = getAllStations();
+        StringBuilder namesBuilder = new StringBuilder();
+        for(Station station : stations) {
+            namesBuilder.append(station.stationName).append("\n");
+        }
+        return namesBuilder.toString();
     }
 
 

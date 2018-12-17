@@ -16,82 +16,86 @@ import picocli.CommandLine.Option;
         )
 public class App implements Runnable {
 
+    @Option(names = {"-a", "-allStations"}, description = "Printing all available stations")
+    private boolean all;
+
     @Option(names = {"-s", "--stationName"}, description = "Station name for Air Index")
     private String stationName;
 
-    @Option(names = {"-d", "--date"}, description = "Date of measurement")
+    @Option(names = {"-d", "--date"}, description = "Date of measurement, \nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String date;
 
-    @Option(names = {"-par", "--parameterName"}, description = "Name of the parameter")
+    @Option(names = {"-p", "--parameterName"}, description = "Name of the parameter")
     private String parameterName;
 
-    @Option(names = {"-st", "--startDate"}, description = "Start date of measurement")
+    @Option(names = {"-b", "--beginDate"}, description = "Start date of measurement, " +
+            "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String startDate;
 
-    @Option(names = {"-end", "--endDate"}, description = "End date of measurement")
+    @Option(names = {"-e", "--endDate"}, description = "End date of measurement, " +
+            "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String endDate;
 
-    @Option(names = {"-sw", "--sinceWhen"},
+    @Option(names = {"-w", "--sinceWhen"},
             description = "Since when we want to have information about which parameter " +
-                    "has biggest difference between maximum and minimum value of pollution")
+                    "has biggest difference between maximum and minimum value of pollution, " +
+                    "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String sinceWhenDate;
 
-    @Option(names = {"-lw", "--lowestWhen"}, description = "Parameter with lowest value on given date")
+    @Option(names = {"-l", "--lowestWhen"}, description = "Give this date when you want to check which parameter's " +
+            "pollution was lowest at given time, \nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String dateForLowestParameter;
 
+
     public static void main(String[] args) {
-        CommandLine.run(new App(), args);
+        if (args.length == 0) {
+//            Displays information about the usage of the program when no arguments are given
+            CommandLine.usage(new App(), System.out);
+        } else {
+            CommandLine.run(new App(), args);
+        }
     }
+
 
     @Override
     public void run() {
         OptionsHandler optionsHandler = new OptionsHandler();
 
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-15 21:00:00" -b "2018-12-16 17:00:00" -e "2018-12-16 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 
 
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -par "O3" -d "2018-12-15 21:00:00" -st "2018-12-16 17:00:00" -end "2018-12-16 21:00:00" -sw "2018-12-16 07:00:00"
+        if (stationName != null) {
+            System.out.println(optionsHandler.airIndexForStation(stationName));
+        }
+
+        if (stationName != null && date != null && parameterName != null) {
+            System.out.println(optionsHandler.currentParameterValue(date, stationName, parameterName));
+        }
 
 
-//         java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami"
-//        if (stationName != null) {
-//            System.out.println(optionsHandler.airIndexForStation(stationName));
-//        }
+        if (startDate != null && endDate != null && parameterName != null) {
+            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
+                    + endDate + ": " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
+        }
 
-//         java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -par "O3" -d "2018-12-15 21:00:00"
-//        if (stationName != null && date != null && parameterName != null) {
-//            System.out.println(optionsHandler.currentParameterValue(date, stationName, parameterName));
-//        }
-
-
-//        java -jar AirPollution-1.0-all.jar -st "2018-12-16 17:00:00" -end "2018-12-16 21:00:00" -par "O3"
-//        if (startDate != null && endDate != null && parameterName != null) {
-//            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
-//                    + endDate + ": " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
-//        }
-
-//        "Żywiec, ul. Kopernika  83 a"
-//        java -jar AirPollution-1.0-all.jar --startDate="2018-12-16 17:00:00" --endDate="2018-12-16 18:00:00"--parameterName="O3" --stationName="Tarnów, ul. Bitwy pod Studziankami"
-//        java -jar AirPollution-1.0-all.jar -st "2018-12-16 17:00:00" -end "2018-12-16 21:00:00" -par "O3" -s "Tarnów, ul. Bitwy pod Studziankami"
-//        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
-//            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
-//                    + startDate + " to " + endDate + ": " +
-//                    optionsHandler.averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName));
-//        }
+        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
+            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
+                    + startDate + " to " + endDate + ": " +
+                    optionsHandler.averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName));
+        }
 
 
+        if (sinceWhenDate != null) {
+            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
+        }
 
-//        java -jar AirPollution-1.0-all.jar -sw "2018-12-16 07:00:00"
-//        if (sinceWhenDate != null) {
-//            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
-//        }
-
-        // 5
-//          java -jar AirPollution-1.0-all.jar -lw "2018-12-17 12:00:00"
         if(dateForLowestParameter != null) {
             System.out.println(optionsHandler.multiThreadParameterWithLowestValueAtSpecificTime(dateForLowestParameter));
         }
 
-        //Displays information about usage of the program when no arguments are given
-        CommandLine.usage(this, System.out);
+
+        if (all) {
+            System.out.println(optionsHandler.printerNamesOfAllStations());
+        }
     }
 }
