@@ -9,7 +9,10 @@ import picocli.CommandLine.Option;
                 name = "Air Pollution in Poland",
                 version = "Air Pollution in Poland,\nv1.0 by Jakub Płotnikowski 2018,\nall rights reserved",
                 description = "Gives various information about air quality in Poland",
-                mixinStandardHelpOptions = true
+                mixinStandardHelpOptions = true,
+                descriptionHeading = "%n@|bold,underline Description:|@%n%n",
+                optionListHeading = "%n@|bold,underline Options:|@%n"
+
         )
 public class App implements Runnable {
 
@@ -37,9 +40,6 @@ public class App implements Runnable {
     private String dateForLowestParameter;
 
     public static void main(String[] args) {
-        if (args.length == 0) {
-            System.out.println("Try adding -h for more information");
-        }
         CommandLine.run(new App(), args);
     }
 
@@ -90,5 +90,8 @@ public class App implements Runnable {
         if(dateForLowestParameter != null) {
             System.out.println(optionsHandler.multiThreadParameterWithLowestValueAtSpecificTime(dateForLowestParameter));
         }
+
+        //Displays information about usage of the program when no arguments are given
+        CommandLine.usage(this, System.out);
     }
 }
