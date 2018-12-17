@@ -56,24 +56,24 @@ public class App implements Runnable {
 
 
 //        java -jar AirPollution-1.0-all.jar -st "2018-12-16 17:00:00" -end "2018-12-16 21:00:00" -par "O3"
-//        if (startDate != null && endDate != null && parameterName != null) {
-//            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
-//                    + endDate + ": " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
-//        }
+        if (startDate != null && endDate != null && parameterName != null) {
+            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
+                    + endDate + ": " + optionsHandler.averagePollutionValue(startDate, endDate, parameterName));
+        }
 
 //        "Żywiec, ul. Kopernika  83 a"
 //        java -jar AirPollution-1.0-all.jar --startDate="2018-12-16 17:00:00" --endDate="2018-12-16 18:00:00"--parameterName="O3" --stationName="Tarnów, ul. Bitwy pod Studziankami"
 //        java -jar AirPollution-1.0-all.jar -st "2018-12-16 17:00:00" -end "2018-12-16 21:00:00" -par "O3" -s "Tarnów, ul. Bitwy pod Studziankami"
 //        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
 //            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
-//                    + startDate + " " + endDate + ": " +
+//                    + startDate + " to " + endDate + ": " +
 //                    optionsHandler.averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName));
 //        }
 
 
 //        java -jar AirPollution-1.0-all.jar -sw "2018-12-16 07:00:00"
-        if (sinceWhenDate != null) {
-            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
-        }
+//        if (sinceWhenDate != null) {
+//            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
+//        }
     }
 }
