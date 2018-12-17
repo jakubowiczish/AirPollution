@@ -3,6 +3,7 @@ package AirPollution;
 import com.google.common.util.concurrent.AtomicDouble;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -14,6 +15,26 @@ public class OptionsHandler {
 
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private <T> T[] getNoNullArray(Class<T> tClass, T[] array) {
+        int validElementsCounter = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] != null) {
+                validElementsCounter++;
+            }
+        }
+
+        T[] newArray = (T[]) Array.newInstance(tClass, validElementsCounter);
+        int j = 0;
+
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] != null) {
+                newArray[j++] = array[i];
+            }
+        }
+        return newArray;
+    }
+
+
     private Station[] getAllStations() {
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
@@ -23,21 +44,28 @@ public class OptionsHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(allStations.length + " stations found\n");
-        return allStations;
+
+        Station[] validStations = getNoNullArray(Station.class, allStations);
+//        System.out.println(validStations.length + " stations found\n");
+        return validStations;
     }
+
 
     private Sensor[] getAllSensorsForSpecificStation(int stationID, String stationName) {
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
         Sensor[] allSensors = new Sensor[0];
+
         try {
             allSensors = factory.createSensors(jsonFetcher.getSensors(stationID));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(allSensors.length + " sensors found for station: \"" + stationName + "\"\n");
-        return allSensors;
+
+        Sensor[] validSensors = getNoNullArray(Sensor.class, allSensors);
+
+//        System.out.println(validSensors.length + " sensors found for station: \"" + stationName + "\"\n");
+        return validSensors;
     }
 
     private SensorData getSensorDataForSpecificSensor(int sensorID) {
@@ -88,26 +116,26 @@ public class OptionsHandler {
             boolean foundParameter = false;
 
             for (Sensor sensor : sensors) {
-                if (sensor != null) {
-                    if (sensor.param.paramFormula.equals(parameterName)) {
-                        foundParameter = true;
-                        SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-                        if (sensorData.key.equals(parameterName)) {
-                            boolean validDate = false;
-                            for (SensorData.Value value : sensorData.values) {
-                                if (value != null) {
-                                    if (value.date.equals(date)) {
-                                        validDate = true;
-                                        currentValue = value.value;
-                                    }
+
+                if (sensor.param.paramFormula.equals(parameterName)) {
+                    foundParameter = true;
+                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                    if (sensorData.key.equals(parameterName)) {
+                        boolean validDate = false;
+                        for (SensorData.Value value : sensorData.values) {
+                            if (value != null) {
+                                if (value.date.equals(date)) {
+                                    validDate = true;
+                                    currentValue = value.value;
                                 }
                             }
-                            if (!validDate) {
-                                throw new IllegalArgumentException("There is no such date as " + date + " in system");
-                            }
+                        }
+                        if (!validDate) {
+                            throw new IllegalArgumentException("There is no such date as " + date + " in system");
                         }
                     }
                 }
+
             }
             if (!foundParameter) {
                 throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
@@ -177,27 +205,26 @@ public class OptionsHandler {
         }
         if (parameterName != null && sensors != null) {
             for (Sensor sensor : sensors) {
-                if (sensor != null) {
-                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-                    if (sensorData.key.equals(parameterName)) {
-                        for (SensorData.Value value : sensorData.values) {
-                            if (value.date.contains("-")) {
-                                Date actualDate = parseStringToDate(value.date);
-                                // if date is between given period of time
-                                if (actualDate != null) {
-                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-                                            (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                if (sensorData.key.equals(parameterName)) {
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value.date.contains("-")) {
+                            Date actualDate = parseStringToDate(value.date);
+                            // if date is between given period of time
+                            if (actualDate != null) {
+                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+                                        (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
 
-                                        if (value.value != null) {
-                                            valuesCounter++;
-                                            sumOfValues += value.value;
-                                        }
+                                    if (value.value != null) {
+                                        valuesCounter++;
+                                        sumOfValues += value.value;
                                     }
                                 }
                             }
                         }
                     }
                 }
+
             }
         }
         averageValue = sumOfValues / valuesCounter;
@@ -212,25 +239,23 @@ public class OptionsHandler {
 //
 //        if (parameterName != null) {
 //            for (Station station : allStations) {
-//                if (station != null) {
-//                    Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
-//                    for (Sensor sensor : sensors) {
-//                        if (sensor != null) {
-//                            SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-//                            if (sensorData != null) {
-//                                if (sensorData.key.equals(parameterName)) {
-//                                    for (SensorData.Value value : sensorData.values) {
-//                                        if (value.date.contains("-")) {
-//                                            Date actualDate = parseStringToDate(value.date);
-//                                            // if date is between given period of time
-//                                            if (actualDate != null) {
-//                                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-//                                                        (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-//                                                    if (value.value != null) {
-//                                                        valuesCounter++;
-//                                                        sumOfValues += value.value;
-//                                                    }
-//                                                }
+//
+//                Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+//                for (Sensor sensor : sensors) {
+//
+//                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+//                    if (sensorData != null) {
+//                        if (sensorData.key.equals(parameterName)) {
+//                            for (SensorData.Value value : sensorData.values) {
+//                                if (value.date.contains("-")) {
+//                                    Date actualDate = parseStringToDate(value.date);
+//                                    // if date is between given period of time
+//                                    if (actualDate != null) {
+//                                        if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+//                                                (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+//                                            if (value.value != null) {
+//                                                valuesCounter++;
+//                                                sumOfValues += value.value;
 //                                            }
 //                                        }
 //                                    }
@@ -238,7 +263,9 @@ public class OptionsHandler {
 //                            }
 //                        }
 //                    }
+//
 //                }
+//
 //            }
 //        }
 //        averageValue = sumOfValues / valuesCounter;
@@ -254,27 +281,23 @@ public class OptionsHandler {
 
         if (parameterName != null) {
             for (Station station : allStations) {
-                if (station != null) {
-                    numberOfThreads.incrementAndGet();
-                    new Thread(() -> {
-                        Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
-                        for (Sensor sensor : sensors) {
-                            if (sensor != null) {
-                                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-                                if (sensorData != null) {
-                                    if (sensorData.key.equals(parameterName)) {
-                                        for (SensorData.Value value : sensorData.values) {
-                                            if (value.date.contains("-")) {
-                                                Date actualDate = multiThreadParseStringToDate(value.date);
-                                                // if date is between given period of time
-                                                if (actualDate != null) {
-                                                    if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-                                                            (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-                                                        if (value.value != null) {
-                                                            valuesCounter.incrementAndGet();
-                                                            sumOfValues.addAndGet(value.value);
-                                                        }
-                                                    }
+                numberOfThreads.incrementAndGet();
+                new Thread(() -> {
+                    Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+                    for (Sensor sensor : sensors) {
+                        SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                        if (sensorData != null) {
+                            if (sensorData.key.equals(parameterName)) {
+                                for (SensorData.Value value : sensorData.values) {
+                                    if (value.date.contains("-")) {
+                                        Date actualDate = multiThreadParseStringToDate(value.date);
+                                        // if date is between given period of time
+                                        if (actualDate != null) {
+                                            if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+                                                    (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                                                if (value.value != null) {
+                                                    valuesCounter.incrementAndGet();
+                                                    sumOfValues.addAndGet(value.value);
                                                 }
                                             }
                                         }
@@ -282,9 +305,11 @@ public class OptionsHandler {
                                 }
                             }
                         }
-                        numberOfThreads.decrementAndGet();
-                    }).start();
-                }
+
+                    }
+                    numberOfThreads.decrementAndGet();
+                }).start();
+
             }
         }
 
@@ -305,57 +330,58 @@ public class OptionsHandler {
         ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
 
         for (Station station : allStations) {
-            if (station != null) {
-                numberOfThreads.incrementAndGet();
-                new Thread(() -> {
-                    Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
 
-                    for (Sensor sensor : sensors) {
-                        SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-                        double maxValue = 0;
-                        double minValue = 1000;
+            numberOfThreads.incrementAndGet();
+            new Thread(() -> {
+                Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
 
-                        if (sensorData.values.length == 0) continue;
+                for (Sensor sensor : sensors) {
+                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                    double maxValue = 0;
+                    double minValue = 1000;
 
-                        for (SensorData.Value value : sensorData.values) {
-                            if (value.value != null) {
+                    if (sensorData.values.length == 0) continue;
 
-                                if (value.date.contains("-")) {
-                                    Date actualDate = multiThreadParseStringToDate(value.date);
-                                    if (actualDate != null) {
-                                        if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
-                                            if (value.value < minValue) {
-                                                minValue = value.value;
-                                            }
-                                            if (value.value > maxValue) {
-                                                maxValue = value.value;
-                                            }
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value.value != null) {
+
+                            if (value.date.contains("-")) {
+                                Date actualDate = multiThreadParseStringToDate(value.date);
+                                if (actualDate != null) {
+                                    if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
+                                        if (value.value < minValue) {
+                                            minValue = value.value;
+                                        }
+                                        if (value.value > maxValue) {
+                                            maxValue = value.value;
                                         }
                                     }
                                 }
                             }
                         }
-                        Double difference = maxValue - minValue;
-
-                        if (fluctuations.get(sensorData.key) != null) {
-                            if (fluctuations.get(sensorData.key).getDifference() < difference)
-                                fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-                        } else {
-                            fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-                        }
                     }
-                    numberOfThreads.decrementAndGet();
-                }).start();
-            }
+                    Double difference = maxValue - minValue;
+
+                    if (fluctuations.get(sensorData.key) != null) {
+                        if (fluctuations.get(sensorData.key).getDifference() < difference)
+                            fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
+                    } else {
+                        fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
+                    }
+                }
+                numberOfThreads.decrementAndGet();
+            }).start();
+
         }
         while (numberOfThreads.get() != 0) {
 
         }
         System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
-        return "Parameter name: " + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
+        return "Most fluctuating parameter since " + sinceWhenDate + " is "
+                + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
 
     }
-
+//
 //    public String mostFluctuatingParameter(String sinceWhenString) {
 //
 //        Date sinceWhenDate = parseStringToDate(sinceWhenString);
@@ -370,66 +396,75 @@ public class OptionsHandler {
 //        double minValue;
 //
 //        for (Station station : allStations) {
-//            if (station != null) {
-//                Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
-//                for (Sensor sensor : sensors) {
-//                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-//                    maxValue = 0;
-//                    minValue = 1000;
 //
-//                    if (sensorData.values.length == 0) continue;
+//            Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+//            for (Sensor sensor : sensors) {
+//                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+//                maxValue = 0;
+//                minValue = 1000;
 //
-//                    for (SensorData.Value value : sensorData.values) {
-//                        if (value.value != null) {
+//                if (sensorData.values.length == 0) continue;
 //
-//                            if (value.date.contains("-")) {
-//                                Date actualDate = parseStringToDate(value.date);
-//                                if (actualDate != null) {
-//                                    if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
-//                                        if (value.value < minValue) {
-//                                            minValue = value.value;
-//                                        }
-//                                        if (value.value > maxValue) {
-//                                            maxValue = value.value;
-//                                        }
+//                for (SensorData.Value value : sensorData.values) {
+//                    if (value.value != null) {
+//
+//                        if (value.date.contains("-")) {
+//                            Date actualDate = parseStringToDate(value.date);
+//                            if (actualDate != null) {
+//                                if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
+//                                    if (value.value < minValue) {
+//                                        minValue = value.value;
+//                                    }
+//                                    if (value.value > maxValue) {
+//                                        maxValue = value.value;
 //                                    }
 //                                }
-//
 //                            }
+//
 //                        }
 //                    }
-//                    Double difference = maxValue - minValue;
+//                }
+//                Double difference = maxValue - minValue;
 //
-//                    if (fluctuations.get(sensorData.key) != null) {
-//                        if (fluctuations.get(sensorData.key).getDifference() < difference)
-//                            fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-//                    } else {
+//                if (fluctuations.get(sensorData.key) != null) {
+//                    if (fluctuations.get(sensorData.key).getDifference() < difference)
 //                        fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-//                    }
+//                } else {
+//                    fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
 //                }
 //            }
+//
 //        }
 //
 //        System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
 //        return "Parameter name: " + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
 //    }
 
+
 //    public String parameterWithLowestValueAtSpecificTime(String date) {
 //        Date specificDate = parseStringToDate(date);
 //        if (specificDate == null) {
 //            throw new IllegalArgumentException("This date is not valid");
 //        }
-//        Factory factory = new Factory();
-//        JsonFetcher jsonFetcher = new JsonFetcher();
 //
-//        Station[] allStations;
-//        try {
-//            allStations = factory.createStations(jsonFetcher.getAllStations());
+//        Station[] allStations = getAllStations();
+//        for (Station station : allStations) {
 //
+//            Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+//            for (Sensor sensor : sensors) {
+//                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+//                if (sensorData.values.length == 0) continue;
+//                for (SensorData.Value value : sensorData.values) {
+//                    if (value.value != null) {
 //
-//        } catch (IOException e) {
-//            e.printStackTrace();
+//                    }
+//                }
+//
+//            }
+//
 //        }
+//
+//
 //    }
 }
 
