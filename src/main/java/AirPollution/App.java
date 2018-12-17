@@ -58,7 +58,7 @@ public class App implements Runnable {
 //        java -jar AirPollution-1.0-all.jar -st "2018-12-16 17:00:00" -end "2018-12-16 21:00:00" -par "O3"
         if (startDate != null && endDate != null && parameterName != null) {
             System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
-                    + endDate + ": " + optionsHandler.averagePollutionValue(startDate, endDate, parameterName));
+                    + endDate + ": " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
         }
 
 //        "Żywiec, ul. Kopernika  83 a"
