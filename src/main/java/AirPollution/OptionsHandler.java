@@ -377,7 +377,7 @@ public class OptionsHandler {
 
         }
         System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
-        return "Most fluctuating parameter since " + sinceWhenDate + " is "
+        return "Most fluctuating parameter since " + sinceWhenString + " is "
                 + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
 
     }
@@ -440,6 +440,64 @@ public class OptionsHandler {
 //        return "Parameter name: " + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
 //    }
 
+    public String multiThreadParameterWithLowestValueAtSpecificTime(String date) {
+        final AtomicInteger numberOfThreads = new AtomicInteger();
+
+        Date specificDate = parseStringToDate(date);
+        if (specificDate == null) {
+            throw new IllegalArgumentException("This specificDate is not valid");
+        }
+        Station[] allStations = getAllStations();
+        ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
+
+        for (Station station : allStations) {
+
+            numberOfThreads.incrementAndGet();
+            new Thread(() -> {
+                Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+
+                for (Sensor sensor : sensors) {
+                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                    double minValue = 10000;
+
+                    if (sensorData.values.length == 0) continue;
+
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value.value != null) {
+
+                            if (value.date.contains("-")) {
+                                Date actualDate = multiThreadParseStringToDate(value.date);
+                                if (actualDate != null) {
+                                    if (actualDate.after(specificDate) || actualDate.equals(specificDate)) {
+                                        if (value.value < minValue) {
+                                            minValue = value.value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (fluctuations.get(sensorData.key) != null) {
+                        if (fluctuations.get(sensorData.key) > minValue)
+                            fluctuations.put(sensorData.key, minValue);
+                    } else {
+                        fluctuations.put(sensorData.key, minValue);
+                    }
+                }
+                numberOfThreads.decrementAndGet();
+            }).start();
+
+        }
+        while (numberOfThreads.get() != 0) {
+
+        }
+        System.out.println("The lowest parameter value is " +
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue());
+        return "Parameter with lowest value on " + date + " is " +
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
+
+    }
 
 //    public String parameterWithLowestValueAtSpecificTime(String date) {
 //        Date specificDate = parseStringToDate(date);
@@ -453,6 +511,10 @@ public class OptionsHandler {
 //            Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
 //            for (Sensor sensor : sensors) {
 //                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+//
+//                double maxValue = 0;
+//                double minValue = 1000;
+//
 //                if (sensorData.values.length == 0) continue;
 //                for (SensorData.Value value : sensorData.values) {
 //                    if (value.value != null) {

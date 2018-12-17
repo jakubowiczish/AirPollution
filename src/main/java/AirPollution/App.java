@@ -33,6 +33,9 @@ public class App implements Runnable {
                     "has biggest difference between maximum and minimum value of pollution")
     private String sinceWhenDate;
 
+    @Option(names = {"-lw", "--lowestWhen"}, description = "Parameter with lowest value on given date")
+    private String dateForLowestParameter;
+
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Try adding -h for more information");
@@ -76,9 +79,16 @@ public class App implements Runnable {
 //        }
 
 
+
 //        java -jar AirPollution-1.0-all.jar -sw "2018-12-16 07:00:00"
-        if (sinceWhenDate != null) {
-            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
+//        if (sinceWhenDate != null) {
+//            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
+//        }
+
+        // 5
+//          java -jar AirPollution-1.0-all.jar -lw "2018-12-17 12:00:00"
+        if(dateForLowestParameter != null) {
+            System.out.println(optionsHandler.multiThreadParameterWithLowestValueAtSpecificTime(dateForLowestParameter));
         }
     }
 }
