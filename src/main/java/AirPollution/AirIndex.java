@@ -37,32 +37,32 @@ public class AirIndex {
 
     @Override
     public String toString() {
-        return "AIR_INDEX {" + "\n" +
-                "   id:                  " + id + "\n" +
-                "   stIndexLevel: " + stIndexLevel + "\n" +
-                "   stCalcDate:         '" + stCalcDate + '\'' + "\n" +
-                "   stSourceDataDate:   '" + stSourceDataDate + '\'' + "\n" +
-                "   so2IndexLevel: " + so2IndexLevel + "\n" +
-                "   so2CalcDate:        '" + so2CalcDate + '\'' + "\n" +
-                "   so2SourceDataDate:  '" + so2SourceDataDate + '\'' + "\n" +
-                "   no2IndexLevel: " + no2IndexLevel + "\n" +
-                "   no2CalcDate:        '" + no2CalcDate + '\'' + "\n" +
-                "   no2SourceDataDate:  '" + no2SourceDataDate + '\'' + "\n" +
-                "   coIndexLevel: " + coIndexLevel + "\n" +
-                "   coCalcDate:         '" + coCalcDate + '\'' + "\n" +
-                "   coSourceDataDate:   '" + coSourceDataDate + '\'' + "\n" +
-                "   pm10IndexLevel: " + pm10IndexLevel + "\n" +
-                "   pm10CalcDate:       '" + pm10CalcDate + '\'' + "\n" +
-                "   pm10SourceDataDate: '" + pm10SourceDataDate + '\'' + "\n" +
-                "   pm25IndexLevel: " + pm25IndexLevel + "\n" +
-                "   pm25CalcDate:       '" + pm25CalcDate + '\'' + "\n" +
-                "   pm25SourceDataDate: '" + pm25SourceDataDate + '\'' + "\n" +
-                "   o3IndexLevel: " + o3IndexLevel + "\n" +
-                "   o3CalcDate:         '" + o3CalcDate + '\'' + "\n" +
-                "   o3SourceDataDate:   '" + o3SourceDataDate + '\'' + "\n" +
-                "   c6h6IndexLevel: " + c6h6IndexLevel + "\n" +
-                "   c6h6CalcDate:       '" + c6h6CalcDate + '\'' + "\n" +
-                "   c6h6SourceDataDate: '" + c6h6SourceDataDate + '\'' + "\n" +
+        return "{" + "\n" +
+                "   id:                 " + id + "\n" +
+                "   stIndexLevel:       " + stIndexLevel + "\n" +
+                "   stCalcDate:         " + stCalcDate + "\n" +
+                "   stSourceDataDate:   " + stSourceDataDate + "\n" +
+                "   so2IndexLevel:      " + so2IndexLevel + "\n" +
+                "   so2CalcDate:        " + so2CalcDate + "\n" +
+                "   so2SourceDataDate:  " + so2SourceDataDate + "\n" +
+                "   no2IndexLevel:      " + no2IndexLevel + "\n" +
+                "   no2CalcDate:        " + no2CalcDate + "\n" +
+                "   no2SourceDataDate:  " + no2SourceDataDate + "\n" +
+                "   coIndexLevel:       " + coIndexLevel + "\n" +
+                "   coCalcDate:         " + coCalcDate + "\n" +
+                "   coSourceDataDate:   " + coSourceDataDate + "\n" +
+                "   pm10IndexLevel:     " + pm10IndexLevel + "\n" +
+                "   pm10CalcDate:       " + pm10CalcDate + "\n" +
+                "   pm10SourceDataDate: " + pm10SourceDataDate + "\n" +
+                "   pm25IndexLevel:     " + pm25IndexLevel + "\n" +
+                "   pm25CalcDate:       " + pm25CalcDate + "\n" +
+                "   pm25SourceDataDate: " + pm25SourceDataDate + "\n" +
+                "   o3IndexLevel:       " + o3IndexLevel + "\n" +
+                "   o3CalcDate:         " + o3CalcDate + "\n" +
+                "   o3SourceDataDate:   " + o3SourceDataDate + "\n" +
+                "   c6h6IndexLevel:     " + c6h6IndexLevel + "\n" +
+                "   c6h6CalcDate:       " + c6h6CalcDate + "\n" +
+                "   c6h6SourceDataDate: " + c6h6SourceDataDate + "\n" +
                 '}';
     }
 

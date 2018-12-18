@@ -4,6 +4,8 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.text.DecimalFormat;
+
 @Command
         (
                 name = "Air Pollution in Poland",
@@ -46,6 +48,9 @@ public class App implements Runnable {
             "pollution was lowest at given time, \nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String dateForLowestParameter;
 
+    @Option(names = {"-f", "--fragmentOfAddress"}, description = "Give fragment of address for instance " +
+            "street name of city name that you want to find station in")
+    private String addressFragment;
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -60,29 +65,31 @@ public class App implements Runnable {
     @Override
     public void run() {
         OptionsHandler optionsHandler = new OptionsHandler();
-
+        DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-15 21:00:00" -b "2018-12-16 17:00:00" -e "2018-12-16 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 
 
-//        if (stationName != null) {
-//            System.out.println(optionsHandler.airIndexForStation(stationName));
-//        }
+        if (stationName != null) {
+            System.out.println(optionsHandler.airIndexForStation(stationName));
+        }
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 15:00:00"
-//        if (stationName != null && date != null && parameterName != null) {
-//            System.out.println(optionsHandler.currentParameterValue(date, stationName, parameterName));
-//        }
-//
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -b "2018-12-16 17:00:00" -e "2018-12-16 21:00:00" -p "O3"
-        if (startDate != null && endDate != null && parameterName != null) {
-            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
-                    + endDate + ": " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
+        if (stationName != null && date != null && parameterName != null) {
+            System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
+                    optionsHandler.currentParameterValue(date, stationName, parameterName));
         }
 //
-//        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
-//            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
-//                    + startDate + " to " + endDate + ": " +
-//                    optionsHandler.averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName));
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -b "2018-12-18 15:00:00" -e "2018-12-18 16:00:00" -p "O3"
+//        if (startDate != null && endDate != null && parameterName != null) {
+//            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
+//                    + endDate + " is " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
 //        }
+//
+        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
+            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
+                    + startDate + " to " + endDate + ": " +
+                    decimalFormat.format(optionsHandler.
+                            averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName)));
+        }
 //
 //
 //        if (sinceWhenDate != null) {
@@ -94,8 +101,13 @@ public class App implements Runnable {
 //        }
 
 
+        if (addressFragment != null) {
+            System.out.println(optionsHandler.printerNamesOfAllStationsContainingGivenString(addressFragment));
+        }
+
         if (all) {
             System.out.println(optionsHandler.printerNamesOfAllStations());
         }
+
     }
 }

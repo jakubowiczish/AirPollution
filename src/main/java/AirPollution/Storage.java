@@ -18,6 +18,7 @@ public class Storage {
 
             if (allStations == null) {
                 System.out.println("There is no stations available at the moment");
+                return null;
             }
 
             if (allStations != null) {
