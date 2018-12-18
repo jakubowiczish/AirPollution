@@ -1,9 +1,8 @@
 package AirPollution;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DataReceiver {
 
@@ -31,7 +30,7 @@ public class DataReceiver {
         return airIndex;
     }
 
-    public ArrayList<Sensor> getAllSensorsForSpecificStation(int stationID, String stationName) {
+    public CopyOnWriteArrayList<Sensor> getAllSensorsForSpecificStation(int stationID) {
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
         Sensor[] allSensors = new Sensor[0];
@@ -41,13 +40,13 @@ public class DataReceiver {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ArrayList<Sensor> validSensors = new ArrayList<>();
+        CopyOnWriteArrayList<Sensor> validSensors = new CopyOnWriteArrayList<>();
         for (Sensor sensor : allSensors) {
             if (sensor != null) {
                 validSensors.add(sensor);
             }
         }
-        //        System.out.println(validSensors.length + " sensors found for station: \"" + stationName + "\"\n");
+//        System.out.println(validSensors.size() + " sensors found for station: \"" + stationName + "\"\n");
         return validSensors;
     }
 

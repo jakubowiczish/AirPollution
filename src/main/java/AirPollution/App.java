@@ -67,16 +67,16 @@ public class App implements Runnable {
 //        if (stationName != null) {
 //            System.out.println(optionsHandler.airIndexForStation(stationName));
 //        }
-//
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 15:00:00"
 //        if (stationName != null && date != null && parameterName != null) {
 //            System.out.println(optionsHandler.currentParameterValue(date, stationName, parameterName));
 //        }
 //
-//
-//        if (startDate != null && endDate != null && parameterName != null) {
-//            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
-//                    + endDate + ": " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
-//        }
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -b "2018-12-16 17:00:00" -e "2018-12-16 21:00:00" -p "O3"
+        if (startDate != null && endDate != null && parameterName != null) {
+            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
+                    + endDate + ": " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
+        }
 //
 //        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
 //            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
