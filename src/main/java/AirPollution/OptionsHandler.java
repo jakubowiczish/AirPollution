@@ -14,43 +14,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OptionsHandler {
 
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    private <T> T[] getNoNullArray(Class<T> tClass, T[] array) {
-        int validElementsCounter = 0;
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] != null) {
-                validElementsCounter++;
-            }
-        }
-
-        T[] newArray = (T[]) Array.newInstance(tClass, validElementsCounter);
-        int j = 0;
-
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] != null) {
-                newArray[j++] = array[i];
-            }
-        }
-        return newArray;
-    }
-
-
-    private Station[] getAllStations() {
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-        Station[] allStations = new Station[0];
-        try {
-            allStations = factory.createStations(jsonFetcher.getAllStations());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //        System.out.println(validStations.length + " stations found\n");
-        return getNoNullArray(Station.class, allStations);
-    }
+    private DataReceiver dataReceiver = new DataReceiver();
 
     public String printerNamesOfAllStations() {
-        Station[] stations = getAllStations();
+        ArrayList<Station> stations = dataReceiver.getAllStations();
         StringBuilder namesBuilder = new StringBuilder();
         for(Station station : stations) {
             namesBuilder.append(station.stationName).append("\n");
@@ -58,53 +25,11 @@ public class OptionsHandler {
         return namesBuilder.toString();
     }
 
-
-    private Sensor[] getAllSensorsForSpecificStation(int stationID, String stationName) {
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-        Sensor[] allSensors = new Sensor[0];
-
-        try {
-            allSensors = factory.createSensors(jsonFetcher.getSensors(stationID));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Sensor[] validSensors = getNoNullArray(Sensor.class, allSensors);
-
-//        System.out.println(validSensors.length + " sensors found for station: \"" + stationName + "\"\n");
-        return validSensors;
-    }
-
-    private SensorData getSensorDataForSpecificSensor(int sensorID) {
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-        SensorData sensorData = null;
-        try {
-            sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensorID));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sensorData;
-    }
-
-    private AirIndex getAirIndexOfSpecificStation(int stationID) {
-        Factory factory = new Factory();
-        JsonFetcher jsonFetcher = new JsonFetcher();
-        AirIndex airIndex = null;
-        try {
-            airIndex = factory.createAirIndex(jsonFetcher.getQualityIndex(stationID));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return airIndex;
-    }
-
     public String airIndexForStation(String stationName) {
-        Station[] allStations = getAllStations();
+        ArrayList<Station> allStations = dataReceiver.getAllStations();
         if (stationName != null) {
             int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-            AirIndex airIndex = getAirIndexOfSpecificStation(stationID);
+            AirIndex airIndex = dataReceiver.getAirIndexOfSpecificStation(stationID);
             if (airIndex != null) {
                 return airIndex.toString();
             }
@@ -113,13 +38,13 @@ public class OptionsHandler {
     }
 
     public double currentParameterValue(String date, String stationName, String parameterName) {
-        Station[] allStations = getAllStations();
+        ArrayList<Station> allStations = dataReceiver.getAllStations();
 
         double currentValue = -1;
 
         if (stationName != null) {
             int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-            Sensor[] sensors = getAllSensorsForSpecificStation(stationID, stationName);
+            ArrayList<Sensor> sensors = dataReceiver.getAllSensorsForSpecificStation(stationID, stationName);
 
             boolean foundParameter = false;
 
@@ -127,7 +52,7 @@ public class OptionsHandler {
 
                 if (sensor.param.paramFormula.equals(parameterName)) {
                     foundParameter = true;
-                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                    SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
                     if (sensorData.key.equals(parameterName)) {
                         boolean validDate = false;
                         for (SensorData.Value value : sensorData.values) {
@@ -203,17 +128,17 @@ public class OptionsHandler {
             throw new IllegalArgumentException("These dates are not valid");
         }
 
-        Sensor[] sensors = null;
+        ArrayList<Sensor> sensors = null;
 
-        Station[] allStations = getAllStations();
+        ArrayList<Station> allStations = dataReceiver.getAllStations();
         for (Station station : allStations) {
             if (station.stationName.equals(stationName)) {
-                sensors = getAllSensorsForSpecificStation(station.id, stationName);
+                sensors = dataReceiver.getAllSensorsForSpecificStation(station.id, stationName);
             }
         }
         if (parameterName != null && sensors != null) {
             for (Sensor sensor : sensors) {
-                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
                 if (sensorData.key.equals(parameterName)) {
                     for (SensorData.Value value : sensorData.values) {
                         if (value.date.contains("-")) {
@@ -285,15 +210,15 @@ public class OptionsHandler {
         final AtomicDouble sumOfValues = new AtomicDouble();
         final AtomicInteger numberOfThreads = new AtomicInteger();
 
-        Station[] allStations = getAllStations();
+        ArrayList<Station> allStations = dataReceiver.getAllStations();
 
         if (parameterName != null) {
             for (Station station : allStations) {
                 numberOfThreads.incrementAndGet();
                 new Thread(() -> {
-                    Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+                    ArrayList<Sensor> sensors = dataReceiver.getAllSensorsForSpecificStation(station.id, station.stationName);
                     for (Sensor sensor : sensors) {
-                        SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                        SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
                         if (sensorData != null) {
                             if (sensorData.key.equals(parameterName)) {
                                 for (SensorData.Value value : sensorData.values) {
@@ -334,17 +259,17 @@ public class OptionsHandler {
         if (sinceWhenDate == null) {
             throw new IllegalArgumentException("This date is not valid");
         }
-        Station[] allStations = getAllStations();
+        ArrayList<Station> allStations = dataReceiver.getAllStations();
         ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
 
         for (Station station : allStations) {
 
             numberOfThreads.incrementAndGet();
             new Thread(() -> {
-                Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+                ArrayList<Sensor> sensors = dataReceiver.getAllSensorsForSpecificStation(station.id, station.stationName);
 
                 for (Sensor sensor : sensors) {
-                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                    SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
                     double maxValue = 0;
                     double minValue = 1000;
 
@@ -455,17 +380,17 @@ public class OptionsHandler {
         if (specificDate == null) {
             throw new IllegalArgumentException("This specificDate is not valid");
         }
-        Station[] allStations = getAllStations();
+        ArrayList<Station> allStations = dataReceiver.getAllStations();
         ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
 
         for (Station station : allStations) {
 
             numberOfThreads.incrementAndGet();
             new Thread(() -> {
-                Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
+                ArrayList<Sensor> sensors = dataReceiver.getAllSensorsForSpecificStation(station.id, station.stationName);
 
                 for (Sensor sensor : sensors) {
-                    SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
+                    SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
                     double minValue = 10000;
 
                     if (sensorData.values.length == 0) continue;

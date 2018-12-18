@@ -1,5 +1,7 @@
 package AirPollution;
 
+import java.util.ArrayList;
+
 public class Station {
     int id;
     String stationName;
@@ -36,7 +38,7 @@ public class Station {
         }
     }
 
-    public static int returnIdOfGivenStation(Station[] stations, String stationName) {
+    public static int returnIdOfGivenStation(ArrayList<Station> stations, String stationName) {
         int result = -1;
         int stationCounter = 0;
         for (Station station : stations) {
