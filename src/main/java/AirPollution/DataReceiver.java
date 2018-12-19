@@ -13,7 +13,9 @@ public class DataReceiver {
         try {
             sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensorID));
         } catch (IOException e) {
+            System.out.println("There is no SensorData for this sensor: " + sensorID);
             e.printStackTrace();
+            return null;
         }
         return sensorData;
     }
@@ -25,7 +27,9 @@ public class DataReceiver {
         try {
             airIndex = factory.createAirIndex(jsonFetcher.getQualityIndex(stationID));
         } catch (IOException e) {
+            System.out.println("There is no AirIndex for this station: " + stationID);
             e.printStackTrace();
+            return null;
         }
         return airIndex;
     }

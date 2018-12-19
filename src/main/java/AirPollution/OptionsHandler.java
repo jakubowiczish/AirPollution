@@ -80,7 +80,7 @@ public class OptionsHandler {
                             }
                         }
                         if (!validDate) {
-                            throw new IllegalArgumentException("There is no such date as " + date + " in system");
+                            throw new IllegalArgumentException("There is no such date as " + date + " in the system");
                         }
                     }
                 }
