@@ -15,8 +15,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OptionsHandler {
 
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private Storage storageReceiver = new Storage();
-//    private DataReceiver dataReceiver = new DataReceiver();
+    private Storage storageReceiver;
+
+    OptionsHandler(Storage storageReceiver) {
+        this.storageReceiver = storageReceiver;
+    }
 
     public String printerNamesOfAllStations() {
         ArrayList<Station> stations = storageReceiver.getAllStations();
@@ -157,6 +160,7 @@ public class OptionsHandler {
 
             }
         }
+
         averageValue = sumOfValues / valuesCounter;
         return averageValue;
     }
@@ -169,7 +173,7 @@ public class OptionsHandler {
 //        }
 //        return countAveragePollution(realStartDate, realEndDate, parameterName);
 //    }
-
+//
 //    private double countAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
 //        double sumOfValues = 0;
 //        int valuesCounter = 0;
@@ -387,7 +391,7 @@ public class OptionsHandler {
 //        System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
 //        return "Parameter name: " + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
 //    }
-/*
+
     public String multiThreadParameterWithLowestValueAtSpecificTime(String date) {
         final AtomicInteger numberOfThreads = new AtomicInteger();
 
@@ -395,17 +399,17 @@ public class OptionsHandler {
         if (specificDate == null) {
             throw new IllegalArgumentException("This specificDate is not valid");
         }
-        ArrayList<Station> allStations = dataReceiver.getAllStations();
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
         ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
 
         for (Station station : allStations) {
 
             numberOfThreads.incrementAndGet();
             new Thread(() -> {
-                ArrayList<Sensor> sensors = dataReceiver.getAllSensorsForSpecificStation(station.id, station.stationName);
+                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
                 for (Sensor sensor : sensors) {
-                    SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
+                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
                     double minValue = 10000;
 
                     if (sensorData.values.length == 0) continue;
@@ -476,6 +480,6 @@ public class OptionsHandler {
 //
 //
 //    }
-*/
+
 }
 

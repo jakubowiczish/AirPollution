@@ -5,6 +5,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 
 @Command
         (
@@ -64,34 +65,48 @@ public class App implements Runnable {
 
     @Override
     public void run() {
-        OptionsHandler optionsHandler = new OptionsHandler();
         DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
+
+        PhysicalStorage physicalStorage = new PhysicalStorage();
+        Storage storage = physicalStorage.loadStorageFromFile();
+        Date currentDate = new Date();
+
+        if (storage == null || (currentDate.getTime() - storage.lastLoadDate.getTime() > 20 * 60 * 1000)) {
+            storage = new Storage();
+            storage.loadAllData();
+
+            physicalStorage.saveStorageToFile(storage);
+        }
+
+        OptionsHandler optionsHandler = new OptionsHandler(storage);
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 
 
-        if (stationName != null) {
-            System.out.println(optionsHandler.airIndexForStation(stationName));
-        }
+//        if (stationName != null) {
+//            System.out.println(optionsHandler.airIndexForStation(stationName));
+//        }
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 15:00:00"
         if (stationName != null && date != null && parameterName != null) {
             System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
                     optionsHandler.currentParameterValue(date, stationName, parameterName));
         }
-//
+
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -b "2018-12-18 15:00:00" -e "2018-12-18 16:00:00" -p "O3"
 //        if (startDate != null && endDate != null && parameterName != null) {
 //            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
 //                    + endDate + " is " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
 //        }
 
-        for (int i = 0; i < 5; i++) {
-            if (startDate != null && endDate != null && parameterName != null && stationName != null) {
-                System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
-                        + startDate + " to " + endDate + ": " +
-                        decimalFormat.format(optionsHandler.
-                                averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName)));
-            }
-        }
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
+
+
+//        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
+//            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
+//                    + startDate + " to " + endDate + ": " +
+//                    decimalFormat.format(optionsHandler.
+//                            averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName)));
+//        }
+
 //
 //        if (sinceWhenDate != null) {
 //            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
