@@ -66,7 +66,7 @@ public class App implements Runnable {
     public void run() {
         OptionsHandler optionsHandler = new OptionsHandler();
         DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-15 21:00:00" -b "2018-12-16 17:00:00" -e "2018-12-16 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 
 
         if (stationName != null) {
@@ -83,14 +83,15 @@ public class App implements Runnable {
 //            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
 //                    + endDate + " is " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
 //        }
-//
-        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
-            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
-                    + startDate + " to " + endDate + ": " +
-                    decimalFormat.format(optionsHandler.
-                            averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName)));
+
+        for (int i = 0; i < 5; i++) {
+            if (startDate != null && endDate != null && parameterName != null && stationName != null) {
+                System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
+                        + startDate + " to " + endDate + ": " +
+                        decimalFormat.format(optionsHandler.
+                                averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName)));
+            }
         }
-//
 //
 //        if (sinceWhenDate != null) {
 //            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));

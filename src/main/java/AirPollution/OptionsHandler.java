@@ -16,7 +16,7 @@ public class OptionsHandler {
 
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Storage storageReceiver = new Storage();
-    private DataReceiver dataReceiver = new DataReceiver();
+//    private DataReceiver dataReceiver = new DataReceiver();
 
     public String printerNamesOfAllStations() {
         ArrayList<Station> stations = storageReceiver.getAllStations();
@@ -125,7 +125,7 @@ public class OptionsHandler {
         }
 
 
-        ArrayList<Station> allStations = dataReceiver.getAllStations();
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
         CopyOnWriteArrayList<Sensor> sensors = null;
 
         for (Station station : allStations) {
@@ -135,7 +135,7 @@ public class OptionsHandler {
         }
         if (parameterName != null && sensors != null) {
             for (Sensor sensor : sensors) {
-                SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
                 if (sensorData.key.equals(parameterName)) {
                     for (SensorData.Value value : sensorData.values) {
                         if (value.date.contains("-")) {
@@ -266,7 +266,7 @@ public class OptionsHandler {
 //        }
 //        return sumOfValues.get() / valuesCounter.get();
 //    }
-/*
+
     public String multiThreadMostFluctuatingParameter(String sinceWhenString) {
         final AtomicInteger numberOfThreads = new AtomicInteger();
 
@@ -274,17 +274,17 @@ public class OptionsHandler {
         if (sinceWhenDate == null) {
             throw new IllegalArgumentException("This date is not valid");
         }
-        ArrayList<Station> allStations = dataReceiver.getAllStations();
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
         ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
 
         for (Station station : allStations) {
 
             numberOfThreads.incrementAndGet();
             new Thread(() -> {
-                ArrayList<Sensor> sensors = dataReceiver.getAllSensorsForSpecificStation(station.id, station.stationName);
+                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
                 for (Sensor sensor : sensors) {
-                    SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensor.id);
+                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
                     double maxValue = 0;
                     double minValue = 1000;
 
@@ -387,7 +387,7 @@ public class OptionsHandler {
 //        System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
 //        return "Parameter name: " + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
 //    }
-
+/*
     public String multiThreadParameterWithLowestValueAtSpecificTime(String date) {
         final AtomicInteger numberOfThreads = new AtomicInteger();
 

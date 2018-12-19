@@ -12,6 +12,8 @@ public class Storage {
     private ConcurrentHashMap<Integer, SensorData> sensorDataMemory = new ConcurrentHashMap<>();
     DataReceiver dataReceiver = new DataReceiver();
 
+
+
     public ArrayList<Station> getAllStations() {
         if (stationMemory.size() == 0) {
             ArrayList<Station> allStations = dataReceiver.getAllStations();
@@ -21,11 +23,10 @@ public class Storage {
                 return null;
             }
 
-            if (allStations != null) {
-                for (Station station : allStations) {
-                    stationMemory.put(station.stationName, station);
-                }
+            for (Station station : allStations) {
+                stationMemory.put(station.stationName, station);
             }
+
         }
 
         return new ArrayList<>(stationMemory.values());
@@ -53,7 +54,7 @@ public class Storage {
     }
 
     public AirIndex getAirIndexOfSpecificStation(int stationID) {
-        if(airIndexMemory.containsKey(stationID)) {
+        if (airIndexMemory.containsKey(stationID)) {
             return airIndexMemory.get(stationID);
         }
 
