@@ -50,12 +50,13 @@ public class App implements Runnable {
     private String sinceWhenDate;
 
     @Option(names = {"-l", "--lowestWhen"}, description = "Give this date when you want to check which parameter's " +
-            "pollution was lowest at given time, \nin format \"yyyy-MM-dd HH:mm:ss\"")
+            "pollution was lowest at given time\nassuming that this value is higher than 0, \nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String dateForLowestParameter;
 
     @Option(names = {"-f", "--fragmentOfAddress"}, description = "Give fragment of address for instance " +
             "street name of city name that you want to find station in")
     private String addressFragment;
+
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -66,7 +67,7 @@ public class App implements Runnable {
         }
     }
 
-
+// zrobiony punkt 1,2,3,4,5
     @Override
     public void run() {
         DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
@@ -87,38 +88,46 @@ public class App implements Runnable {
 
 
         if (stationName != null) {
-            optionsHandler.printAirIndexForGivenStation(stationName);
+            System.out.println(optionsHandler.printerOfAirIndexForGivenStation(stationName));
         }
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 15:00:00"
         if (stationName != null && date != null && parameterName != null) {
             System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
-                    optionsHandler.currentParameterValue(date, stationName, parameterName));
+                    optionsHandler.currentValueOfGivenParameterInGivenStation(date, stationName, parameterName));
         }
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -b "2018-12-18 15:00:00" -e "2018-12-18 16:00:00" -p "O3"
 //        if (startDate != null && endDate != null && parameterName != null) {
 //            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
-//                    + endDate + " is " + optionsHandler.multiThreadAveragePollutionValue(startDate, endDate, parameterName));
+//                    + endDate + " is " + optionsHandler.averagePollutionValueOfGivenParameterForAllStations(startDate, endDate, parameterName));
 //        }
 
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-20 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
 
 
-//        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
-//            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
-//                    + startDate + " to " + endDate + ": " +
-//                    decimalFormat.format(optionsHandler.
-//                            averagePollutionValueForSpecificStation(startDate, endDate, parameterName, stationName)));
-//        }
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -b "2018-12-19 17:00:00" -e "2018-12-19 21:00:00"
+        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
+            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
+                    + startDate + " to " + endDate + ": " +
+                    decimalFormat.format(optionsHandler.
+                            averagePollutionValueOfGivenParameterForSpecificStation(startDate, endDate, parameterName, stationName)));
+        }
+
+        if(startDate != null && endDate != null && parameterName != null) {
+            System.out.println("Pollution of parameter " + parameterName + " for all stations from "
+                    + startDate + " to " + endDate + ": " +
+                    decimalFormat.format(optionsHandler.
+                            averagePollutionValueOfGivenParameterForAllStations(startDate, endDate, parameterName)));
+        }
 
 //
-//        if (sinceWhenDate != null) {
-//            System.out.println(optionsHandler.multiThreadMostFluctuatingParameter(sinceWhenDate));
-//        }
-//
-//        if(dateForLowestParameter != null) {
-//            System.out.println(optionsHandler.multiThreadParameterWithLowestValueAtSpecificTime(dateForLowestParameter));
-//        }
+        if (sinceWhenDate != null) {
+            System.out.println(optionsHandler.mostFluctuatingParameter(sinceWhenDate));
+        }
+
+        if(dateForLowestParameter != null) {
+            System.out.println(optionsHandler.parameterWithLowestValueAtSpecificTime(dateForLowestParameter));
+        }
 
 
         if (addressFragment != null) {
@@ -132,6 +141,5 @@ public class App implements Runnable {
         if(allWithSensors){
             optionsHandler.printAllStationsWithTheirSensors();
         }
-
     }
 }

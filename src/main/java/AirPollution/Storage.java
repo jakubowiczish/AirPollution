@@ -1,10 +1,8 @@
 package AirPollution;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -38,19 +36,7 @@ public class Storage {
         }
 
         System.out.println("Starting " + threads.size() + " threads");
-        for (Thread thread : threads) {
-            thread.start();
-        }
-
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                System.out.println("Interrupted thread: " + thread.getId());
-                e.printStackTrace();
-            }
-        }
-
+        Utils.startAndJoinThreads(threads);
         System.out.println("Loading all of the data is now finished");
         lastLoadDate = new Date();
     }

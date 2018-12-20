@@ -2,8 +2,6 @@ package AirPollution;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -14,12 +12,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class OptionsHandler {
 
-    private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private Storage storageReceiver;
-
     OptionsHandler(Storage storageReceiver) {
         this.storageReceiver = storageReceiver;
     }
+
+    private Storage storageReceiver;
+
 
     public void printNamesOfAllStations() {
         storageReceiver.getAllStations()
@@ -44,27 +42,25 @@ public class OptionsHandler {
         });
     }
 
-
-    public void printAirIndexForGivenStation(String stationName) {
+    public String printerOfAirIndexForGivenStation(String stationName) {
         ArrayList<Station> allStations = storageReceiver.getAllStations();
-        boolean foundStationName = false;
-        for (Station station : allStations) {
-            if (station.stationName.equals(stationName)) {
-                foundStationName = true;
-            }
-        }
-        if (!foundStationName) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean foundStation = Utils.checkWhetherStationExists(allStations, stationName);
+
+        if (!foundStation) {
             System.out.println("There is no such station as " + stationName + " in the system");
         }
-        if (foundStationName) {
+        if (foundStation) {
             int stationID = Station.returnIdOfGivenStation(allStations, stationName);
             AirIndex airIndex = storageReceiver.getAirIndexOfSpecificStation(stationID);
-            System.out.println("Air Index for station: " + stationName + "\n" + airIndex.toString());
+            stringBuilder.append("Air Index for station: ").append(stationName).append("\n").append(airIndex.toString());
 
         }
+        return stringBuilder.toString();
     }
 
-    public double currentParameterValue(String date, String stationName, String parameterName) {
+    public double currentValueOfGivenParameterInGivenStation(String date, String stationName, String parameterName) {
         ArrayList<Station> allStations = storageReceiver.getAllStations();
 
         double currentValue = -1;
@@ -76,7 +72,6 @@ public class OptionsHandler {
             boolean foundParameter = false;
 
             for (Sensor sensor : sensors) {
-
                 if (sensor.param.paramFormula.equals(parameterName)) {
                     foundParameter = true;
                     SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
@@ -95,7 +90,6 @@ public class OptionsHandler {
                         }
                     }
                 }
-
             }
             if (!foundParameter) {
                 throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
@@ -104,40 +98,15 @@ public class OptionsHandler {
         return currentValue;
     }
 
-    private Date multiThreadParseStringToDate(String date) {
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
-        } catch (ParseException e) {
-            System.out.println("The date: " + date + " could not be parsed");
-            e.printStackTrace();
-        }
-        return null;
-    }
 
 
-    private Date parseStringToDate(String date) {
-        try {
-            return usedDateFormat.parse(date);
-        } catch (ParseException e) {
-            System.out.println("The date: " + date + " could not be parsed");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    public double averagePollutionValueForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
+    public double averagePollutionValueOfGivenParameterForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
         double sumOfValues = 0;
         int valuesCounter = 0;
         double averageValue = 0;
 
-        Date realStartDate = parseStringToDate(startDate);
-        Date realEndDate = parseStringToDate(endDate);
-
-        if (realStartDate == null || realEndDate == null) {
-            throw new IllegalArgumentException("These dates are not valid");
-        }
-
+        Date realStartDate = Utils.parseAndCheckDate(startDate);
+        Date realEndDate = Utils.parseAndCheckDate(endDate);
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         CopyOnWriteArrayList<Sensor> sensors = null;
@@ -153,149 +122,96 @@ public class OptionsHandler {
                 if (sensorData.key.equals(parameterName)) {
                     for (SensorData.Value value : sensorData.values) {
                         if (value.date.contains("-")) {
-                            Date actualDate = parseStringToDate(value.date);
+                            Date actualDate = Utils.parseStringToDate(value.date);
                             // if date is between given period of time
-                            if (actualDate != null) {
-                                if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-                                        (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-
-                                    if (value.value != null) {
-                                        valuesCounter++;
-                                        sumOfValues += value.value;
-                                    }
+                            if (Utils.checkDateInterval(realStartDate, realEndDate, actualDate)) {
+                                if (value.value != null) {
+                                    valuesCounter++;
+                                    sumOfValues += value.value;
                                 }
                             }
                         }
                     }
                 }
-
             }
         }
+
 
         averageValue = sumOfValues / valuesCounter;
         return averageValue;
     }
 
-//    public double averagePollutionValue(String startDate, String endDate, String parameterName) {
-//        Date realStartDate = parseStringToDate(startDate);
-//        Date realEndDate = parseStringToDate(endDate);
-//        if (realStartDate == null || realEndDate == null) {
-//            throw new IllegalArgumentException("These dates are not valid");
-//        }
-//        return countAveragePollution(realStartDate, realEndDate, parameterName);
-//    }
-//
-//    private double countAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
-//        double sumOfValues = 0;
-//        int valuesCounter = 0;
-//        double averageValue = 0;
-//        ArrayList<Station> allStations = storageReceiver.getAllStations();
-//
-//        if (parameterName != null) {
-//            for (Station station : allStations) {
-//
-//                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
-//                for (Sensor sensor : sensors) {
-//
-//                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-//                    if (sensorData != null) {
-//                        if (sensorData.key.equals(parameterName)) {
-//                            for (SensorData.Value value : sensorData.values) {
-//                                if (value.date.contains("-")) {
-//                                    Date actualDate = parseStringToDate(value.date);
-//                                    // if date is between given period of time
-//                                    if (actualDate != null) {
-//                                        if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-//                                                (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-//                                            if (value.value != null) {
-//                                                valuesCounter++;
-//                                                sumOfValues += value.value;
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                }
-//
-//            }
-//        }
-//        averageValue = sumOfValues / valuesCounter;
-//        return averageValue;
-//    }
-//
-//    public double multiThreadAveragePollutionValue(String startDate, String endDate, String parameterName) {
-//        Date realStartDate = parseStringToDate(startDate);
-//        Date realEndDate = parseStringToDate(endDate);
-//        if (realStartDate == null || realEndDate == null) {
-//            throw new IllegalArgumentException("These dates are not valid");
-//        }
-//        return multiThreadCountAveragePollution(realStartDate, realEndDate, parameterName);
-//    }
-//
-//    private double multiThreadCountAveragePollution(Date realStartDate, Date realEndDate, String parameterName) {
-//        final AtomicInteger valuesCounter = new AtomicInteger();
-//        final AtomicDouble sumOfValues = new AtomicDouble();
-//        final AtomicInteger numberOfThreads = new AtomicInteger();
-//
-//        ArrayList<Station> allStations = storageReceiver.getAllStations();
-//
-//        if (parameterName != null) {
-//            for (Station station : allStations) {
-//                numberOfThreads.incrementAndGet();
-//                new Thread(() -> {
-//                    CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
-//                    for (Sensor sensor : sensors) {
-//                        SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-//                        if (sensorData != null) {
-//                            if (sensorData.key.equals(parameterName)) {
-//                                for (SensorData.Value value : sensorData.values) {
-//                                    if (value.date.contains("-")) {
-//                                        Date actualDate = multiThreadParseStringToDate(value.date);
-//                                        // if date is between given period of time
-//                                        if (actualDate != null) {
-//                                            if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-//                                                    (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-//                                                if (value.value != null) {
-//                                                    valuesCounter.incrementAndGet();
-//                                                    sumOfValues.addAndGet(value.value);
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                    }
-//                    numberOfThreads.decrementAndGet();
-//                }).start();
-//
-//            }
-//        }
-//
-//        while (numberOfThreads.get() != 0) {
-//
-//        }
-//        return sumOfValues.get() / valuesCounter.get();
-//    }
+    public double averagePollutionValueOfGivenParameterForAllStations(String startDate, String endDate, String parameterName) {
+        Date realStartDate = Utils.parseStringToDate(startDate);
+        Date realEndDate = Utils.parseStringToDate(endDate);
+        if (realStartDate == null || realEndDate == null) {
+            throw new IllegalArgumentException("These dates are not valid");
+        }
+        return countAveragePollutionValueOfGivenParameterForAllStations(realStartDate, realEndDate, parameterName);
+    }
 
-    public String multiThreadMostFluctuatingParameter(String sinceWhenString) {
+    private double countAveragePollutionValueOfGivenParameterForAllStations(Date realStartDate, Date realEndDate, String parameterName) {
+        final AtomicInteger valuesCounter = new AtomicInteger();
+        final AtomicDouble sumOfValues = new AtomicDouble();
         final AtomicInteger numberOfThreads = new AtomicInteger();
 
-        Date sinceWhenDate = parseStringToDate(sinceWhenString);
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        LinkedList<Thread> threads = new LinkedList<>();
+
+        if (parameterName == null) {
+            throw new IllegalArgumentException("There was no parameter given in argument, try again");
+        }
+
+        for (Station station : allStations) {
+            Thread thread = new Thread(() -> {
+                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+                for (Sensor sensor : sensors) {
+                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                    if (sensorData != null) {
+                        if (sensorData.key.equals(parameterName)) {
+                            for (SensorData.Value value : sensorData.values) {
+                                if (value.date.contains("-")) {
+                                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                                    // if date is between given period of time
+                                    if (actualDate != null) {
+                                        if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
+                                                (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
+                                            if (value.value != null) {
+                                                valuesCounter.incrementAndGet();
+                                                sumOfValues.addAndGet(value.value);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+                numberOfThreads.decrementAndGet();
+            });
+            threads.add(thread);
+        }
+
+        Utils.startAndJoinThreads(threads);
+
+//        System.out.println("Average pollution of parameter: " + parameterName + " for all stations");
+        return sumOfValues.get() / valuesCounter.get();
+    }
+
+    public String mostFluctuatingParameter(String sinceWhenString) {
+        Date sinceWhenDate = Utils.parseStringToDate(sinceWhenString);
         if (sinceWhenDate == null) {
             throw new IllegalArgumentException("This date is not valid");
         }
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
 
+        LinkedList<Thread> threads = new LinkedList<>();
+
         for (Station station : allStations) {
 
-            numberOfThreads.incrementAndGet();
-            new Thread(() -> {
+            Thread thread = new Thread(() -> {
                 CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
                 for (Sensor sensor : sensors) {
@@ -307,9 +223,8 @@ public class OptionsHandler {
 
                     for (SensorData.Value value : sensorData.values) {
                         if (value.value != null) {
-
                             if (value.date.contains("-")) {
-                                Date actualDate = multiThreadParseStringToDate(value.date);
+                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
                                 if (actualDate != null) {
                                     if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
                                         if (value.value < minValue) {
@@ -332,91 +247,32 @@ public class OptionsHandler {
                         fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
                     }
                 }
-                numberOfThreads.decrementAndGet();
-            }).start();
+
+            });
+            threads.add(thread);
 
         }
-        while (numberOfThreads.get() != 0) {
+        Utils.startAndJoinThreads(threads);
 
-        }
         System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
-        return "Most fluctuating parameter since " + sinceWhenString + " is "
-                + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
-
+        System.out.print("Most fluctuating parameter since " + sinceWhenString + " is ");
+        return Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
     }
-//
-//    public String mostFluctuatingParameter(String sinceWhenString) {
-//
-//        Date sinceWhenDate = parseStringToDate(sinceWhenString);
-//        if (sinceWhenDate == null) {
-//            throw new IllegalArgumentException("This date is not valid");
-//        }
-//
-//        Station[] allStations = getAllStations();
-//        HashMap<String, StationFluctuation> fluctuations = new HashMap<>();
-//
-//        double maxValue;
-//        double minValue;
-//
-//        for (Station station : allStations) {
-//
-//            Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
-//            for (Sensor sensor : sensors) {
-//                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-//                maxValue = 0;
-//                minValue = 1000;
-//
-//                if (sensorData.values.length == 0) continue;
-//
-//                for (SensorData.Value value : sensorData.values) {
-//                    if (value.value != null) {
-//
-//                        if (value.date.contains("-")) {
-//                            Date actualDate = parseStringToDate(value.date);
-//                            if (actualDate != null) {
-//                                if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
-//                                    if (value.value < minValue) {
-//                                        minValue = value.value;
-//                                    }
-//                                    if (value.value > maxValue) {
-//                                        maxValue = value.value;
-//                                    }
-//                                }
-//                            }
-//
-//                        }
-//                    }
-//                }
-//                Double difference = maxValue - minValue;
-//
-//                if (fluctuations.get(sensorData.key) != null) {
-//                    if (fluctuations.get(sensorData.key).getDifference() < difference)
-//                        fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-//                } else {
-//                    fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-//                }
-//            }
-//
-//        }
-//
-//        System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
-//        return "Parameter name: " + Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
-//    }
 
-    public String multiThreadParameterWithLowestValueAtSpecificTime(String date) {
-        final AtomicInteger numberOfThreads = new AtomicInteger();
 
-        Date specificDate = parseStringToDate(date);
+
+
+    public String parameterWithLowestValueAtSpecificTime(String date) {
+        Date specificDate = Utils.parseStringToDate(date);
         if (specificDate == null) {
-            throw new IllegalArgumentException("This specificDate is not valid");
+            throw new IllegalArgumentException("Given date is not valid");
         }
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
 
+        LinkedList<Thread> threads = new LinkedList<>();
         for (Station station : allStations) {
-
-            numberOfThreads.incrementAndGet();
-            new Thread(() -> {
+            Thread thread = new Thread(() -> {
                 CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
                 for (Sensor sensor : sensors) {
@@ -424,15 +280,13 @@ public class OptionsHandler {
                     double minValue = 10000;
 
                     if (sensorData.values.length == 0) continue;
-
                     for (SensorData.Value value : sensorData.values) {
                         if (value.value != null) {
-
                             if (value.date.contains("-")) {
-                                Date actualDate = multiThreadParseStringToDate(value.date);
+                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
                                 if (actualDate != null) {
                                     if (actualDate.after(specificDate) || actualDate.equals(specificDate)) {
-                                        if (value.value < minValue) {
+                                        if (value.value < minValue && value.value > 0) {
                                             minValue = value.value;
                                         }
                                     }
@@ -448,13 +302,12 @@ public class OptionsHandler {
                         fluctuations.put(sensorData.key, minValue);
                     }
                 }
-                numberOfThreads.decrementAndGet();
-            }).start();
-
+            });
+            threads.add(thread);
         }
-        while (numberOfThreads.get() != 0) {
 
-        }
+        Utils.startAndJoinThreads(threads);
+
         System.out.println("The lowest parameter value is " +
                 Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue());
         return "Parameter with lowest value on " + date + " is " +
