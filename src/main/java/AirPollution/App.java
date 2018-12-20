@@ -10,8 +10,8 @@ import java.util.Date;
 @Command
         (
                 name = "Air Pollution in Poland",
-                version = "Air Pollution in Poland,\nv1.0 by Jakub Płotnikowski 2018,\nall rights reserved",
-                description = "Gives various information about air quality in Poland",
+                version = "Air Pollution in Poland,\nv1.0 by Jakub Płotnikowski\n2018,\nAll rights reserved",
+                description = "Commandline app that provides you with various information about air quality in Poland",
                 mixinStandardHelpOptions = true,
                 descriptionHeading = "%n@|bold,underline Description:|@%n%n",
                 optionListHeading = "%n@|bold,underline Options:|@%n"
@@ -21,6 +21,10 @@ public class App implements Runnable {
 
     @Option(names = {"-a", "-allStations"}, description = "Printing all available stations")
     private boolean all;
+
+    @Option(names = {"-q", "-allStationsWithSensors"},
+            description = "Printing all available stations along with their sensors")
+    private boolean allWithSensors;
 
     @Option(names = {"-s", "--stationName"}, description = "Station name for Air Index")
     private String stationName;
@@ -82,9 +86,9 @@ public class App implements Runnable {
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 
 
-//        if (stationName != null) {
-//            System.out.println(optionsHandler.airIndexForStation(stationName));
-//        }
+        if (stationName != null) {
+            optionsHandler.printAirIndexForGivenStation(stationName);
+        }
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 15:00:00"
         if (stationName != null && date != null && parameterName != null) {
             System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
@@ -118,11 +122,15 @@ public class App implements Runnable {
 
 
         if (addressFragment != null) {
-            System.out.println(optionsHandler.printerNamesOfAllStationsContainingGivenString(addressFragment));
+            optionsHandler.printNamesOfAllStationsContainingGivenString(addressFragment);
         }
 
         if (all) {
-            System.out.println(optionsHandler.printerNamesOfAllStations());
+            optionsHandler.printNamesOfAllStations();
+        }
+
+        if(allWithSensors){
+            optionsHandler.printAllStationsWithTheirSensors();
         }
 
     }

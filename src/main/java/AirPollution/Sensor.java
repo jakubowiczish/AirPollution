@@ -8,10 +8,10 @@ public class Sensor {
     @Override
     public String toString() {
         return "Sensor{" +
-                "id=" + id +
-                ", stationId=" + stationId +
-                ", param=" + param +
-                '}';
+                "id:" + id + " " +
+                "stationId:" + stationId + " " +
+                "param:" + param +
+                "}";
     }
 
     class Param {
@@ -22,12 +22,12 @@ public class Sensor {
 
         @Override
         public String toString() {
-            return "Param{" +
-                    "paramName='" + paramName + '\'' +
-                    ", paramFormula='" + paramFormula + '\'' +
-                    ", paramCode='" + paramCode + '\'' +
-                    ", idParam=" + idParam +
-                    '}';
+            return "{" +
+                    "paramName:" + paramName + " " +
+                    "paramFormula:" + paramFormula + " " +
+                    "paramCode:" + paramCode + " " +
+                    "idParam:" + idParam +
+                    "}";
         }
     }
 }

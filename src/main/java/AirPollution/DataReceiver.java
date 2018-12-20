@@ -9,7 +9,7 @@ public class DataReceiver {
     public SensorData getSensorDataForSpecificSensor(int sensorID) {
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
-        SensorData sensorData = null;
+        SensorData sensorData;
         try {
             sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensorID));
         } catch (IOException e) {
@@ -23,7 +23,7 @@ public class DataReceiver {
     public AirIndex getAirIndexOfSpecificStation(int stationID) {
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
-        AirIndex airIndex = null;
+        AirIndex airIndex;
         try {
             airIndex = factory.createAirIndex(jsonFetcher.getQualityIndex(stationID));
         } catch (IOException e) {
@@ -42,6 +42,7 @@ public class DataReceiver {
         try {
             allSensors = factory.createSensors(jsonFetcher.getSensors(stationID));
         } catch (IOException e) {
+            System.out.println("System was unable to fetch all sensors for station with stationID: " + stationID);
             e.printStackTrace();
         }
         CopyOnWriteArrayList<Sensor> validSensors = new CopyOnWriteArrayList<>();
@@ -50,7 +51,10 @@ public class DataReceiver {
                 validSensors.add(sensor);
             }
         }
-//        System.out.println(validSensors.size() + " sensors found for station: \"" + stationName + "\"\n");
+        if (validSensors.size() == 0) {
+            System.out.println("None of the sensors were found for station: " + stationID);
+            return null;
+        }
         return validSensors;
     }
 
@@ -62,6 +66,7 @@ public class DataReceiver {
         try {
             allStations = factory.createStations(jsonFetcher.getAllStations());
         } catch (IOException e) {
+            System.out.println("System was unable to fetch all stations");
             e.printStackTrace();
         }
         ArrayList<Station> validStations = new ArrayList<>();
@@ -70,7 +75,10 @@ public class DataReceiver {
                 validStations.add(station);
             }
         }
-        //        System.out.println(validStations.length + " stations found\n");
+        if (validStations.size() == 0) {
+            System.out.println("None of stations were found, something probably went wrong");
+            return null;
+        }
         return validStations;
     }
 

@@ -14,7 +14,7 @@ public class PhysicalStorage {
         try {
             storage = gson.fromJson(receiveFile(new File(filePath)), Storage.class);
         } catch (Exception e) {
-            System.out.println("error while loading storage from file: " + e);
+            System.out.println("Error while loading storage from file: " + e);
             return null;
         }
         return storage;

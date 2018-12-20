@@ -21,36 +21,47 @@ public class OptionsHandler {
         this.storageReceiver = storageReceiver;
     }
 
-    public String printerNamesOfAllStations() {
-        ArrayList<Station> stations = storageReceiver.getAllStations();
-        StringBuilder namesBuilder = new StringBuilder();
-        for (Station station : stations) {
-            namesBuilder.append(station.stationName).append("\n");
-        }
-        return namesBuilder.toString();
+    public void printNamesOfAllStations() {
+        storageReceiver.getAllStations()
+                .forEach(station -> System.out.println(station.stationName));
     }
 
-    public String printerNamesOfAllStationsContainingGivenString(String stationAddressFragment) {
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        StringBuilder namesBuilder = new StringBuilder();
-        for (Station station : allStations) {
+    public void printAllStationsWithTheirSensors() {
+        storageReceiver.getAllStations()
+                .forEach(station -> {
+                    System.out.println("\nSTATION NAME: " + station.stationName + "\nSensors for this station:");
+                    storageReceiver.getAllSensorsForSpecificStation(station.id)
+                            .forEach(sensor -> System.out.println(sensor.toString()));
+                });
+
+    }
+
+    public void printNamesOfAllStationsContainingGivenString(String stationAddressFragment) {
+        storageReceiver.getAllStations().forEach(station -> {
             if (station.stationName.contains(stationAddressFragment)) {
-                namesBuilder.append(station.stationName).append("\n");
+                System.out.println(station.stationName);
+            }
+        });
+    }
+
+
+    public void printAirIndexForGivenStation(String stationName) {
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        boolean foundStationName = false;
+        for (Station station : allStations) {
+            if (station.stationName.equals(stationName)) {
+                foundStationName = true;
             }
         }
-        return namesBuilder.toString();
-    }
-
-    public String airIndexForStation(String stationName) {
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        if (stationName != null) {
+        if (!foundStationName) {
+            System.out.println("There is no such station as " + stationName + " in the system");
+        }
+        if (foundStationName) {
             int stationID = Station.returnIdOfGivenStation(allStations, stationName);
             AirIndex airIndex = storageReceiver.getAirIndexOfSpecificStation(stationID);
-            if (airIndex != null) {
-                return "Air Index for station: " + stationName + "\n" + airIndex.toString();
-            }
+            System.out.println("Air Index for station: " + stationName + "\n" + airIndex.toString());
+
         }
-        return null;
     }
 
     public double currentParameterValue(String date, String stationName, String parameterName) {

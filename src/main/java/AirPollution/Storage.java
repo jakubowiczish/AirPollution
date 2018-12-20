@@ -80,7 +80,7 @@ public class Storage {
 
         CopyOnWriteArrayList<Sensor> allSensors = dataReceiver.getAllSensorsForSpecificStation(stationID);
         if (allSensors == null) {
-            System.out.println("Sensors for " + stationID + "are null");
+            System.out.println("Sensors for " + stationID + " are not available at the moment or do not exist");
             return null;
         }
         sensorMemory.put(stationID, allSensors);
