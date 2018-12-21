@@ -2,12 +2,11 @@ package AirPollution;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 
 public class OptionsHandler {
@@ -35,11 +34,19 @@ public class OptionsHandler {
     }
 
     public void printNamesOfAllStationsContainingGivenString(String stationAddressFragment) {
-        storageReceiver.getAllStations().forEach(station -> {
+        boolean found = false;
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        for (Station station : allStations) {
             if (station.stationName.contains(stationAddressFragment)) {
                 System.out.println(station.stationName);
+                found = true;
             }
-        });
+        }
+        if (!found) {
+            System.out.println("There is no station that contains \"" + stationAddressFragment + "\" in her name");
+        }
+
+
     }
 
     public String printerOfAirIndexForGivenStation(String stationName) {
@@ -99,7 +106,6 @@ public class OptionsHandler {
     }
 
 
-
     public double averagePollutionValueOfGivenParameterForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
         double sumOfValues = 0;
         int valuesCounter = 0;
@@ -153,7 +159,6 @@ public class OptionsHandler {
     private double countAveragePollutionValueOfGivenParameterForAllStations(Date realStartDate, Date realEndDate, String parameterName) {
         final AtomicInteger valuesCounter = new AtomicInteger();
         final AtomicDouble sumOfValues = new AtomicDouble();
-        final AtomicInteger numberOfThreads = new AtomicInteger();
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         LinkedList<Thread> threads = new LinkedList<>();
@@ -167,19 +172,17 @@ public class OptionsHandler {
                 CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
                 for (Sensor sensor : sensors) {
                     SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                    if (sensorData != null) {
-                        if (sensorData.key.equals(parameterName)) {
-                            for (SensorData.Value value : sensorData.values) {
-                                if (value.date.contains("-")) {
-                                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                                    // if date is between given period of time
-                                    if (actualDate != null) {
-                                        if ((actualDate.before(realEndDate) || actualDate.equals(realEndDate)) &&
-                                                (actualDate.after(realStartDate) || actualDate.equals(realStartDate))) {
-                                            if (value.value != null) {
-                                                valuesCounter.incrementAndGet();
-                                                sumOfValues.addAndGet(value.value);
-                                            }
+                    if (sensorData == null) continue;
+                    if (sensorData.key.equals(parameterName)) {
+                        for (SensorData.Value value : sensorData.values) {
+                            if (value.date.contains("-")) {
+                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                                // if date is between given period of time
+                                if (actualDate != null) {
+                                    if (Utils.checkDateInterval(realStartDate, realEndDate, actualDate)) {
+                                        if (value.value != null) {
+                                            valuesCounter.incrementAndGet();
+                                            sumOfValues.addAndGet(value.value);
                                         }
                                     }
                                 }
@@ -187,8 +190,8 @@ public class OptionsHandler {
                         }
                     }
 
+
                 }
-                numberOfThreads.decrementAndGet();
             });
             threads.add(thread);
         }
@@ -260,8 +263,6 @@ public class OptionsHandler {
     }
 
 
-
-
     public String parameterWithLowestValueAtSpecificTime(String date) {
         Date specificDate = Utils.parseStringToDate(date);
         if (specificDate == null) {
@@ -315,35 +316,65 @@ public class OptionsHandler {
 
     }
 
-//    public String parameterWithLowestValueAtSpecificTime(String date) {
-//        Date specificDate = parseStringToDate(date);
-//        if (specificDate == null) {
-//            throw new IllegalArgumentException("This date is not valid");
-//        }
-//
-//        Station[] allStations = getAllStations();
-//        for (Station station : allStations) {
-//
-//            Sensor[] sensors = getAllSensorsForSpecificStation(station.id, station.stationName);
-//            for (Sensor sensor : sensors) {
-//                SensorData sensorData = getSensorDataForSpecificSensor(sensor.id);
-//
-//                double maxValue = 0;
-//                double minValue = 1000;
-//
-//                if (sensorData.values.length == 0) continue;
-//                for (SensorData.Value value : sensorData.values) {
-//                    if (value.value != null) {
-//
-//                    }
-//                }
-//
-//            }
-//
-//        }
-//
-//
-//    }
+
+    public String parameterExtremeValues(String parameterName) {
+        final Container<Date> minDate = new Container<>();
+        final Container<Date> maxDate = new Container<>();
+        final Container<Station> minStation = new Container<>();
+        final Container<Station> maxStation = new Container<>();
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        LinkedList<Thread> threads = new LinkedList<>();
+        final AtomicDouble maxValue = new AtomicDouble(0);
+        final AtomicDouble minValue = new AtomicDouble(10000);
+
+        for (Station station : allStations) {
+            Thread thread = new Thread(() -> {
+                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+                for (Sensor sensor : sensors) {
+                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                    if (sensorData == null) continue;
+                    if (sensorData.values.length == 0) continue;
+                    if (sensorData.key.equals(parameterName)) {
+                        for (SensorData.Value value : sensorData.values) {
+                            if (value.date.contains("-") && value.value != null) {
+                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                                if (value.value < minValue.get()) {
+                                    minValue.set(value.value);
+                                    synchronized (minDate) {
+                                        minDate.set(actualDate);
+                                    }
+                                    synchronized (minStation) {
+                                        minStation.set(station);
+                                    }
+                                }
+                                if (value.value > maxValue.get()) {
+                                    maxValue.set(value.value);
+                                    synchronized (maxDate) {
+                                        maxDate.set(actualDate);
+                                    }
+                                    synchronized (maxStation) {
+                                        maxStation.set(station);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            });
+            threads.add(thread);
+
+        }
+
+        Utils.startAndJoinThreads(threads);
+
+        return "Minimum value of parameter occurs on " + minDate.getValue() +
+                " for station: " + minStation.getValue().stationName +
+                "\nMaximum value of parameter occurs on " + maxDate.getValue() +
+                " for stationL: " + maxStation.getValue().stationName;
+    }
+
 
 }
 

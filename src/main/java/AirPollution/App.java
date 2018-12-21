@@ -58,6 +58,7 @@ public class App implements Runnable {
     private String addressFragment;
 
 
+
     public static void main(String[] args) {
         if (args.length == 0) {
 //            Displays information about the usage of the program when no arguments are given
@@ -140,6 +141,10 @@ public class App implements Runnable {
 
         if(allWithSensors){
             optionsHandler.printAllStationsWithTheirSensors();
+        }
+
+        if (parameterName != null) {
+            System.out.println(optionsHandler.parameterExtremeValues(parameterName));
         }
     }
 }
