@@ -1,6 +1,7 @@
 package AirPollution;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import jdk.jshell.execution.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -316,6 +317,21 @@ public class OptionsHandler {
 
     }
 
+    boolean checkWhetherParameterNameExists(String parameterName) {
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        for (Station station : allStations) {
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+            for (Sensor sensor : sensors) {
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                if (sensorData.key.equals(parameterName)) {
+                    return true;
+                }
+
+            }
+        }
+        return false;
+    }
+
 
     public String parameterExtremeValues(String parameterName) {
         final Container<Date> minDate = new Container<>();
@@ -327,6 +343,11 @@ public class OptionsHandler {
         LinkedList<Thread> threads = new LinkedList<>();
         final AtomicDouble maxValue = new AtomicDouble(0);
         final AtomicDouble minValue = new AtomicDouble(10000);
+
+        if (!checkWhetherParameterNameExists(parameterName)) {
+            System.out.println("Theres is no parameter as " + parameterName + " in system");
+            return null;
+        }
 
         for (Station station : allStations) {
             Thread thread = new Thread(() -> {
@@ -369,10 +390,10 @@ public class OptionsHandler {
 
         Utils.startAndJoinThreads(threads);
 
-        return "Minimum value of parameter occurs on " + minDate.getValue() +
-                " for station: " + minStation.getValue().stationName +
-                "\nMaximum value of parameter occurs on " + maxDate.getValue() +
-                " for stationL: " + maxStation.getValue().stationName;
+        return "Minimum value of parameter occurs on " + Utils.convertDateToString(minDate.getValue()) +
+                " for station: " + minStation.getValue().stationName + " and its value is: " + minValue.get() +
+                "\nMaximum value of parameter occurs on " + Utils.convertDateToString(maxDate.getValue()) +
+                " for station: " + maxStation.getValue().stationName + " and its value is: " + maxValue.get();
     }
 
 

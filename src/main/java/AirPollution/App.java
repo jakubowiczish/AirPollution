@@ -58,7 +58,6 @@ public class App implements Runnable {
     private String addressFragment;
 
 
-
     public static void main(String[] args) {
         if (args.length == 0) {
 //            Displays information about the usage of the program when no arguments are given
@@ -68,7 +67,7 @@ public class App implements Runnable {
         }
     }
 
-// zrobiony punkt 1,2,3,4,5
+    // zrobiony punkt 1,2,3,4,5
     @Override
     public void run() {
         DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
@@ -97,14 +96,7 @@ public class App implements Runnable {
                     optionsHandler.currentValueOfGivenParameterInGivenStation(date, stationName, parameterName));
         }
 
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -b "2018-12-18 15:00:00" -e "2018-12-18 16:00:00" -p "O3"
-//        if (startDate != null && endDate != null && parameterName != null) {
-//            System.out.println("Average pollution of parameter: " + parameterName + " from " + startDate + " to "
-//                    + endDate + " is " + optionsHandler.averagePollutionValueOfGivenParameterForAllStations(startDate, endDate, parameterName));
-//        }
-
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-20 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
-
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -b "2018-12-19 17:00:00" -e "2018-12-19 21:00:00"
         if (startDate != null && endDate != null && parameterName != null && stationName != null) {
@@ -114,7 +106,7 @@ public class App implements Runnable {
                             averagePollutionValueOfGivenParameterForSpecificStation(startDate, endDate, parameterName, stationName)));
         }
 
-        if(startDate != null && endDate != null && parameterName != null) {
+        if (startDate != null && endDate != null && parameterName != null) {
             System.out.println("Pollution of parameter " + parameterName + " for all stations from "
                     + startDate + " to " + endDate + ": " +
                     decimalFormat.format(optionsHandler.
@@ -126,7 +118,7 @@ public class App implements Runnable {
             System.out.println(optionsHandler.mostFluctuatingParameter(sinceWhenDate));
         }
 
-        if(dateForLowestParameter != null) {
+        if (dateForLowestParameter != null) {
             System.out.println(optionsHandler.parameterWithLowestValueAtSpecificTime(dateForLowestParameter));
         }
 
@@ -139,7 +131,7 @@ public class App implements Runnable {
             optionsHandler.printNamesOfAllStations();
         }
 
-        if(allWithSensors){
+        if (allWithSensors) {
             optionsHandler.printAllStationsWithTheirSensors();
         }
 

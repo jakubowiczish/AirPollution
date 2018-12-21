@@ -18,6 +18,7 @@ public class Utils {
         return false;
     }
 
+
     static Date multiThreadParseStringToDate(String date) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
@@ -26,6 +27,13 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+
+
+    static String convertDateToString(Date date) {
+        return usedDateFormat.format(date);
     }
 
     static Date parseStringToDate(String date) {
