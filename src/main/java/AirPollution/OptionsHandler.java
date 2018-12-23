@@ -1,13 +1,11 @@
 package AirPollution;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import jdk.jshell.execution.Util;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.LongAdder;
 
 
 public class OptionsHandler {
@@ -17,94 +15,6 @@ public class OptionsHandler {
     }
 
     private Storage storageReceiver;
-
-
-    public void printNamesOfAllStations() {
-        storageReceiver.getAllStations()
-                .forEach(station -> System.out.println(station.stationName));
-    }
-
-    public void printAllStationsWithTheirSensors() {
-        storageReceiver.getAllStations()
-                .forEach(station -> {
-                    System.out.println("\nSTATION NAME: " + station.stationName + "\nSensors for this station:");
-                    storageReceiver.getAllSensorsForSpecificStation(station.id)
-                            .forEach(sensor -> System.out.println(sensor.toString()));
-                });
-
-    }
-
-    public void printNamesOfAllStationsContainingGivenString(String stationAddressFragment) {
-        boolean found = false;
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        for (Station station : allStations) {
-            if (station.stationName.contains(stationAddressFragment)) {
-                System.out.println(station.stationName);
-                found = true;
-            }
-        }
-        if (!found) {
-            System.out.println("There is no station that contains \"" + stationAddressFragment + "\" in her name");
-        }
-
-
-    }
-
-    public String printerOfAirIndexForGivenStation(String stationName) {
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean foundStation = Utils.checkWhetherStationExists(allStations, stationName);
-
-        if (!foundStation) {
-            System.out.println("There is no such station as " + stationName + " in the system");
-        }
-        if (foundStation) {
-            int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-            AirIndex airIndex = storageReceiver.getAirIndexOfSpecificStation(stationID);
-            stringBuilder.append("Air Index for station: ").append(stationName).append("\n").append(airIndex.toString());
-
-        }
-        return stringBuilder.toString();
-    }
-
-    public double currentValueOfGivenParameterInGivenStation(String date, String stationName, String parameterName) {
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-
-        double currentValue = -1;
-
-        if (stationName != null) {
-            int stationID = Station.returnIdOfGivenStation(allStations, stationName);
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(stationID);
-
-            boolean foundParameter = false;
-
-            for (Sensor sensor : sensors) {
-                if (sensor.param.paramFormula.equals(parameterName)) {
-                    foundParameter = true;
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                    if (sensorData.key.equals(parameterName)) {
-                        boolean validDate = false;
-                        for (SensorData.Value value : sensorData.values) {
-                            if (value != null) {
-                                if (value.date.equals(date)) {
-                                    validDate = true;
-                                    currentValue = value.value;
-                                }
-                            }
-                        }
-                        if (!validDate) {
-                            throw new IllegalArgumentException("There is no such date as " + date + " in the system");
-                        }
-                    }
-                }
-            }
-            if (!foundParameter) {
-                throw new IllegalArgumentException("There is no such parameter as " + parameterName + " in system");
-            }
-        }
-        return currentValue;
-    }
 
 
     public double averagePollutionValueOfGivenParameterForSpecificStation(String startDate, String endDate, String parameterName, String stationName) {
@@ -345,7 +255,7 @@ public class OptionsHandler {
         final AtomicDouble minValue = new AtomicDouble(10000);
 
         if (!checkWhetherParameterNameExists(parameterName)) {
-            System.out.println("Theres is no parameter as " + parameterName + " in system");
+            System.out.println("There is no such parameter as " + parameterName + " in system");
             return null;
         }
 
@@ -387,12 +297,21 @@ public class OptionsHandler {
             threads.add(thread);
 
         }
+//        if (minValue.get() == 10000) {
+//            System.out.println("Minimum value of given parameter was not found");
+//
+//        }
+//        if (maxValue.get() == 0) {
+//            System.out.println("Maximum value of given parameter was not found");
+//        }
 
         Utils.startAndJoinThreads(threads);
 
-        return "Minimum value of parameter occurs on " + Utils.convertDateToString(minDate.getValue()) +
+        return "Minimum value of parameter " + parameterName + " occurs on " +
+                Utils.convertDateToString(minDate.getValue()) +
                 " for station: " + minStation.getValue().stationName + " and its value is: " + minValue.get() +
-                "\nMaximum value of parameter occurs on " + Utils.convertDateToString(maxDate.getValue()) +
+                "\nMaximum value of parameter " + parameterName + " occurs on " +
+                Utils.convertDateToString(maxDate.getValue()) +
                 " for station: " + maxStation.getValue().stationName + " and its value is: " + maxValue.get();
     }
 

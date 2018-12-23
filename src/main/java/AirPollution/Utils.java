@@ -30,8 +30,6 @@ public class Utils {
     }
 
 
-
-
     static String convertDateToString(Date date) {
         return usedDateFormat.format(date);
     }

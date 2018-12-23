@@ -26,8 +26,11 @@ public class App implements Runnable {
             description = "Printing all available stations along with their sensors")
     private boolean allWithSensors;
 
-    @Option(names = {"-s", "--stationName"}, description = "Station name for Air Index")
+    @Option(names = {"-s", "--stationName"}, description = "Station name")
     private String stationName;
+
+    @Option(names = {"-m", "--multipleStations"}, description = "Multiple names of stations", split = ",")
+    private String[] stations;
 
     @Option(names = {"-d", "--date"}, description = "Date of measurement, \nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String date;
@@ -57,6 +60,9 @@ public class App implements Runnable {
             "street name of city name that you want to find station in")
     private String addressFragment;
 
+    @Option(names = {"-r"}, description = "All parameters available in the system at this very moment")
+    private boolean allParameters;
+
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -84,18 +90,24 @@ public class App implements Runnable {
         }
 
         OptionsHandler optionsHandler = new OptionsHandler(storage);
+        AirIndexOptionHandler airIndexOptionHandler = new AirIndexOptionHandler(storage);
+        PrintApiInformationOptionHandler printApiInformationOptionHandler = new PrintApiInformationOptionHandler(storage);
+        ValueOfParameterOptionHandler valueOfParameterOptionHandler = new ValueOfParameterOptionHandler(storage);
+
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 
 
         if (stationName != null) {
-            System.out.println(optionsHandler.printerOfAirIndexForGivenStation(stationName));
-        }
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 15:00:00"
-        if (stationName != null && date != null && parameterName != null) {
-            System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
-                    optionsHandler.currentValueOfGivenParameterInGivenStation(date, stationName, parameterName));
+            System.out.println(airIndexOptionHandler.printerOfAirIndexForGivenStation(stationName));
         }
 
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-22 16:00:00"
+        if (stationName != null && date != null && parameterName != null) {
+            System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
+                    valueOfParameterOptionHandler.valueOfGivenParameterForGivenStationAndDate(date, stationName, parameterName));
+            System.out.println(valueOfParameterOptionHandler.valueOfAllParametersForGivenStationAndDate(date, stationName));
+        }
+/*
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-20 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -b "2018-12-19 17:00:00" -e "2018-12-19 21:00:00"
@@ -121,22 +133,27 @@ public class App implements Runnable {
         if (dateForLowestParameter != null) {
             System.out.println(optionsHandler.parameterWithLowestValueAtSpecificTime(dateForLowestParameter));
         }
+        */
 
+        if (allParameters) {
+            System.out.println(valueOfParameterOptionHandler.parameterNames());
+        }
 
         if (addressFragment != null) {
-            optionsHandler.printNamesOfAllStationsContainingGivenString(addressFragment);
+            printApiInformationOptionHandler.printNamesOfAllStationsContainingGivenString(addressFragment);
         }
 
         if (all) {
-            optionsHandler.printNamesOfAllStations();
+            printApiInformationOptionHandler.printNamesOfAllStations();
         }
 
         if (allWithSensors) {
-            optionsHandler.printAllStationsWithTheirSensors();
+            printApiInformationOptionHandler.printAllStationsWithTheirSensors();
         }
 
         if (parameterName != null) {
             System.out.println(optionsHandler.parameterExtremeValues(parameterName));
         }
     }
+
 }
