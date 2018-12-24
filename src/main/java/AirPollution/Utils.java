@@ -31,7 +31,7 @@ public class Utils {
 
     static ArrayList<Station> validStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
         ArrayList<Station> validStations = new ArrayList<>();
-        if (listOfStations.size() > 1) {
+        if (listOfStations.size() > 0) {
             for (String stationName : listOfStations) {
                 for (Station station : allStations) {
                     if (station.stationName.equals(stationName) && !validStations.contains(station)) {

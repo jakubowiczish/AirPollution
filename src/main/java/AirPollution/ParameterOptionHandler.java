@@ -2,6 +2,7 @@ package AirPollution;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -12,6 +13,8 @@ public class ParameterOptionHandler {
     public ParameterOptionHandler(Storage storageReceiver) {
         this.storageReceiver = storageReceiver;
     }
+
+    DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
 
 
     public String parameterExtremeValues(String parameterName) {
@@ -87,11 +90,12 @@ public class ParameterOptionHandler {
         }
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
+
         ArrayList<Station> validStations = null;
         if (listOfStations != null) {
             validStations = Utils.validStations(listOfStations, allStations);
-
         }
+
         if (validStations != null && validStations.size() > 0) {
             allStations = validStations;
         }
@@ -145,9 +149,26 @@ public class ParameterOptionHandler {
         }
         Utils.startAndJoinThreads(threads);
 
-        System.out.println(Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue());
-        System.out.print("Most fluctuating parameter since \"" + sinceWhenString + "\" is ");
-        return Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
+        StringBuilder resultString = new StringBuilder();
+        if (validStations != null && validStations.size() > 0) {
+            StringBuilder stationNames = new StringBuilder();
+            for (Station station : validStations) {
+                stationNames.append(station.stationName).append("\n");
+            }
+            resultString.
+                    append("Most fluctuating parameter since \"").append(sinceWhenString).
+                    append("\" for stations:\n").append(stationNames).append("is ");
+        } else {
+            resultString.
+                    append("Most fluctuating parameter since \"").
+                    append(sinceWhenString).append("\" for all stations is ");
+        }
+        return resultString +
+                Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey() +
+                ", the difference between maximum and minimum pollution for this parameter amounts to: " +
+                Collections.max(fluctuations.entrySet(),
+                        Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue();
+
     }
 
 

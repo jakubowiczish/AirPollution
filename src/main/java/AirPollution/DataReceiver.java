@@ -81,24 +81,4 @@ public class DataReceiver {
         }
         return validStations;
     }
-
-
-//    private <T> T[] getNoNullArray(Class<T> tClass, T[] array) {
-//        int validElementsCounter = 0;
-//        for (int i = 0; i < array.length; i++) {
-//            if (array[i] != null) {
-//                validElementsCounter++;
-//            }
-//        }
-//
-//        T[] newArray = (T[]) Array.newInstance(tClass, validElementsCounter);
-//        int j = 0;
-//
-//        for (int i = 0; i < array.length; i++) {
-//            if (array[i] != null) {
-//                newArray[j++] = array[i];
-//            }
-//        }
-//        return newArray;
-//    }
 }
