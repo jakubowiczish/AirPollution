@@ -7,7 +7,18 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class Utils {
+
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    final static ArrayList<String> parameters = new ArrayList<>() {{
+        add("NO2");
+        add("O3");
+        add("PM10");
+        add("SO2");
+        add("C6H6");
+        add("CO");
+        add("PM2.5");
+    }};
 
     static boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
         for (Station station : allStations) {
@@ -19,6 +30,10 @@ public class Utils {
     }
 
 
+    static boolean checkWhetherParameterNameIsValid(String parameterName) {
+        return parameters.contains(parameterName);
+    }
+
     static Date multiThreadParseStringToDate(String date) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
@@ -28,6 +43,7 @@ public class Utils {
         }
         return null;
     }
+
 
 
     static String convertDateToString(Date date) {
