@@ -80,12 +80,22 @@ public class ParameterOptionHandler {
     }
 
 
-    public String mostFluctuatingParameter(String sinceWhenString) {
+    public String mostFluctuatingParameter(String sinceWhenString, ArrayList<String> listOfStations) {
         Date sinceWhenDate = Utils.parseStringToDate(sinceWhenString);
         if (sinceWhenDate == null) {
-            throw new IllegalArgumentException("This date is not valid");
+            throw new IllegalArgumentException("This date is not valid: " + sinceWhenString);
         }
+
         ArrayList<Station> allStations = storageReceiver.getAllStations();
+        ArrayList<Station> validStations = null;
+        if (listOfStations != null) {
+            validStations = Utils.validStations(listOfStations, allStations);
+
+        }
+        if (validStations != null && validStations.size() > 0) {
+            allStations = validStations;
+        }
+
         ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
 
         LinkedList<Thread> threads = new LinkedList<>();
@@ -187,10 +197,11 @@ public class ParameterOptionHandler {
 
         Utils.startAndJoinThreads(threads);
 
-        System.out.println("The lowest parameter value is " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue());
         return "Parameter with lowest value on \"" + date + "\" is " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey()
+                + " and its value is: " +
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue();
+
 
     }
 

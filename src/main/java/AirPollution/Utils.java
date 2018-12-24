@@ -29,6 +29,19 @@ public class Utils {
         return false;
     }
 
+    static ArrayList<Station> validStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
+        ArrayList<Station> validStations = new ArrayList<>();
+        if (listOfStations.size() > 1) {
+            for (String stationName : listOfStations) {
+                for (Station station : allStations) {
+                    if (station.stationName.equals(stationName) && !validStations.contains(station)) {
+                        validStations.add(station);
+                    }
+                }
+            }
+        }
+        return validStations;
+    }
 
     static boolean checkWhetherParameterNameIsValid(String parameterName) {
         return parameters.contains(parameterName);
@@ -43,7 +56,6 @@ public class Utils {
         }
         return null;
     }
-
 
 
     static String convertDateToString(Date date) {
