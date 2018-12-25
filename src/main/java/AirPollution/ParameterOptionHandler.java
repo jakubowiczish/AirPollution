@@ -2,9 +2,11 @@ package AirPollution;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ParameterOptionHandler {
@@ -217,16 +219,11 @@ public class ParameterOptionHandler {
         if (sinceWhenDate == null) {
             throw new IllegalArgumentException("This date is not valid: " + sinceWhenString);
         }
-        ArrayList<Station> validStations = null;
+
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
-
-        if (listOfStations != null && listOfStations.size() > 0) {
-            validStations = Utils.validStations(listOfStations, allStations);
-        }
-        if (validStations != null && validStations.size() > 0) {
-            allStations = validStations;
-        }
+        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+        allStations = Utils.assignAllStations(allStations, validStations);
 
         ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
 
@@ -236,13 +233,14 @@ public class ParameterOptionHandler {
 
             Thread thread = new Thread(() -> {
                 CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
-
                 for (Sensor sensor : sensors) {
                     SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                    if (sensorData == null) continue;
+                    if (sensorData.values.length == 0) continue;
+
                     double maxValue = 0;
                     double minValue = 1000;
 
-                    if (sensorData.values.length == 0) continue;
 
                     for (SensorData.Value value : sensorData.values) {
                         if (value.value != null && value.date.contains("-")) {
@@ -300,9 +298,6 @@ public class ParameterOptionHandler {
 
     public String sortedSensors(ArrayList<String> listOfStations, String argumentDate, String parameterName) {
         Date date = Utils.parseAndCheckDate(argumentDate);
-//        if (date == null) {
-//            throw new IllegalArgumentException("Given date: " + argumentDate + " is not valid");
-//        }
 
         if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
             System.out.println("Parameter name: " + parameterName + " is not valid");
@@ -310,39 +305,54 @@ public class ParameterOptionHandler {
         }
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = null;
+        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+        allStations = Utils.assignAllStations(allStations, validStations);
 
-        if (listOfStations != null && listOfStations.size() > 0) {
-            validStations = Utils.validStations(listOfStations, allStations);
-        }
-        if (validStations != null && validStations.size() > 0) {
-            allStations = validStations;
-        }
-
-        TreeMap<Double, String> parameterDataAtSpecificTime = new TreeMap<>();
+        ConcurrentSkipListMap<Double, String> parameterDataAtSpecificTime = new ConcurrentSkipListMap<>();
+        LinkedList<Thread> threads = new LinkedList<>();
 
         for (Station station : allStations) {
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
-            for (Sensor sensor : sensors) {
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                if (!sensorData.key.equals(parameterName)) continue;
-                for (SensorData.Value value : sensorData.values) {
-                    if (value.date.contains("-")) {
-                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                        if (actualDate == null) continue;
-                        if (actualDate.equals(date)) {
-                            parameterDataAtSpecificTime.put(value.value, "Station name: " + station.stationName + "\nSensor id: " + sensor.id);
+            Thread thread = new Thread(() -> {
+                for (Sensor sensor : sensors) {
+                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                    if (sensorData == null) continue;
+                    if (!sensorData.key.equals(parameterName)) continue;
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value.date.contains("-")) {
+                            Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                            if (actualDate == null) continue;
+                            if (actualDate.equals(date)) {
+                                if (value.value == null) {
+                                    System.out.println(
+                                            "Key for station " + station.stationName + ", sensor: " +
+                                                    sensor.id + " and date " + date + " is null"
+                                    );
+                                    parameterDataAtSpecificTime.
+                                            put(0.0, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
+                                } else {
+                                    parameterDataAtSpecificTime.
+                                            put(value.value, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
+                                }
+
+                            }
                         }
                     }
                 }
-            }
+            });
+            threads.add(thread);
         }
+
+        Utils.startAndJoinThreads(threads);
 
         StringBuilder result = new StringBuilder();
         for (Map.Entry<Double, String> entry : parameterDataAtSpecificTime.entrySet()) {
-            result.append(entry.getValue()).append(" value of parameter: ").append(parameterName).append(" is ").append(entry.getKey()).append("\n");
+            result.append(entry.getValue()).append(" Value of parameter: ").
+                    append(parameterName).append(" is equal to: ").append(entry.getKey()).append("\n");
         }
         return result.toString();
     }
+
+
 }

@@ -43,6 +43,22 @@ public class Utils {
         return validStations;
     }
 
+    public static ArrayList<Station> assignValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
+        ArrayList<Station> validStations = null;
+        if (listOfStations != null && listOfStations.size() > 0) {
+            validStations = Utils.validStations(listOfStations, allStations);
+        }
+        return validStations;
+    }
+
+    public static ArrayList<Station> assignAllStations(ArrayList<Station> allStations, ArrayList<Station> validStations) {
+        if (validStations != null && validStations.size() > 0) {
+            return validStations;
+        }
+        return allStations;
+    }
+
+
     static boolean checkWhetherParameterNameIsValid(String parameterName) {
         return parameters.contains(parameterName);
     }
