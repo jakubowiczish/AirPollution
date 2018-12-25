@@ -127,6 +127,10 @@ public class App implements Runnable {
         if (sinceWhenDate != null) {
             System.out.println(parameterOptionHandler.mostFluctuatingParameter(sinceWhenDate, listOfStations));
         }
+
+        if (date != null && parameterName != null) {
+            System.out.println(parameterOptionHandler.sortedSensors(listOfStations, date, parameterName));
+        }
 /*
         if (dateForLowestParameter != null) {
             System.out.println(parameterOptionHandler.parameterWithLowestValueAtSpecificTime(dateForLowestParameter));

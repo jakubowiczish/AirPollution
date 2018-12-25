@@ -83,95 +83,6 @@ public class ParameterOptionHandler {
     }
 
 
-    public String mostFluctuatingParameter(String sinceWhenString, ArrayList<String> listOfStations) {
-        Date sinceWhenDate = Utils.parseStringToDate(sinceWhenString);
-        if (sinceWhenDate == null) {
-            throw new IllegalArgumentException("This date is not valid: " + sinceWhenString);
-        }
-
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-
-        ArrayList<Station> validStations = null;
-        if (listOfStations != null) {
-            validStations = Utils.validStations(listOfStations, allStations);
-        }
-
-        if (validStations != null && validStations.size() > 0) {
-            allStations = validStations;
-        }
-
-        ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
-
-        LinkedList<Thread> threads = new LinkedList<>();
-
-        for (Station station : allStations) {
-
-            Thread thread = new Thread(() -> {
-                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
-
-                for (Sensor sensor : sensors) {
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                    double maxValue = 0;
-                    double minValue = 1000;
-
-                    if (sensorData.values.length == 0) continue;
-
-                    for (SensorData.Value value : sensorData.values) {
-                        if (value.value != null) {
-                            if (value.date.contains("-")) {
-                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                                if (actualDate != null) {
-                                    if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
-                                        if (value.value < minValue) {
-                                            minValue = value.value;
-                                        }
-                                        if (value.value > maxValue) {
-                                            maxValue = value.value;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Double difference = maxValue - minValue;
-
-                    if (fluctuations.get(sensorData.key) != null) {
-                        if (fluctuations.get(sensorData.key).getDifference() < difference)
-                            fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-                    } else {
-                        fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
-                    }
-                }
-
-            });
-            threads.add(thread);
-
-        }
-        Utils.startAndJoinThreads(threads);
-
-        StringBuilder resultString = new StringBuilder();
-        if (validStations != null && validStations.size() > 0) {
-            StringBuilder stationNames = new StringBuilder();
-            for (Station station : validStations) {
-                stationNames.append(station.stationName).append("\n");
-            }
-            resultString.
-                    append("Most fluctuating parameter since \"").append(sinceWhenString).
-                    append("\" for stations:\n").append(stationNames).append("is ");
-        } else {
-            resultString.
-                    append("Most fluctuating parameter since \"").
-                    append(sinceWhenString).append("\" for all stations is ");
-        }
-        return resultString +
-                Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey() +
-                ", the difference between maximum and minimum pollution for this parameter amounts to: " +
-                Collections.max(fluctuations.entrySet(),
-                        Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue();
-
-    }
-
-
     public String parameterWithLowestValueAtSpecificTime(String date) {
         Date specificDate = Utils.parseStringToDate(date);
         if (specificDate == null) {
@@ -300,4 +211,138 @@ public class ParameterOptionHandler {
         return parameters;
     }
 
+
+    public String mostFluctuatingParameter(String sinceWhenString, ArrayList<String> listOfStations) {
+        Date sinceWhenDate = Utils.parseStringToDate(sinceWhenString);
+        if (sinceWhenDate == null) {
+            throw new IllegalArgumentException("This date is not valid: " + sinceWhenString);
+        }
+        ArrayList<Station> validStations = null;
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+
+        if (listOfStations != null && listOfStations.size() > 0) {
+            validStations = Utils.validStations(listOfStations, allStations);
+        }
+        if (validStations != null && validStations.size() > 0) {
+            allStations = validStations;
+        }
+
+        ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
+
+        LinkedList<Thread> threads = new LinkedList<>();
+
+        for (Station station : allStations) {
+
+            Thread thread = new Thread(() -> {
+                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+
+                for (Sensor sensor : sensors) {
+                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                    double maxValue = 0;
+                    double minValue = 1000;
+
+                    if (sensorData.values.length == 0) continue;
+
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value.value != null && value.date.contains("-")) {
+                            Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                            if (actualDate == null) continue;
+                            if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
+                                if (value.value < minValue) {
+                                    minValue = value.value;
+                                }
+                                if (value.value > maxValue) {
+                                    maxValue = value.value;
+                                }
+                            }
+
+                        }
+                    }
+                    Double difference = maxValue - minValue;
+
+                    if (fluctuations.get(sensorData.key) != null) {
+                        if (fluctuations.get(sensorData.key).getDifference() < difference)
+                            fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
+                    } else {
+                        fluctuations.put(sensorData.key, new StationFluctuation(station, difference));
+                    }
+                }
+
+            });
+            threads.add(thread);
+
+        }
+        Utils.startAndJoinThreads(threads);
+
+        StringBuilder resultString = new StringBuilder();
+        if (validStations != null && validStations.size() > 0) {
+            StringBuilder stationNames = new StringBuilder();
+            for (Station station : validStations) {
+                stationNames.append(station.stationName).append("\n");
+            }
+            resultString.
+                    append("Most fluctuating parameter since \"").append(sinceWhenString).
+                    append("\" for stations:\n").append(stationNames).append("is ");
+        } else {
+            resultString.
+                    append("Most fluctuating parameter since \"").
+                    append(sinceWhenString).append("\" for all stations is ");
+        }
+        return resultString +
+                Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey() +
+                ", the difference between maximum and minimum pollution for this parameter amounts to: " +
+                Collections.max(fluctuations.entrySet(),
+                        Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue();
+
+    }
+
+
+    public String sortedSensors(ArrayList<String> listOfStations, String argumentDate, String parameterName) {
+        Date date = Utils.parseAndCheckDate(argumentDate);
+//        if (date == null) {
+//            throw new IllegalArgumentException("Given date: " + argumentDate + " is not valid");
+//        }
+
+        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
+            System.out.println("Parameter name: " + parameterName + " is not valid");
+            return null;
+        }
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        ArrayList<Station> validStations = null;
+
+        if (listOfStations != null && listOfStations.size() > 0) {
+            validStations = Utils.validStations(listOfStations, allStations);
+        }
+        if (validStations != null && validStations.size() > 0) {
+            allStations = validStations;
+        }
+
+        TreeMap<Double, String> parameterDataAtSpecificTime = new TreeMap<>();
+
+        for (Station station : allStations) {
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+
+            for (Sensor sensor : sensors) {
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                if (!sensorData.key.equals(parameterName)) continue;
+                for (SensorData.Value value : sensorData.values) {
+                    if (value.date.contains("-")) {
+                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                        if (actualDate == null) continue;
+                        if (actualDate.equals(date)) {
+                            parameterDataAtSpecificTime.put(value.value, "Station name: " + station.stationName + "\nSensor id: " + sensor.id);
+                        }
+                    }
+                }
+            }
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (Map.Entry<Double, String> entry : parameterDataAtSpecificTime.entrySet()) {
+            result.append(entry.getValue()).append(" value of parameter: ").append(parameterName).append(" is ").append(entry.getKey()).append("\n");
+        }
+        return result.toString();
+    }
 }
