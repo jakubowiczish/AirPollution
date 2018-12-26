@@ -29,14 +29,20 @@ public class Utils {
         return false;
     }
 
-    static ArrayList<Station> validStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
+    static ArrayList<Station> checkValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
         ArrayList<Station> validStations = new ArrayList<>();
+
         if (listOfStations.size() > 0) {
             for (String stationName : listOfStations) {
+                boolean stationNameFound = false;
                 for (Station station : allStations) {
                     if (station.stationName.equals(stationName) && !validStations.contains(station)) {
                         validStations.add(station);
+                        stationNameFound = true;
                     }
+                }
+                if (!stationNameFound) {
+                    System.out.println("There is no such station in the system as: " + stationName);
                 }
             }
         }
@@ -46,7 +52,7 @@ public class Utils {
     public static ArrayList<Station> assignValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
         ArrayList<Station> validStations = null;
         if (listOfStations != null && listOfStations.size() > 0) {
-            validStations = Utils.validStations(listOfStations, allStations);
+            validStations = Utils.checkValidStations(listOfStations, allStations);
         }
         return validStations;
     }

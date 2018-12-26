@@ -94,11 +94,11 @@ public class App implements Runnable {
         AveragePollutionHandler averagePollutionHandler = new AveragePollutionHandler(storage);
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
-/*
-        if (stationName != null) {
-            System.out.println(airIndexOptionHandler.printerOfAirIndexForGivenStation(stationName));
-        }
 
+        if (listOfStations != null) {
+            System.out.println(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations));
+        }
+/*
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-22 16:00:00"
         if (stationName != null && date != null && parameterName != null) {
             System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
@@ -113,12 +113,12 @@ public class App implements Runnable {
 
         */
 
-        if (date != null && parameterName != null) {
-            System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
-        }
-        if (date != null) {
-            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationsAndDate(date, listOfStations));
-        }
+//        if (date != null && parameterName != null) {
+//            System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
+//        }
+//        if (date != null) {
+//            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationsAndDate(date, listOfStations));
+//        }
 
 
 //        if (sinceWhenDate != null) {

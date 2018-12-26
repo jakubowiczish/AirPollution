@@ -9,20 +9,17 @@ public class AirIndexOptionHandler {
         this.storageReceiver = storageReceiver;
     }
 
-    public String printerOfAirIndexForGivenStation(String stationName) {
+    public String airIndicesOfGivenStations(ArrayList<String> listOfStations) {
         ArrayList<Station> allStations = storageReceiver.getAllStations();
 
+        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+        allStations = Utils.assignAllStations(allStations, validStations);
         StringBuilder stringBuilder = new StringBuilder();
-        boolean foundStation = Utils.checkWhetherStationExists(allStations, stationName);
 
-        if (!foundStation) {
-            System.out.println("There is no such station as " + stationName + " in the system");
-        }
-        if (foundStation) {
-            int stationID = Station.returnIdOfGivenStation(allStations, stationName);
+        for (Station station : allStations) {
+            int stationID = Station.returnIdOfGivenStation(allStations, station.stationName);
             AirIndex airIndex = storageReceiver.getAirIndexOfSpecificStation(stationID);
-            stringBuilder.append("Air Index for station: ").append(stationName).append("\n").append(airIndex.toString());
-
+            stringBuilder.append("AIR INDEX FOR STATION: \"").append(station.stationName).append("\"\n").append(airIndex.toString()).append("\n");
         }
         return stringBuilder.toString();
     }

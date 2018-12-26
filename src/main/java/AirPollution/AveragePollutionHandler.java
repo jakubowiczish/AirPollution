@@ -24,6 +24,9 @@ public class AveragePollutionHandler {
         Date realEndDate = Utils.parseAndCheckDate(endDate);
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
+//        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+//        allStations = Utils.assignAllStations(allStations, validStations);
+//
 
         if (!Utils.checkWhetherStationExists(allStations, stationName)) {
             System.out.println("There is no such station as " + stationName + " in the system");
