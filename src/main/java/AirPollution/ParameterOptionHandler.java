@@ -196,12 +196,13 @@ public class ParameterOptionHandler {
                         if (value.date.equals(date)) {
                             validDate = true;
                             if (value.value == null) {
-                                System.out.println("Value of pollution for station: " + station.stationName + " is null");
                                 valuesOfParameterForGivenStationsAndDate.
-                                        put(-1.0, " - pollution value for station: \"" + station.stationName + "\"\n");
+                                        put(-1.0, " NULL pollution value of parameter: " +
+                                                parameterName + " for station: \"" + station.stationName + "\"\n");
                             } else {
                                 valuesOfParameterForGivenStationsAndDate.
-                                        put(value.value, " - pollution value for station: \"" + station.stationName + "\"\n");
+                                        put(value.value, " - pollution value of parameter: " +
+                                                parameterName + " for station: \"" + station.stationName + "\"\n");
                             }
 
                         }
@@ -214,7 +215,7 @@ public class ParameterOptionHandler {
 
             }
             if (!foundParameter) {
-                System.out.println("There is no such parameter as \"" + parameterName + "\" in system for station: " + station.stationName);
+                System.out.println("There is no such parameter as \"" + parameterName + "\" in the system for station: " + station.stationName);
             }
         }
         for (Map.Entry<Double, String> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
@@ -224,21 +225,16 @@ public class ParameterOptionHandler {
         return stringBuilder.toString();
     }
 
-//    public String valueOfAllParametersForGivenStationsAndDate(String date, ArrayList<String> liftOfStations) {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        for (String parameter : Utils.parameters) {
-//            double value = valueOfGivenParameterForGivenStationsAndDate(date, liftOfStations, parameter);
-//            if (value < 0) continue;
-//            stringBuilder.
-//                    append("Parameter name ").
-//                    append(parameter).
-//                    append(" and its value on ").
-//                    append(date).
-//                    append(" is ").append(value).
-//                    append("\n");
-//        }
-//        return stringBuilder.toString();
-//    }
+    public String valueOfAllParametersForGivenStationsAndDate(String date, ArrayList<String> liftOfStations) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("VALUES OF ALL PARAMETERS: ").append("\n");
+        for (String parameter : Utils.parameters) {
+            String value = valueOfGivenParameterForGivenStationsAndDate(date, liftOfStations, parameter);
+            if (value.length() < 50) continue; // means that we did not add any pollution values, just communicate about which parameter is being checked
+            stringBuilder.append(value);
+        }
+        return stringBuilder.toString();
+    }
 
 
     ArrayList<String> parameterNames() {

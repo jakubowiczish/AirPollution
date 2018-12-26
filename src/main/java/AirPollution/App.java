@@ -116,6 +116,10 @@ public class App implements Runnable {
         if (date != null && parameterName != null) {
             System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
         }
+        if (date != null) {
+            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationsAndDate(date, listOfStations));
+        }
+
 
 //        if (sinceWhenDate != null) {
 //            System.out.println(parameterOptionHandler.mostFluctuatingParameter(sinceWhenDate, listOfStations));
