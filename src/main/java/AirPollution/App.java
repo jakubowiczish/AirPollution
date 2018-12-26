@@ -102,35 +102,28 @@ public class App implements Runnable {
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-22 16:00:00"
         if (stationName != null && date != null && parameterName != null) {
             System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
-                    parameterOptionHandler.valueOfGivenParameterForGivenStationAndDate(date, stationName, parameterName));
-            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationAndDate(date, stationName));
+                    parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, stationName, parameterName));
+            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationsAndDate(date, stationName));
         }
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-20 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -b "2018-12-19 17:00:00" -e "2018-12-19 21:00:00"
-        if (startDate != null && endDate != null && parameterName != null && stationName != null) {
-            System.out.println("Pollution of parameter " + parameterName + " in " + stationName + " from "
-                    + startDate + " to " + endDate + ": " +
-                    decimalFormat.format(averagePollutionHandler.
-                            averagePollutionValueOfGivenParameterForSpecificStation(startDate, endDate, parameterName, stationName)));
-        }
 
-        if (startDate != null && endDate != null && parameterName != null) {
-            System.out.println("Pollution of parameter " + parameterName + " for all stations from "
-                    + startDate + " to " + endDate + ": " +
-                    decimalFormat.format(averagePollutionHandler.
-                            averagePollutionValueOfGivenParameterForAllStations(startDate, endDate, parameterName)));
-        }
 
         */
-        if (sinceWhenDate != null) {
-            System.out.println(parameterOptionHandler.mostFluctuatingParameter(sinceWhenDate, listOfStations));
-        }
 
         if (date != null && parameterName != null) {
-            System.out.println(parameterOptionHandler.sortedSensors(listOfStations, date, parameterName));
+            System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
         }
+
+//        if (sinceWhenDate != null) {
+//            System.out.println(parameterOptionHandler.mostFluctuatingParameter(sinceWhenDate, listOfStations));
+//        }
+
+//        if (date != null && parameterName != null) {
+//            System.out.println(parameterOptionHandler.sortedSensors(listOfStations, date, parameterName));
+//        }
 /*
         if (dateForLowestParameter != null) {
             System.out.println(parameterOptionHandler.parameterWithLowestValueAtSpecificTime(dateForLowestParameter));

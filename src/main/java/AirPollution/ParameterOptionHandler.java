@@ -2,13 +2,15 @@ package AirPollution;
 
 import com.google.common.util.concurrent.AtomicDouble;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Class that is responsible with handling commandline arguments about parameters
+ */
 public class ParameterOptionHandler {
     private Storage storageReceiver;
 
@@ -18,7 +20,15 @@ public class ParameterOptionHandler {
 
     DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
 
-
+    /**
+     * Is responsible for returning String that contains information about extreme values of parameter
+     * (maximum and minimum values).
+     * This information consists of names of the stations where such extreme values occur together with
+     * date when they occur and pollution values for this specific parameter
+     *
+     * @param parameterName name of the parameter that we want to have extreme values' information about
+     * @return Information about extreme values for given parameter
+     */
     public String parameterExtremeValues(String parameterName) {
         final Container<Date> minDate = new Container<>();
         final Container<Date> maxDate = new Container<>();
@@ -84,7 +94,13 @@ public class ParameterOptionHandler {
                 " for station: \"" + maxStation.getValue().stationName + "\" and its value is: " + maxValue.get();
     }
 
-
+    /**
+     * Is designed to provide user with information about the name of the parameter
+     * which has the lowest value of pollution at specific time - time that is given in an argument
+     *
+     * @param date we convey this date when we want to check which parameter has lowest value at this specific time,in format yyyy-MM-dd HH:mm:ss
+     * @return name of the parameter that has lowest value at specific date given in an argument
+     */
     public String parameterWithLowestValueAtSpecificTime(String date) {
         Date specificDate = Utils.parseStringToDate(date);
         if (specificDate == null) {
@@ -139,62 +155,90 @@ public class ParameterOptionHandler {
 
     }
 
-
-    public double valueOfGivenParameterForGivenStationAndDate(String date, String stationName, String parameterName) {
+    /**
+     * Is responsible for providing user with information about the value of given parameter
+     * for specified, given names of the stations and given date in format yyyy-MM-dd HH:mm:ss
+     *
+     * @param date
+     * @param listOfStations
+     * @param parameterName
+     * @return
+     */
+    public String valueOfGivenParameterForGivenStationsAndDate(String date, ArrayList<String> listOfStations, String parameterName) {
         ArrayList<Station> allStations = storageReceiver.getAllStations();
 
-        double currentValue = -1;
+        StringBuilder stringBuilder = new StringBuilder();
 
-        if (stationName != null) {
-            int stationID = Station.returnIdOfGivenStation(allStations, stationName);
+        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+        allStations = Utils.assignAllStations(allStations, validStations);
+
+        stringBuilder.append("For Parameter: ").append(parameterName).append("\nDate: ").append(date).append("\n");
+
+        ConcurrentSkipListMap<Double, String> valuesOfParameterForGivenStationsAndDate = new ConcurrentSkipListMap<>();
+
+        for (Station station : allStations) {
+            if (station == null) continue;
+            int stationID = Station.returnIdOfGivenStation(allStations, station.stationName);
+
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(stationID);
 
             boolean foundParameter = false;
 
             for (Sensor sensor : sensors) {
-                if (sensor.param.paramFormula.equals(parameterName)) {
-                    foundParameter = true;
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                    if (sensorData == null) continue;
-                    if (sensorData.key.equals(parameterName)) {
-                        boolean validDate = false;
-                        for (SensorData.Value value : sensorData.values) {
-                            if (value != null) {
-                                if (value.date.equals(date)) {
-                                    validDate = true;
-                                    currentValue = value.value;
-                                }
+                if (!sensor.param.paramFormula.equals(parameterName)) continue;
+                foundParameter = true;
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                if (sensorData == null) continue;
+                if (sensorData.key.equals(parameterName)) {
+                    boolean validDate = false;
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value == null) continue;
+                        if (value.date.equals(date)) {
+                            validDate = true;
+                            if (value.value == null) {
+                                System.out.println("Value of pollution for station: " + station.stationName + " is null");
+                                valuesOfParameterForGivenStationsAndDate.
+                                        put(-1.0, " - pollution value for station: \"" + station.stationName + "\"\n");
+                            } else {
+                                valuesOfParameterForGivenStationsAndDate.
+                                        put(value.value, " - pollution value for station: \"" + station.stationName + "\"\n");
                             }
+
                         }
-                        if (!validDate) {
-                            System.out.println("There is no such date as \"" + date + "\"  in the system");
-                        }
+
+                    }
+                    if (!validDate) {
+                        System.out.println("There is no such date as \"" + date + "\"  in the system for station: " + station.stationName);
                     }
                 }
+
             }
             if (!foundParameter) {
-                System.out.println("There is no such parameter as \" " + parameterName + "\" in system for station: " + stationName);
+                System.out.println("There is no such parameter as \"" + parameterName + "\" in system for station: " + station.stationName);
             }
         }
-        return currentValue;
-    }
-
-
-    public String valueOfAllParametersForGivenStationAndDate(String date, String stationName) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String parameter : Utils.parameters) {
-            double value = valueOfGivenParameterForGivenStationAndDate(date, stationName, parameter);
-            if (value < 0) continue;
-            stringBuilder.
-                    append("Parameter name ").
-                    append(parameter).
-                    append(" and its value on ").
-                    append(date).
-                    append(" is ").append(value).
-                    append("\n");
+        for (Map.Entry<Double, String> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
+            stringBuilder.append(entry.getKey()).append(entry.getValue());
         }
+
         return stringBuilder.toString();
     }
+
+//    public String valueOfAllParametersForGivenStationsAndDate(String date, ArrayList<String> liftOfStations) {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (String parameter : Utils.parameters) {
+//            double value = valueOfGivenParameterForGivenStationsAndDate(date, liftOfStations, parameter);
+//            if (value < 0) continue;
+//            stringBuilder.
+//                    append("Parameter name ").
+//                    append(parameter).
+//                    append(" and its value on ").
+//                    append(date).
+//                    append(" is ").append(value).
+//                    append("\n");
+//        }
+//        return stringBuilder.toString();
+//    }
 
 
     ArrayList<String> parameterNames() {
@@ -330,7 +374,7 @@ public class ParameterOptionHandler {
                                                     sensor.id + " and date " + date + " is null"
                                     );
                                     parameterDataAtSpecificTime.
-                                            put(0.0, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
+                                            put(-1.0, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
                                 } else {
                                     parameterDataAtSpecificTime.
                                             put(value.value, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
