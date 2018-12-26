@@ -38,7 +38,7 @@ public class App implements Runnable {
 
     @Option(names = {"-b", "--beginDate"}, description = "Start date of measurement, " +
             "\nin format \"yyyy-MM-dd HH:mm:ss\"")
-    private String startDate;
+    private String beginDate;
 
     @Option(names = {"-e", "--endDate"}, description = "End date of measurement, " +
             "\nin format \"yyyy-MM-dd HH:mm:ss\"")
@@ -94,10 +94,10 @@ public class App implements Runnable {
         AveragePollutionHandler averagePollutionHandler = new AveragePollutionHandler(storage);
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
-
-        if (listOfStations != null) {
-            System.out.println(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations));
-        }
+//
+//        if (listOfStations != null) {
+//            System.out.println(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations));
+//        }
 /*
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-22 16:00:00"
         if (stationName != null && date != null && parameterName != null) {
@@ -139,6 +139,11 @@ public class App implements Runnable {
         }
 
 */
+        if (beginDate != null && endDate != null && parameterName != null) {
+            System.out.println(averagePollutionHandler.
+                    averagePollutionValueOfGivenParameterForGivenStations(beginDate, endDate, parameterName, listOfStations));
+        }
+
         if (all) {
             printApiInformationOptionHandler.printNamesOfAllStations();
         }

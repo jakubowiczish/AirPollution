@@ -14,8 +14,8 @@ public class DataReceiver {
             sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensorID));
         } catch (IOException e) {
             System.out.println("There is no SensorData for this sensor: " + sensorID);
-            e.printStackTrace();
             return null;
+//            e.printStackTrace();
         }
         return sensorData;
     }
