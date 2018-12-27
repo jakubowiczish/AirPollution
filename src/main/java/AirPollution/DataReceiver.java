@@ -15,7 +15,6 @@ public class DataReceiver {
         } catch (IOException e) {
             System.out.println("There is no SensorData for this sensor: " + sensorID);
             return null;
-//            e.printStackTrace();
         }
         return sensorData;
     }
@@ -28,7 +27,6 @@ public class DataReceiver {
             airIndex = factory.createAirIndex(jsonFetcher.getQualityIndex(stationID));
         } catch (IOException e) {
             System.out.println("There is no AirIndex for this station: " + stationID);
-            e.printStackTrace();
             return null;
         }
         return airIndex;
@@ -43,7 +41,6 @@ public class DataReceiver {
             allSensors = factory.createSensors(jsonFetcher.getSensors(stationID));
         } catch (IOException e) {
             System.out.println("System was unable to fetch all sensors for station with stationID: " + stationID);
-            e.printStackTrace();
         }
         CopyOnWriteArrayList<Sensor> validSensors = new CopyOnWriteArrayList<>();
         for (Sensor sensor : allSensors) {
@@ -67,7 +64,6 @@ public class DataReceiver {
             allStations = factory.createStations(jsonFetcher.getAllStations());
         } catch (IOException e) {
             System.out.println("System was unable to fetch all stations");
-            e.printStackTrace();
         }
         ArrayList<Station> validStations = new ArrayList<>();
         for(Station station : allStations) {

@@ -16,9 +16,12 @@ public class AirIndexOptionHandler {
         allStations = Utils.assignAllStations(allStations, validStations);
         StringBuilder stringBuilder = new StringBuilder();
 
+        if (allStations == null) return null;
         for (Station station : allStations) {
+            if (station == null) continue;
             int stationID = Station.returnIdOfGivenStation(allStations, station.stationName);
             AirIndex airIndex = storageReceiver.getAirIndexOfSpecificStation(stationID);
+            if (airIndex == null) continue;
             stringBuilder.append("AIR INDEX FOR STATION: \"").append(station.stationName).append("\"\n").append(airIndex.toString()).append("\n");
         }
         return stringBuilder.toString();

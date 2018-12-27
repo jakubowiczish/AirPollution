@@ -61,7 +61,7 @@ public class App implements Runnable {
     @Option(names = {"-r"}, description = "All parameters available in the system at this very moment")
     private boolean allParameters;
 
-    @Option(names = {"-S"}, description = "List of stations", split = ",")
+    @Option(names = {"-S"}, description = "List of stations", split = ";")
     private ArrayList<String> listOfStations;
 
     public static void main(String[] args) {
@@ -79,20 +79,20 @@ public class App implements Runnable {
 
         PhysicalStorage physicalStorage = new PhysicalStorage();
         Storage storage = physicalStorage.loadStorageFromFile();
-        Date currentDate = new Date();
 
-        if (storage == null || (currentDate.getTime() - storage.lastLoadDate.getTime() > 20 * 60 * 1000)) {
+        if (storage == null || (System.currentTimeMillis() - storage.lastLoadDate.getTime() > 3600 * 1000)) {
             storage = new Storage();
             storage.loadAllData();
 
             physicalStorage.saveStorageToFile(storage);
         }
 
+
         AirIndexOptionHandler airIndexOptionHandler = new AirIndexOptionHandler(storage);
         PrintApiInformationOptionHandler printApiInformationOptionHandler = new PrintApiInformationOptionHandler(storage);
         ParameterOptionHandler parameterOptionHandler = new ParameterOptionHandler(storage);
         AveragePollutionHandler averagePollutionHandler = new AveragePollutionHandler(storage);
-
+        BarGraphHandler barGraphHandler = new BarGraphHandler(storage);
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 //
 //        if (listOfStations != null) {
@@ -139,9 +139,13 @@ public class App implements Runnable {
         }
 
 */
+//        if (beginDate != null && endDate != null && parameterName != null) {
+//            System.out.println(averagePollutionHandler.
+//                    averagePollutionValueOfGivenParameterForGivenStations(beginDate, endDate, parameterName, listOfStations));
+//        }
+
         if (beginDate != null && endDate != null && parameterName != null) {
-            System.out.println(averagePollutionHandler.
-                    averagePollutionValueOfGivenParameterForGivenStations(beginDate, endDate, parameterName, listOfStations));
+            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginDate, endDate, parameterName, listOfStations));
         }
 
         if (all) {

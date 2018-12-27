@@ -348,8 +348,8 @@ public class ParameterOptionHandler {
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-        ConcurrentSkipListMap<Double, String> parameterDataAtSpecificTime = new ConcurrentSkipListMap<>();
         LinkedList<Thread> threads = new LinkedList<>();
+        ConcurrentSkipListMap<Double, String> parameterDataAtSpecificTime = new ConcurrentSkipListMap<>();
 
         for (Station station : allStations) {
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
