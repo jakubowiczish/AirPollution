@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -143,4 +145,88 @@ public class BarGraphHandler {
         }
         return stringBuilder.toString();
     }
+//    public String barGraphForGivenParameterStationsAndPeriodOfTime2(String startDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
+//        Date realStartDate = Utils.parseAndCheckDate(startDate);
+//        Date realEndDate = Utils.parseAndCheckDate(endDate);
+//
+//        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
+//            System.out.println("Given parameter name: \"" + parameterName + "\" is not valid");
+//            return null;
+//        }
+//
+//        ArrayList<Station> allStations = storageReceiver.getAllStations();
+//        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+//        allStations = Utils.assignAllStations(allStations, validStations);
+//
+//        int maxLengthOfLine = 100;
+//        int longestStationNameLength = findLongestStationName(allStations);
+//
+//        double maxValue = findMaximumValueOfGivenParameter(allStations, parameterName);
+//
+//        StringBuilder stringBuilder = new StringBuilder();
+//
+//        ConcurrentSkipListMap<String, String> graphSortedByHours = new ConcurrentSkipListMap<>();
+//
+//        for (Station station : allStations) {
+//            if (station == null) continue;
+//            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+//            if (sensors == null) continue;
+//            for (Sensor sensor : sensors) {
+//                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+//                if (sensorData == null || sensorData.values.length == 0) continue;
+//                if (!sensorData.key.equals(parameterName)) {
+//                    System.out.println("There is no such parameter as: " + parameterName +
+//                            " for station: " + station.stationName +
+//                            " and sensor: " + sensor.id);
+//                    continue;
+//                }
+//                for (SensorData.Value value : sensorData.values) {
+//                    if (!value.date.contains("-")) continue;
+//                    if (value.value == null) continue;
+//                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+//                    if (!Utils.checkDateInterval(realStartDate, realEndDate, actualDate)) continue;
+//
+//                    int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
+//                    String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "#");
+//                    String[] dateParts = value.date.split(" ");
+//                    int blankSpaceLength = longestStationNameLength - station.stationName.length() + 1;
+//
+//
+//                    if (isToday(actualDate)) {
+//                        if (graphSortedByHours.)
+//                        String string = dateParts[1] +
+//                                " TODAY               " + " (" + station.stationName + ")" +
+//                                createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
+//                                graphLine + " " + value.value +
+//                                "\n";
+//                        graphSortedByHours.put(dateParts[1], string);
+//
+//
+//                    } else if (wasYesterday(actualDate)) {
+//                        String string = dateParts[1] +
+//                                " YESTERDAY           " + " (" + station.stationName + ")" +
+//                                createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
+//                                graphLine + " " + value.value +
+//                                "\n";
+//                        graphSortedByHours.put(dateParts[1], string);
+//
+//                    } else {
+//                        String string = dateParts[1] +
+//                                " DAY BEFORE YESTERDAY" + " (" + station.stationName + ")" +
+//                                createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
+//                                graphLine + " " + value.value +
+//                                "\n";
+//                        graphSortedByHours.put(dateParts[1], string);
+//                    }
+//                }
+//            }
+//            for (Map.Entry<String, String> entry : graphSortedByHours.entrySet()) {
+//                stringBuilder.append(entry.getValue());
+//            }
+//        }
+//
+//
+//        return stringBuilder.toString();
+//    }
+
 }
