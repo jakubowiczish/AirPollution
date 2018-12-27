@@ -5,6 +5,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -93,6 +94,7 @@ public class App implements Runnable {
         ParameterOptionHandler parameterOptionHandler = new ParameterOptionHandler(storage);
         AveragePollutionHandler averagePollutionHandler = new AveragePollutionHandler(storage);
         BarGraphHandler barGraphHandler = new BarGraphHandler(storage);
+
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 //
 //        if (listOfStations != null) {

@@ -2,17 +2,25 @@ package AirPollution;
 
 import com.google.common.base.Strings;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class BarGraphHandler {
+
     private Storage storageReceiver;
 
     public BarGraphHandler(Storage storageReceiver) {
         this.storageReceiver = storageReceiver;
     }
+
+    LocalDate today = LocalDate.now(); // 2018-12-27
+    LocalDate yesterday = LocalDate.now().minusDays(1);
+
 
     private double findMaximumValueOfGivenParameter(ArrayList<Station> allStations, String parameterName) {
         double maxValue = -1.0;
@@ -49,16 +57,18 @@ public class BarGraphHandler {
     private String createStringOfGivenLengthAndCharacter(int length, String character) {
         return Strings.repeat(character, length);
     }
-    
 
-    private boolean wasYesterday(Date actualDate) {
-        return (System.currentTimeMillis() - actualDate.getTime()) > 24 * 3600 * 1000 &&
-                (System.currentTimeMillis() - actualDate.getTime()) < 48 * 3600 * 1000;
+
+    public boolean wasYesterday(Date actualDate) {
+        LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return yesterday.equals(realDate);
     }
 
     private boolean isToday(Date actualDate) {
-        return (System.currentTimeMillis() - actualDate.getTime()) < 24 * 3600 * 1000;
+        LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return today.equals(realDate);
     }
+
 
 
     public String barGraphForGivenParameterStationsAndPeriodOfTime(String startDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
@@ -74,7 +84,7 @@ public class BarGraphHandler {
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-        int maxLengthOfLine = 70;
+        int maxLengthOfLine = 100;
         int longestStationNameLength = findLongestStationName(allStations);
 
         double maxValue = findMaximumValueOfGivenParameter(allStations, parameterName);
@@ -107,7 +117,7 @@ public class BarGraphHandler {
                     if (isToday(actualDate)) {
                         stringBuilder.
                                 append(dateParts[1]).
-                                append(" TODAY               ").append("(").append(station.stationName).append(")").
+                                append(" TODAY               ").append(" (").append(station.stationName).append(")").
                                 append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
                                 append(graphLine).append(" ").append(value.value).
                                 append("\n");
@@ -115,7 +125,7 @@ public class BarGraphHandler {
                     } else if (wasYesterday(actualDate)) {
                         stringBuilder.
                                 append(dateParts[1]).
-                                append(" YESTERDAY           ").append("(").append(station.stationName).append(")").
+                                append(" YESTERDAY           ").append(" (").append(station.stationName).append(")").
                                 append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
                                 append(graphLine).append(" ").append(value.value).
                                 append("\n");
@@ -123,7 +133,7 @@ public class BarGraphHandler {
                     } else {
                         stringBuilder.
                                 append(dateParts[1]).
-                                append(" DAY BEFORE YESTERDAY").append("(").append(station.stationName).append(")").
+                                append(" DAY BEFORE YESTERDAY").append(" (").append(station.stationName).append(")").
                                 append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
                                 append(graphLine).append(" ").append(value.value).
                                 append("\n");
