@@ -50,7 +50,7 @@ public class Storage {
 
     public ArrayList<Station> getAllStations() {
         if (stationMemory.size() == 0) {
-            ArrayList<Station> allStations = dataReceiver.getAllStations();
+            ArrayList<Station> allStations = dataReceiver.getAllStations(0);
 
             if (allStations == null) {
                 System.out.println("There are no stations available at the moment");
@@ -71,7 +71,7 @@ public class Storage {
             return sensorMemory.get(stationID);
         }
 
-        CopyOnWriteArrayList<Sensor> allSensors = dataReceiver.getAllSensorsForSpecificStation(stationID);
+        CopyOnWriteArrayList<Sensor> allSensors = dataReceiver.getAllSensorsForSpecificStation(stationID, 0);
         if (allSensors == null) {
             System.out.println("Sensors for " + stationID + " are not available at the moment or do not exist");
             return null;
@@ -85,7 +85,7 @@ public class Storage {
             return sensorDataMemory.get(sensorID);
         }
 
-        SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensorID);
+        SensorData sensorData = dataReceiver.getSensorDataForSpecificSensor(sensorID, 0);
 
         if (sensorData == null) {
             System.out.println("SensorData for sensor: " + sensorID + " is null");
@@ -101,7 +101,7 @@ public class Storage {
             return airIndexMemory.get(stationID);
         }
 
-        AirIndex airIndex = dataReceiver.getAirIndexOfSpecificStation(stationID);
+        AirIndex airIndex = dataReceiver.getAirIndexOfSpecificStation(stationID, 0);
 
         if (airIndex == null) {
             return null;
