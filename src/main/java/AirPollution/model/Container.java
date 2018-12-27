@@ -1,4 +1,4 @@
-package AirPollution;
+package AirPollution.model;
 
 public class Container<T> {
 

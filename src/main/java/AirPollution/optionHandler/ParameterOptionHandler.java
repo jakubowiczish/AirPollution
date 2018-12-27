@@ -1,5 +1,8 @@
-package AirPollution;
+package AirPollution.optionHandler;
 
+import AirPollution.storage.Storage;
+import AirPollution.utils.Utils;
+import AirPollution.model.*;
 import com.google.common.util.concurrent.AtomicDouble;
 
 import java.text.DecimalFormat;
@@ -237,7 +240,7 @@ public class ParameterOptionHandler {
     }
 
 
-    ArrayList<String> parameterNames() {
+    public ArrayList<String> parameterNames() {
         ArrayList<String> parameters = new ArrayList<>();
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         for (Station station : allStations) {

@@ -1,5 +1,9 @@
-package AirPollution;
+package AirPollution.api;
 
+import AirPollution.model.AirIndex;
+import AirPollution.model.Sensor;
+import AirPollution.model.SensorData;
+import AirPollution.model.Station;
 import com.google.gson.Gson;
 
 public class Factory {

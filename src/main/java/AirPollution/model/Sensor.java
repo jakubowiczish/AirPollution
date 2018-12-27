@@ -1,9 +1,9 @@
-package AirPollution;
+package AirPollution.model;
 
 public class Sensor {
-    int id;
+    public int id;
     int stationId;
-    Param param;
+    public Param param;
 
     @Override
     public String toString() {
@@ -14,9 +14,9 @@ public class Sensor {
                 "}";
     }
 
-    class Param {
+    public class Param {
         String paramName;
-        String paramFormula;
+        public String paramFormula;
         String paramCode;
         int idParam;
 

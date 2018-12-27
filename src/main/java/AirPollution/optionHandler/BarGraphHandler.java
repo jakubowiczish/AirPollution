@@ -1,14 +1,17 @@
-package AirPollution;
+package AirPollution.optionHandler;
 
+import AirPollution.storage.Storage;
+import AirPollution.utils.Utils;
+import AirPollution.model.Sensor;
+import AirPollution.model.SensorData;
+import AirPollution.model.Station;
 import com.google.common.base.Strings;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 
@@ -72,7 +75,6 @@ public class BarGraphHandler {
     }
 
 
-
     public String barGraphForGivenParameterStationsAndPeriodOfTime(String startDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
         Date realStartDate = Utils.parseAndCheckDate(startDate);
         Date realEndDate = Utils.parseAndCheckDate(endDate);
@@ -100,45 +102,42 @@ public class BarGraphHandler {
             for (Sensor sensor : sensors) {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
                 if (sensorData == null || sensorData.values.length == 0) continue;
-                if (!sensorData.key.equals(parameterName)) {
-                    System.out.println("There is no such parameter as: " + parameterName +
-                            " for station: " + station.stationName +
-                            " and sensor: " + sensor.id);
-                    continue;
-                }
-                for (SensorData.Value value : sensorData.values) {
-                    if (!value.date.contains("-")) continue;
-                    if (value.value == null) continue;
-                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                    if (!Utils.checkDateInterval(realStartDate, realEndDate, actualDate)) continue;
+                if (sensorData.key.equals(parameterName)) {
+                    for (SensorData.Value value : sensorData.values) {
+                        if (!value.date.contains("-")) continue;
+                        if (value.value == null) continue;
+                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                        if (!Utils.checkDateInterval(realStartDate, realEndDate, actualDate)) continue;
 
-                    int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
-                    String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "#");
-                    String[] dateParts = value.date.split(" ");
-                    int blankSpaceLength = longestStationNameLength - station.stationName.length() + 1;
-                    if (isToday(actualDate)) {
-                        stringBuilder.
-                                append(dateParts[1]).
-                                append(" TODAY               ").append(" (").append(station.stationName).append(")").
-                                append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
-                                append(graphLine).append(" ").append(value.value).
-                                append("\n");
+                        int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
+                        String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "#");
+                        String[] dateParts = value.date.split(" ");
+                        int blankSpaceLength = longestStationNameLength - station.stationName.length() + 1;
 
-                    } else if (wasYesterday(actualDate)) {
-                        stringBuilder.
-                                append(dateParts[1]).
-                                append(" YESTERDAY           ").append(" (").append(station.stationName).append(")").
-                                append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
-                                append(graphLine).append(" ").append(value.value).
-                                append("\n");
+                        if (isToday(actualDate)) {
+                            stringBuilder.
+                                    append(dateParts[1]).
+                                    append(" TODAY               ").append(" (").append(station.stationName).append(")").
+                                    append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
+                                    append(graphLine).append(" ").append(value.value).
+                                    append("\n");
 
-                    } else {
-                        stringBuilder.
-                                append(dateParts[1]).
-                                append(" DAY BEFORE YESTERDAY").append(" (").append(station.stationName).append(")").
-                                append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
-                                append(graphLine).append(" ").append(value.value).
-                                append("\n");
+                        } else if (wasYesterday(actualDate)) {
+                            stringBuilder.
+                                    append(dateParts[1]).
+                                    append(" YESTERDAY           ").append(" (").append(station.stationName).append(")").
+                                    append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
+                                    append(graphLine).append(" ").append(value.value).
+                                    append("\n");
+
+                        } else {
+                            stringBuilder.
+                                    append(dateParts[1]).
+                                    append(" DAY BEFORE YESTERDAY").append(" (").append(station.stationName).append(")").
+                                    append(createStringOfGivenLengthAndCharacter(blankSpaceLength, " ")).
+                                    append(graphLine).append(" ").append(value.value).
+                                    append("\n");
+                        }
                     }
                 }
             }

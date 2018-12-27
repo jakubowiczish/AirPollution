@@ -1,4 +1,4 @@
-package AirPollution;
+package AirPollution.api;
 
 import java.io.BufferedReader;
 import java.io.IOException;

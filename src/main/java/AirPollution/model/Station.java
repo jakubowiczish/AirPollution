@@ -1,10 +1,10 @@
-package AirPollution;
+package AirPollution.model;
 
 import java.util.ArrayList;
 
 public class Station {
-    int id;
-    String stationName;
+    public int id;
+    public String stationName;
     double gegrLat;
     double gegrLon;
     City city;

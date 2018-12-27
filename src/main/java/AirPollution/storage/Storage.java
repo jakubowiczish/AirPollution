@@ -1,4 +1,11 @@
-package AirPollution;
+package AirPollution.storage;
+
+import AirPollution.utils.Utils;
+import AirPollution.api.DataReceiver;
+import AirPollution.model.AirIndex;
+import AirPollution.model.Sensor;
+import AirPollution.model.SensorData;
+import AirPollution.model.Station;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -1,4 +1,6 @@
-package AirPollution;
+package AirPollution.utils;
+
+import AirPollution.model.Station;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,7 +12,7 @@ public class Utils {
 
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    final static ArrayList<String> parameters = new ArrayList<>() {{
+    public final static ArrayList<String> parameters = new ArrayList<>() {{
         add("NO2");
         add("O3");
         add("PM10");
@@ -65,11 +67,11 @@ public class Utils {
     }
 
 
-    static boolean checkWhetherParameterNameIsValid(String parameterName) {
+    public static boolean checkWhetherParameterNameIsValid(String parameterName) {
         return parameters.contains(parameterName);
     }
 
-    static Date multiThreadParseStringToDate(String date) {
+    public static Date multiThreadParseStringToDate(String date) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
         } catch (ParseException e) {
@@ -80,11 +82,11 @@ public class Utils {
     }
 
 
-    static String convertDateToString(Date date) {
+    public static String convertDateToString(Date date) {
         return usedDateFormat.format(date);
     }
 
-    static Date parseStringToDate(String date) {
+    public static Date parseStringToDate(String date) {
         try {
             return usedDateFormat.parse(date);
         } catch (ParseException e) {
@@ -94,7 +96,7 @@ public class Utils {
         return null;
     }
 
-    static boolean checkDateInterval(Date startDate, Date endDate, Date actualDate) {
+    public static boolean checkDateInterval(Date startDate, Date endDate, Date actualDate) {
         if (actualDate != null) {
             return (actualDate.before(endDate) || actualDate.equals(endDate)) &&
                     (actualDate.after(startDate) || actualDate.equals(startDate));
@@ -102,7 +104,7 @@ public class Utils {
         return false;
     }
 
-    static Date parseAndCheckDate(String dateString) {
+    public static Date parseAndCheckDate(String dateString) {
         Date date = parseStringToDate(dateString);
         if (date == null) {
             throw new IllegalArgumentException("This date: " + dateString + " is not valid");

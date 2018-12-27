@@ -1,14 +1,14 @@
-package AirPollution;
+package AirPollution.model;
 
 import java.util.Arrays;
 
 public class SensorData {
-    String key;
-    Value[] values;
+    public String key;
+    public Value[] values;
 
-    class Value {
-        String date;
-        Double value;
+    public class Value {
+        public String date;
+        public Double value;
 
         @Override
         public String toString() {

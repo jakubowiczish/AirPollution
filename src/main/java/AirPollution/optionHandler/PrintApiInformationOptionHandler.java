@@ -1,4 +1,7 @@
-package AirPollution;
+package AirPollution.optionHandler;
+
+import AirPollution.storage.Storage;
+import AirPollution.model.Station;
 
 import java.util.ArrayList;
 

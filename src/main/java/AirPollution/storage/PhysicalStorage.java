@@ -1,4 +1,4 @@
-package AirPollution;
+package AirPollution.storage;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -8,7 +8,7 @@ import java.io.*;
 public class PhysicalStorage {
     private static final String filePath = "/home/plotnikowski/IdeaProjects/AirPollution/src/PhysicalStorage.json";
 
-    Storage loadStorageFromFile() {
+    public Storage loadStorageFromFile() {
         Storage storage;
         Gson gson = new Gson();
         try {
@@ -20,7 +20,7 @@ public class PhysicalStorage {
         return storage;
     }
 
-    void saveStorageToFile(Storage storage) {
+    public void saveStorageToFile(Storage storage) {
         Writer writer = null;
         try {
             writer = new FileWriter(filePath);
