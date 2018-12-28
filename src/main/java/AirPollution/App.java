@@ -39,6 +39,10 @@ public class App implements Runnable {
             "name of the parameter which values were the most fluctuating among all stations")
     private boolean mostFluctuatingParameter_4;
 
+    @Option(names = {"-5"}, description = "give this option if you want to receive" +
+            "information about which parameter had lowest and highest pollution at given time")
+    private boolean lowestAndHighestValue_5;
+
     @Option(names = {"-F"}, description = "if you do not want to fetch data, use this option, " +
             "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
     private boolean noDataFetching;
@@ -137,6 +141,11 @@ public class App implements Runnable {
 
         if (mostFluctuatingParameter_4 && date != null) {
             System.out.println(parameterOptionHandler.mostFluctuatingParameter(date, listOfStations));
+        }
+
+        if (lowestAndHighestValue_5 && date != null) {
+            System.out.println(parameterOptionHandler.parameterWithLowestValueAtSpecificTime(date));
+
         }
 
 //        if (parameterName != null && beginDate != null && endDate != null) {

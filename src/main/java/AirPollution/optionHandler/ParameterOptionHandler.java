@@ -145,10 +145,6 @@ public class ParameterOptionHandler {
 
         ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
 
-        double finalMaxValue = -1;
-        double finalMinValue = 10000;
-        double maxDifference = -1;
-
         for (Station station : allStations) {
 
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
@@ -172,12 +168,6 @@ public class ParameterOptionHandler {
                             if (value.value > maxValue) {
                                 maxValue = value.value;
 
-                            }
-                            if (value.value > finalMaxValue) {
-                                finalMaxValue = value.value;
-                            }
-                            if (value.value < finalMinValue) {
-                                finalMinValue = value.value;
                             }
                         }
 
@@ -210,16 +200,75 @@ public class ParameterOptionHandler {
                     append(sinceWhenString).append("\" for all stations is ");
         }
 
-        String maxAndMin = "\nMaximum value of pollution is equal to: " + finalMaxValue +
-                ",\nminimum value of pollution is equal to " + finalMinValue;
 
         return resultString +
                 Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey() +
-                maxAndMin +
                 ",\nthe difference between maximum and minimum pollution for this parameter amounts to: " +
                 Collections.max(fluctuations.entrySet(),
                         Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue();
     }
+
+
+    /**
+     * Provides user with information about the name of the parameter
+     * which has the lowest value of pollution at specific time - time that is given in an argument
+     *
+     * @param date we convey this date when we want to check which parameter has lowest value at this specific time,
+     *             in format yyyy-MM-dd HH:mm:ss
+     * @return name of the parameter that has lowest value at specific date given in an argument
+     */
+    public String parameterWithLowestValueAtSpecificTime(String date) {
+        Date specificDate = Utils.parseStringToDate(date);
+        if (specificDate == null) {
+            throw new IllegalArgumentException("Given date is not valid");
+        }
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
+
+        for (Station station : allStations) {
+
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+
+            for (Sensor sensor : sensors) {
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                double minValue = 10000;
+
+                if (sensorData.values.length == 0) continue;
+                for (SensorData.Value value : sensorData.values) {
+                    if (value.value != null) {
+                        if (value.date.contains("-")) {
+                            Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                            if (actualDate != null) {
+                                if (actualDate.after(specificDate) || actualDate.equals(specificDate)) {
+                                    if (value.value < minValue && value.value > 0) {
+                                        minValue = value.value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (fluctuations.get(sensorData.key) != null) {
+                    if (fluctuations.get(sensorData.key) > minValue)
+                        fluctuations.put(sensorData.key, minValue);
+                } else {
+                    fluctuations.put(sensorData.key, minValue);
+                }
+            }
+
+        }
+
+
+        return "Parameter with lowest value on \"" + date + "\" is " +
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey()
+                + " and its value is: " +
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue();
+    }
+
+
+
 
     /**
      * Returns String that contains information about extreme values of parameter
@@ -293,67 +342,6 @@ public class ParameterOptionHandler {
                 "\nMaximum value of parameter \"" + parameterName + "\" occurs on " +
                 Utils.convertDateToString(maxDate.getValue()) +
                 " for station: \"" + maxStation.getValue().stationName + "\" and its value is: " + maxValue.get();
-    }
-
-    /**
-     * Provides user with information about the name of the parameter
-     * which has the lowest value of pollution at specific time - time that is given in an argument
-     *
-     * @param date we convey this date when we want to check which parameter has lowest value at this specific time,
-     *             in format yyyy-MM-dd HH:mm:ss
-     * @return name of the parameter that has lowest value at specific date given in an argument
-     */
-    public String parameterWithLowestValueAtSpecificTime(String date) {
-        Date specificDate = Utils.parseStringToDate(date);
-        if (specificDate == null) {
-            throw new IllegalArgumentException("Given date is not valid");
-        }
-
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
-
-        LinkedList<Thread> threads = new LinkedList<>();
-        for (Station station : allStations) {
-            Thread thread = new Thread(() -> {
-                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
-
-                for (Sensor sensor : sensors) {
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                    double minValue = 10000;
-
-                    if (sensorData.values.length == 0) continue;
-                    for (SensorData.Value value : sensorData.values) {
-                        if (value.value != null) {
-                            if (value.date.contains("-")) {
-                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                                if (actualDate != null) {
-                                    if (actualDate.after(specificDate) || actualDate.equals(specificDate)) {
-                                        if (value.value < minValue && value.value > 0) {
-                                            minValue = value.value;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (fluctuations.get(sensorData.key) != null) {
-                        if (fluctuations.get(sensorData.key) > minValue)
-                            fluctuations.put(sensorData.key, minValue);
-                    } else {
-                        fluctuations.put(sensorData.key, minValue);
-                    }
-                }
-            });
-            threads.add(thread);
-        }
-
-        Utils.startAndJoinThreads(threads);
-
-        return "Parameter with lowest value on \"" + date + "\" is " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey()
-                + " and its value is: " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue();
     }
 
 
