@@ -43,6 +43,10 @@ public class App implements Runnable {
             "information about which parameter had lowest and highest pollution at given time")
     private boolean lowestAndHighestValue_5;
 
+    @Option(names = {"-6"}, description = "give this option when you want to " +
+            "have printed sorted sensors with highest value of given parameter")
+    private boolean sortedSensors_6;
+
     @Option(names = {"-F"}, description = "if you do not want to fetch data, use this option, " +
             "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
     private boolean noDataFetching;
@@ -144,9 +148,13 @@ public class App implements Runnable {
         }
 
         if (lowestAndHighestValue_5 && date != null) {
-            System.out.println(parameterOptionHandler.parameterWithLowestValueAtSpecificTime(date));
-
+            System.out.println(parameterOptionHandler.parametersWithLowestAndHighestValuesAtSpecificTime(date));
         }
+
+        if (sortedSensors_6 && date != null && parameterName != null) {
+            System.out.println(parameterOptionHandler.sortedSensors(listOfStations, date, parameterName));
+        }
+
 
 //        if (parameterName != null && beginDate != null && endDate != null) {
 //            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginDate, endDate, parameterName, listOfStations));

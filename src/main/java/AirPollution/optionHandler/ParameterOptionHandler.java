@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-
 /**
  * Class that is responsible with handling commandline arguments about parameters
  */
@@ -217,14 +216,16 @@ public class ParameterOptionHandler {
      *             in format yyyy-MM-dd HH:mm:ss
      * @return name of the parameter that has lowest value at specific date given in an argument
      */
-    public String parameterWithLowestValueAtSpecificTime(String date) {
-        Date specificDate = Utils.parseStringToDate(date);
-        if (specificDate == null) {
-            throw new IllegalArgumentException("Given date is not valid");
-        }
+    public String parametersWithLowestAndHighestValuesAtSpecificTime(String date) {
+        Date specificDate = Utils.parseAndCheckDate(date);
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
+        String lowestParameterName = null, highestParameterName = null;
+        String lowestStationName = null, highestStationName = null;
+
+        double resultMinValue = 10000;
+        double resultMaxValue = -1;
+
 
         for (Station station : allStations) {
 
@@ -232,7 +233,6 @@ public class ParameterOptionHandler {
 
             for (Sensor sensor : sensors) {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                double minValue = 10000;
 
                 if (sensorData.values.length == 0) continue;
 
@@ -244,32 +244,30 @@ public class ParameterOptionHandler {
                     if (actualDate == null) continue;
 
                     if (actualDate.equals(specificDate)) {
-                        if (value.value < minValue && value.value > 0) {
-                            minValue = value.value;
+                        if (value.value < resultMinValue && value.value > 0) {
+                            resultMinValue = value.value;
+                            lowestParameterName = sensorData.key;
+                            lowestStationName = station.stationName;
+                        }
+
+                        if (value.value > resultMaxValue) {
+                            resultMaxValue = value.value;
+                            highestParameterName = sensorData.key;
+                            highestStationName = station.stationName;
                         }
                     }
                 }
 
-                if (fluctuations.get(sensorData.key) != null) {
-                    if (fluctuations.get(sensorData.key) > minValue)
-                        fluctuations.put(sensorData.key, minValue);
-                } else {
-                    fluctuations.put(sensorData.key, minValue);
-                }
             }
 
         }
 
+        String lowestValueString = "Parameter with lowest value on \"" + date + "\" is " + lowestParameterName +
+                " and its value is: " + resultMinValue + ", it occurs for station: " + lowestStationName;
+        String highestValueString = "\nParameter with highest value on \"" + date + "\" is " + highestParameterName +
+                " and its value is: " + resultMaxValue + ", it occurs for station: " + highestStationName;
 
-        return "Parameter with lowest value on \"" + date + "\" is " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).
-
-                        getKey()
-                + " and its value is: " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).
-
-                        getValue();
-
+        return lowestValueString + highestValueString;
     }
 
 
@@ -349,6 +347,66 @@ public class ParameterOptionHandler {
 
 
     /**
+     * @param listOfStations
+     * @param date
+     * @param parameterName
+     * @return
+     */
+    public String sortedSensors(ArrayList<String> listOfStations, String date, String parameterName) {
+        Date realDate = Utils.parseAndCheckDate(date);
+
+        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
+            System.out.println("Parameter name: " + parameterName + " is not valid");
+            return null;
+        }
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+        allStations = Utils.assignAllStations(allStations, validStations);
+
+        ConcurrentSkipListMap<Double, String> parameterDataAtSpecificTime = new ConcurrentSkipListMap<>();
+
+        for (Station station : allStations) {
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+
+            for (Sensor sensor : sensors) {
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                if (sensorData == null) continue;
+                if (!sensorData.key.equals(parameterName)) continue;
+                for (SensorData.Value value : sensorData.values) {
+                    if (value.date.contains("-")) {
+                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                        if (actualDate == null) continue;
+                        if (actualDate.equals(realDate)) {
+                            if (value.value == null) {
+                                System.out.println(
+                                        "Key for station " + station.stationName + ", sensor: " +
+                                                sensor.id + " and date " + realDate + " is null"
+                                );
+                                parameterDataAtSpecificTime.
+                                        put(-1.0, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
+                            } else {
+                                parameterDataAtSpecificTime.
+                                        put(value.value, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        }
+
+
+        StringBuilder result = new StringBuilder();
+        for (Map.Entry<Double, String> entry : parameterDataAtSpecificTime.entrySet()) {
+            result.append(entry.getValue()).append(" Value of parameter: ").
+                    append(parameterName).append(" is equal to: ").append(entry.getKey()).append("\n");
+        }
+        return result.toString();
+    }
+
+    /**
      * Returns list of all parameters that occur in the system at the very moment
      *
      * @return list of all parameters present in the system
@@ -367,70 +425,5 @@ public class ParameterOptionHandler {
             }
         }
         return parameters;
-    }
-
-
-    /**
-     * @param listOfStations
-     * @param date
-     * @param parameterName
-     * @return
-     */
-    public String sortedSensors(ArrayList<String> listOfStations, String date, String parameterName) {
-        Date realDate = Utils.parseAndCheckDate(date);
-
-        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
-            System.out.println("Parameter name: " + parameterName + " is not valid");
-            return null;
-        }
-
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
-        allStations = Utils.assignAllStations(allStations, validStations);
-
-        LinkedList<Thread> threads = new LinkedList<>();
-        ConcurrentSkipListMap<Double, String> parameterDataAtSpecificTime = new ConcurrentSkipListMap<>();
-
-        for (Station station : allStations) {
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
-
-            Thread thread = new Thread(() -> {
-                for (Sensor sensor : sensors) {
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                    if (sensorData == null) continue;
-                    if (!sensorData.key.equals(parameterName)) continue;
-                    for (SensorData.Value value : sensorData.values) {
-                        if (value.date.contains("-")) {
-                            Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                            if (actualDate == null) continue;
-                            if (actualDate.equals(realDate)) {
-                                if (value.value == null) {
-                                    System.out.println(
-                                            "Key for station " + station.stationName + ", sensor: " +
-                                                    sensor.id + " and date " + realDate + " is null"
-                                    );
-                                    parameterDataAtSpecificTime.
-                                            put(-1.0, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
-                                } else {
-                                    parameterDataAtSpecificTime.
-                                            put(value.value, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
-                                }
-
-                            }
-                        }
-                    }
-                }
-            });
-            threads.add(thread);
-        }
-
-        Utils.startAndJoinThreads(threads);
-
-        StringBuilder result = new StringBuilder();
-        for (Map.Entry<Double, String> entry : parameterDataAtSpecificTime.entrySet()) {
-            result.append(entry.getValue()).append(" Value of parameter: ").
-                    append(parameterName).append(" is equal to: ").append(entry.getKey()).append("\n");
-        }
-        return result.toString();
     }
 }
