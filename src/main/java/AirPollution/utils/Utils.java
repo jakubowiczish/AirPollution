@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.TreeMap;
 
 public class Utils {
 
@@ -21,6 +22,20 @@ public class Utils {
         add("CO");
         add("PM2.5");
     }};
+
+    public static synchronized void addToList(TreeMap<Double, ArrayList<String>> treeMap, Double key, String value) {
+        ArrayList<String> list = treeMap.get(key);
+
+        if (list == null) {
+            list = new ArrayList<>();
+            list.add(value);
+            treeMap.put(key, list);
+        } else {
+            if (!list.contains(value)) {
+                list.add(value);
+            }
+        }
+    }
 
     static boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
         for (Station station : allStations) {

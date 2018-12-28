@@ -47,6 +47,9 @@ public class App implements Runnable {
             "have printed sorted sensors with highest value of given parameter")
     private boolean sortedSensors_6;
 
+    @Option(names = {"-N"}, description = "number of sensors for sorted sensors")
+    private int N;
+
     @Option(names = {"-F"}, description = "if you do not want to fetch data, use this option, " +
             "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
     private boolean noDataFetching;
@@ -152,7 +155,7 @@ public class App implements Runnable {
         }
 
         if (sortedSensors_6 && date != null && parameterName != null) {
-            System.out.println(parameterOptionHandler.sortedSensors(listOfStations, date, parameterName));
+            System.out.println(parameterOptionHandler.sortedStations(listOfStations, date, parameterName, N));
         }
 
 

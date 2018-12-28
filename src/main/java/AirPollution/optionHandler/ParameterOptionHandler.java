@@ -4,12 +4,15 @@ import AirPollution.storage.Storage;
 import AirPollution.utils.Utils;
 import AirPollution.model.*;
 import com.google.common.util.concurrent.AtomicDouble;
+import com.sun.source.tree.Tree;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 
 /**
  * Class that is responsible with handling commandline arguments about parameters
@@ -347,12 +350,17 @@ public class ParameterOptionHandler {
 
 
     /**
-     * @param listOfStations
-     * @param date
-     * @param parameterName
-     * @return
+     * Returns String that contains N stations, sorted by pollution value in ascending order,
+     * where N is number given in an argument
+     *
+     * @param listOfStations list of stations for which we want to have sorted stations
+     * @param date           we convey this date when we want to have the list of sorted stations,
+     *                       *             in format yyyy-MM-dd HH:mm:ss
+     * @param parameterName  name of the parameter for which we want to have desired information
+     * @param N              number of stations that we want them to be printed
+     * @return String containing sorted stations in ascending order
      */
-    public String sortedSensors(ArrayList<String> listOfStations, String date, String parameterName) {
+    public String sortedStations(ArrayList<String> listOfStations, String date, String parameterName, int N) {
         Date realDate = Utils.parseAndCheckDate(date);
 
         if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
@@ -364,7 +372,7 @@ public class ParameterOptionHandler {
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-        ConcurrentSkipListMap<Double, String> parameterDataAtSpecificTime = new ConcurrentSkipListMap<>();
+        TreeMap<Double, ArrayList<String>> parameterDataAtSpecificTime = new TreeMap<>();
 
         for (Station station : allStations) {
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
@@ -374,24 +382,21 @@ public class ParameterOptionHandler {
                 if (sensorData == null) continue;
                 if (!sensorData.key.equals(parameterName)) continue;
                 for (SensorData.Value value : sensorData.values) {
-                    if (value.date.contains("-")) {
-                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                        if (actualDate == null) continue;
-                        if (actualDate.equals(realDate)) {
-                            if (value.value == null) {
-                                System.out.println(
-                                        "Key for station " + station.stationName + ", sensor: " +
-                                                sensor.id + " and date " + realDate + " is null"
-                                );
-                                parameterDataAtSpecificTime.
-                                        put(-1.0, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
-                            } else {
-                                parameterDataAtSpecificTime.
-                                        put(value.value, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
-                            }
+                    if (!value.date.contains("-")) continue;
+                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                    if (actualDate == null) continue;
+                    if (actualDate.equals(realDate)) {
+                        if (value.value == null) {
+                            System.out.println("Key for station " + station.stationName + ", sensor: " +
+                                    sensor.id + " and date " + realDate + " is null");
 
+                            Utils.addToList(parameterDataAtSpecificTime, -1.0, "STATION NAME: " + station.stationName);
+
+                        } else {
+                            Utils.addToList(parameterDataAtSpecificTime, value.value, "STATION NAME: " + station.stationName);
                         }
                     }
+
                 }
             }
 
@@ -399,12 +404,19 @@ public class ParameterOptionHandler {
 
 
         StringBuilder result = new StringBuilder();
-        for (Map.Entry<Double, String> entry : parameterDataAtSpecificTime.entrySet()) {
-            result.append(entry.getValue()).append(" Value of parameter: ").
-                    append(parameterName).append(" is equal to: ").append(entry.getKey()).append("\n");
+        result.append("Top ").append(N).
+                append(" stations with highest pollution of parameter \"").append(parameterName).append("\":\n");
+
+        for (Map.Entry<Double, ArrayList<String>> entry : parameterDataAtSpecificTime.entrySet()) {
+            N++;
+            if (parameterDataAtSpecificTime.entrySet().size() - N < 0) {
+                result.append(entry.getValue()).append(" Value of parameter ").
+                        append(parameterName).append(" is equal to ").append(entry.getKey()).append("\n");
+            }
         }
         return result.toString();
     }
+
 
     /**
      * Returns list of all parameters that occur in the system at the very moment
