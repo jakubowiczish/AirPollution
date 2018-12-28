@@ -20,11 +20,11 @@ public class AveragePollutionHandler {
         this.storageReceiver = storageReceiver;
     }
 
-    public double averagePollutionValueOfGivenParameterForGivenStations(String startDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
+    public double averagePollutionValueOfGivenParameterForGivenStations(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
         final AtomicDouble sumOfValues = new AtomicDouble();
         final AtomicInteger valuesCounter = new AtomicInteger();
 
-        Date realStartDate = Utils.parseAndCheckDate(startDate);
+        Date realStartDate = Utils.parseAndCheckDate(beginDate);
         Date realEndDate = Utils.parseAndCheckDate(endDate);
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
@@ -42,9 +42,9 @@ public class AveragePollutionHandler {
         for (Station station : allStations) {
             if (station == null) continue;
             Thread thread = new Thread(() -> {
-                boolean foundParameter = false;
                 CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
+                boolean foundParameter = false;
                 for (Sensor sensor : sensors) {
                     if (sensor == null) continue;
 
@@ -69,11 +69,8 @@ public class AveragePollutionHandler {
                 }
             });
             threads.add(thread);
-
-//            if (!foundParameter) {
-//                System.out.println("Station \"" + station.stationName + "\" does not have sensor that checks parameter: " + parameterName);
-//            }
         }
+
 
         Utils.startAndJoinThreads(threads);
 
@@ -90,64 +87,4 @@ public class AveragePollutionHandler {
 
         return sumOfValues.get() / valuesCounter.get();
     }
-
-//    public double averagePollutionValueOfGivenParameterForAllStations(String startDate, String endDate, String parameterName) {
-//        Date realStartDate = Utils.parseAndCheckDate(startDate);
-//        Date realEndDate = Utils.parseAndCheckDate(endDate);
-//        if (realStartDate == null || realEndDate == null) {
-//            throw new IllegalArgumentException("These dates are not valid");
-//        }
-//        return countAveragePollutionValueOfGivenParameterForAllStations(realStartDate, realEndDate, parameterName);
-//    }
-//
-//    private double countAveragePollutionValueOfGivenParameterForAllStations(Date realStartDate, Date realEndDate, String parameterName) {
-//        final AtomicInteger valuesCounter = new AtomicInteger();
-//        final AtomicDouble sumOfValues = new AtomicDouble();
-//
-//        ArrayList<Station> allStations = storageReceiver.getAllStations();
-//        LinkedList<Thread> threads = new LinkedList<>();
-//
-//        if (parameterName == null) {
-//            System.out.println("Parameter given in argument is null, try again");
-//            return -1.0;
-//        }
-//
-//
-//        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
-//            System.out.println("Given parameter does not exist in the system");
-//            return -1.0;
-//        }
-//
-//        for (Station station : allStations) {
-//            Thread thread = new Thread(() -> {
-//                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
-//                for (Sensor sensor : sensors) {
-//                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-//                    if (sensorData == null) continue;
-//                    if (sensorData.key.equals(parameterName)) {
-//                        for (SensorData.Value value : sensorData.values) {
-//                            if (value.date.contains("-")) {
-//                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-//                                // if date is between given period of time
-//                                if (actualDate != null) {
-//                                    if (Utils.checkDateInterval(realStartDate, realEndDate, actualDate)) {
-//                                        if (value.value != null) {
-//                                            valuesCounter.incrementAndGet();
-//                                            sumOfValues.addAndGet(value.value);
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            });
-//            threads.add(thread);
-//        }
-//
-//        Utils.startAndJoinThreads(threads);
-//
-//        return sumOfValues.get() / valuesCounter.get();
-//    }
-
 }

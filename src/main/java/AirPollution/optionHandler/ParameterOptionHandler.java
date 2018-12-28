@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+
+
 /**
  * Class that is responsible with handling commandline arguments about parameters
  */
@@ -24,7 +26,106 @@ public class ParameterOptionHandler {
     DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
 
     /**
-     * Is responsible for returning String that contains information about extreme values of parameter
+     * Provides user with information about the value of given parameter
+     * for specified, given names of the stations and given date in format yyyy-MM-dd HH:mm:ss
+     *
+     * @param date           we convey this date when we want to check value of given parameter for this specific date,
+     *                       in format yyyy-MM-dd HH:mm:ss
+     * @param listOfStations list of stations for which we want to check parameter values
+     * @param parameterName  name of the parameter which value we want to get to know
+     * @return String that has in itself value of given parameter for given stations and date
+     */
+    public String valueOfGivenParameterForGivenStationsAndDate(String date, ArrayList<String> listOfStations, String parameterName) {
+        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
+            System.out.println("Invalid parameter name: " + parameterName);
+            return null;
+        }
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
+        allStations = Utils.assignAllStations(allStations, validStations);
+
+        stringBuilder.append("For Parameter: ").append(parameterName).append("\nDate: ").append(date).append("\n");
+
+        ConcurrentSkipListMap<Double, String> valuesOfParameterForGivenStationsAndDate = new ConcurrentSkipListMap<>();
+
+        for (Station station : allStations) {
+            if (station == null) continue;
+            int stationID = Station.returnIdOfGivenStation(allStations, station.stationName);
+
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(stationID);
+
+            boolean foundParameter = false;
+
+            for (Sensor sensor : sensors) {
+                if (!sensor.param.paramFormula.equals(parameterName)) continue;
+                foundParameter = true;
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                if (sensorData == null) continue;
+                if (sensorData.key.equals(parameterName)) {
+                    boolean validDate = false;
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value == null) continue;
+                        if (value.date.equals(date)) {
+                            validDate = true;
+                            if (value.value == null) {
+                                valuesOfParameterForGivenStationsAndDate.
+                                        put(-1.0, " NULL pollution value of parameter: " +
+                                                parameterName + " for station: \"" + station.stationName + "\"\n");
+                            } else {
+                                valuesOfParameterForGivenStationsAndDate.
+                                        put(value.value, " - pollution value of parameter: " +
+                                                parameterName + " for station: \"" + station.stationName + "\"\n");
+                            }
+
+                        }
+
+                    }
+                    if (!validDate) {
+                        System.out.println("There is no such date as \"" + date + "\"  in the system for station: " + station.stationName);
+                    }
+                }
+
+            }
+            if (!foundParameter) {
+                System.out.println("There is no such parameter as \"" + parameterName + "\" in the system for station: " + station.stationName);
+            }
+        }
+        for (Map.Entry<Double, String> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
+            stringBuilder.append(entry.getKey()).append(entry.getValue());
+        }
+
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Provides user with information about the value of all parameters that occur in the system
+     * for specified, given names of the stations and given date in format yyyy-MM-dd HH:mm:ss
+     *
+     * @param date           we convey this date when we want to check value of all parameters in the system for this specific date,
+     *                       in format yyyy-MM-dd HH:mm:ss
+     * @param listOfStations list of stations for which we want to check parameter values
+     *
+     * @return String that has in itself values of all parameters in the system for given stations and date
+     */
+    public String valueOfAllParametersForGivenStationsAndDate(String date, ArrayList<String> listOfStations) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("VALUES OF ALL PARAMETERS: ").append("\n");
+
+        for (String parameter : Utils.parameters) {
+            String value = valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameter);
+            if (value.length() < 50)
+                continue; // means that we did not add any pollution values, just communicate about which parameter is being checked
+            stringBuilder.append(value);
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Returns String that contains information about extreme values of parameter
      * (maximum and minimum values).
      * This information consists of names of the stations where such extreme values occur together with
      * date when they occur and pollution values for this specific parameter
@@ -98,10 +199,11 @@ public class ParameterOptionHandler {
     }
 
     /**
-     * Is designed to provide user with information about the name of the parameter
+     * Provides user with information about the name of the parameter
      * which has the lowest value of pollution at specific time - time that is given in an argument
      *
-     * @param date we convey this date when we want to check which parameter has lowest value at this specific time,in format yyyy-MM-dd HH:mm:ss
+     * @param date we convey this date when we want to check which parameter has lowest value at this specific time,
+     *             in format yyyy-MM-dd HH:mm:ss
      * @return name of the parameter that has lowest value at specific date given in an argument
      */
     public String parameterWithLowestValueAtSpecificTime(String date) {
@@ -109,6 +211,7 @@ public class ParameterOptionHandler {
         if (specificDate == null) {
             throw new IllegalArgumentException("Given date is not valid");
         }
+
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         ConcurrentHashMap<String, Double> fluctuations = new ConcurrentHashMap<>();
 
@@ -158,88 +261,12 @@ public class ParameterOptionHandler {
 
     }
 
+
     /**
-     * Is responsible for providing user with information about the value of given parameter
-     * for specified, given names of the stations and given date in format yyyy-MM-dd HH:mm:ss
+     * Returns list of all parameters that occur in the system at the very moment
      *
-     * @param date
-     * @param listOfStations
-     * @param parameterName
-     * @return
+     * @return list of all parameters present in the system
      */
-    public String valueOfGivenParameterForGivenStationsAndDate(String date, ArrayList<String> listOfStations, String parameterName) {
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
-        allStations = Utils.assignAllStations(allStations, validStations);
-
-        stringBuilder.append("For Parameter: ").append(parameterName).append("\nDate: ").append(date).append("\n");
-
-        ConcurrentSkipListMap<Double, String> valuesOfParameterForGivenStationsAndDate = new ConcurrentSkipListMap<>();
-
-        for (Station station : allStations) {
-            if (station == null) continue;
-            int stationID = Station.returnIdOfGivenStation(allStations, station.stationName);
-
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(stationID);
-
-            boolean foundParameter = false;
-
-            for (Sensor sensor : sensors) {
-                if (!sensor.param.paramFormula.equals(parameterName)) continue;
-                foundParameter = true;
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                if (sensorData == null) continue;
-                if (sensorData.key.equals(parameterName)) {
-                    boolean validDate = false;
-                    for (SensorData.Value value : sensorData.values) {
-                        if (value == null) continue;
-                        if (value.date.equals(date)) {
-                            validDate = true;
-                            if (value.value == null) {
-                                valuesOfParameterForGivenStationsAndDate.
-                                        put(-1.0, " NULL pollution value of parameter: " +
-                                                parameterName + " for station: \"" + station.stationName + "\"\n");
-                            } else {
-                                valuesOfParameterForGivenStationsAndDate.
-                                        put(value.value, " - pollution value of parameter: " +
-                                                parameterName + " for station: \"" + station.stationName + "\"\n");
-                            }
-
-                        }
-
-                    }
-                    if (!validDate) {
-                        System.out.println("There is no such date as \"" + date + "\"  in the system for station: " + station.stationName);
-                    }
-                }
-
-            }
-            if (!foundParameter) {
-                System.out.println("There is no such parameter as \"" + parameterName + "\" in the system for station: " + station.stationName);
-            }
-        }
-        for (Map.Entry<Double, String> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
-            stringBuilder.append(entry.getKey()).append(entry.getValue());
-        }
-
-        return stringBuilder.toString();
-    }
-
-    public String valueOfAllParametersForGivenStationsAndDate(String date, ArrayList<String> liftOfStations) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("VALUES OF ALL PARAMETERS: ").append("\n");
-        for (String parameter : Utils.parameters) {
-            String value = valueOfGivenParameterForGivenStationsAndDate(date, liftOfStations, parameter);
-            if (value.length() < 50) continue; // means that we did not add any pollution values, just communicate about which parameter is being checked
-            stringBuilder.append(value);
-        }
-        return stringBuilder.toString();
-    }
-
-
     public ArrayList<String> parameterNames() {
         ArrayList<String> parameters = new ArrayList<>();
         ArrayList<Station> allStations = storageReceiver.getAllStations();
@@ -257,6 +284,17 @@ public class ParameterOptionHandler {
     }
 
 
+    /**
+     * Returns String that contains information about which parameter was
+     * the most fluctuating one since given date for given list of stations
+     * If no stations are given, list of stations becomes list of all stations available in the system
+     *
+     * @param sinceWhenString date since when we want to check which parameter was the most fluctuating one in the system,
+     *                        in format yyyy-MM-dd HH:mm:ss
+     * @param listOfStations  list of stations for which we want to check the most fluctuating parameter
+     *                        if list is empty, method is executed for all available stations
+     * @return Information about which parameter was the most fluctuating one, with the difference between maximum and minimum value of pollution
+     */
     public String mostFluctuatingParameter(String sinceWhenString, ArrayList<String> listOfStations) {
         Date sinceWhenDate = Utils.parseStringToDate(sinceWhenString);
         if (sinceWhenDate == null) {
@@ -338,9 +376,16 @@ public class ParameterOptionHandler {
 
     }
 
-
-    public String sortedSensors(ArrayList<String> listOfStations, String argumentDate, String parameterName) {
-        Date date = Utils.parseAndCheckDate(argumentDate);
+    /**
+     *
+     *
+     * @param listOfStations
+     * @param date
+     * @param parameterName
+     * @return
+     */
+    public String sortedSensors(ArrayList<String> listOfStations, String date, String parameterName) {
+        Date realDate = Utils.parseAndCheckDate(date);
 
         if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
             System.out.println("Parameter name: " + parameterName + " is not valid");
@@ -366,11 +411,11 @@ public class ParameterOptionHandler {
                         if (value.date.contains("-")) {
                             Date actualDate = Utils.multiThreadParseStringToDate(value.date);
                             if (actualDate == null) continue;
-                            if (actualDate.equals(date)) {
+                            if (actualDate.equals(realDate)) {
                                 if (value.value == null) {
                                     System.out.println(
                                             "Key for station " + station.stationName + ", sensor: " +
-                                                    sensor.id + " and date " + date + " is null"
+                                                    sensor.id + " and date " + realDate + " is null"
                                     );
                                     parameterDataAtSpecificTime.
                                             put(-1.0, "STATION NAME: " + station.stationName + "\nSensor id: " + sensor.id + "\n");
@@ -396,6 +441,4 @@ public class ParameterOptionHandler {
         }
         return result.toString();
     }
-
-
 }

@@ -10,7 +10,7 @@ public class JsonFetcher {
      * Returns content from URL Address: http://api.gios.gov.pl/pjp-api/rest/station/findAll
      *
      * @return content from: http://api.gios.gov.pl/pjp-api/rest/station/findAll, as a String
-     * @throws IOException
+     * @throws IOException exception
      */
     public String getAllStations() throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/station/findAll");
@@ -23,7 +23,7 @@ public class JsonFetcher {
      * @return content from URL Address: http://api.gios.gov.pl/pjp-api/rest/station/sensors/"stationID",
      * for instance http://api.gios.gov.pl/pjp-api/rest/station/sensors/444,
      * as a String
-     * @throws IOException
+     * @throws IOException exception
      */
     public String getSensors(int stationID) throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/station/sensors/" + stationID);
@@ -36,7 +36,7 @@ public class JsonFetcher {
      * @return content from URL Address: http://api.gios.gov.pl/pjp-api/rest/data/getData/"sensorID"
      * for instance http://api.gios.gov.pl/pjp-api/rest/data/getData/3068,
      * as a String
-     * @throws IOException
+     * @throws IOException exception
      */
     public String getSensorData(int sensorID) throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/data/getData/" + sensorID);
@@ -49,7 +49,7 @@ public class JsonFetcher {
      * @return content from URL Address: http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/"stationID"
      * for instance http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/555,
      * as a String
-     * @throws IOException
+     * @throws IOException exception
      */
     public String getQualityIndex(int stationID) throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/" + stationID);

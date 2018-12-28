@@ -22,15 +22,29 @@ import java.util.ArrayList;
         )
 public class App implements Runnable {
 
+    @Option(names = {"-1"}, description = "give this option if you want to receive AIR INDEX")
+    private boolean airIndex_1;
+
+    @Option(names = {"-2"}, description = "give this option if you want to receive current value of given parameter")
+    private boolean currentValueOfParameter_2;
+
+//    @Option(names = {"-2a"}, description = "give this option if you want to receive something for all parameters")
+//    private boolean forAllParameters;
+
+    @Option(names = {"-3"}, description = "give this option if you want to receive average pollution value " +
+            "of given parameters for given period of time and given stations")
+    private boolean averagePollution_3;
+
+    @Option(names = {"-F"}, description = "if you do not want to fetch data, use this option, " +
+            "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
+    private boolean noDataFetching;
+
     @Option(names = {"-a", "-allStations"}, description = "Printing all available stations")
     private boolean all;
 
     @Option(names = {"-q", "-allStationsWithSensors"},
             description = "Printing all available stations along with their sensors")
     private boolean allWithSensors;
-
-    @Option(names = {"-s", "--stationName"}, description = "Station name")
-    private String stationName;
 
     @Option(names = {"-d", "--date"}, description = "Date of measurement, \nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String date;
@@ -81,12 +95,14 @@ public class App implements Runnable {
 
         PhysicalStorage physicalStorage = new PhysicalStorage();
         Storage storage = physicalStorage.loadStorageFromFile();
+        if (!noDataFetching) {
+            if (storage == null || (System.currentTimeMillis() - storage.lastLoadDate.getTime() > 3600 * 1000)) {
 
-        if (storage == null || (System.currentTimeMillis() - storage.lastLoadDate.getTime() > 3600 * 1000)) {
-            storage = new Storage();
-            storage.loadAllData();
+                storage = new Storage();
+                storage.loadAllData();
 
-            physicalStorage.saveStorageToFile(storage);
+                physicalStorage.saveStorageToFile(storage);
+            }
         }
 
 
@@ -98,58 +114,26 @@ public class App implements Runnable {
 
 //java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
 //
-//        if (listOfStations != null) {
-//            System.out.println(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations));
-//        }
-/*
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-22 16:00:00"
-        if (stationName != null && date != null && parameterName != null) {
-            System.out.println("Parameter: " + parameterName + " and its pollution value on " + date + ": " +
-                    parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, stationName, parameterName));
-            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationsAndDate(date, stationName));
+        if (airIndex_1) {
+            System.out.println(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations));
         }
 
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-20 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
+        if (currentValueOfParameter_2 && date != null && parameterName != null) {
+            System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
+        }
 
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -b "2018-12-19 17:00:00" -e "2018-12-19 21:00:00"
-
-
-        */
-
-//        if (date != null && parameterName != null) {
-//            System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
-//        }
-//        if (date != null) {
+//        if (forAllParameters && date != null) {
 //            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationsAndDate(date, listOfStations));
 //        }
 
-
-//        if (sinceWhenDate != null) {
-//            System.out.println(parameterOptionHandler.mostFluctuatingParameter(sinceWhenDate, listOfStations));
-//        }
-
-//        if (date != null && parameterName != null) {
-//            System.out.println(parameterOptionHandler.sortedSensors(listOfStations, date, parameterName));
-//        }
-/*
-        if (dateForLowestParameter != null) {
-            System.out.println(parameterOptionHandler.parameterWithLowestValueAtSpecificTime(dateForLowestParameter));
+        if (averagePollution_3 && beginDate != null && endDate != null && parameterName != null) {
+            System.out.println(averagePollutionHandler.averagePollutionValueOfGivenParameterForGivenStations(beginDate, endDate, parameterName, listOfStations));
         }
 
 
-        if (parameterName != null) {
-            System.out.println(parameterOptionHandler.parameterExtremeValues(parameterName));
-        }
-
-*/
-//        if (beginDate != null && endDate != null && parameterName != null) {
-//            System.out.println(averagePollutionHandler.
-//                    averagePollutionValueOfGivenParameterForGivenStations(beginDate, endDate, parameterName, listOfStations));
+//        if (parameterName != null && beginDate != null && endDate != null) {
+//            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginDate, endDate, parameterName, listOfStations));
 //        }
-
-        if (beginDate != null && endDate != null && parameterName != null) {
-            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginDate, endDate, parameterName, listOfStations));
-        }
 
         if (all) {
             printApiInformationOptionHandler.printNamesOfAllStations();
