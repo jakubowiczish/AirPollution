@@ -6,7 +6,17 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * Class used to fetch URL address
+ */
 public class URLReader {
+    /**
+     * Fetches content from URL Address to String
+     *
+     * @param urlAddress desired URL Address
+     * @return fetched content from URL Address to String
+     * @throws IOException
+     */
     public static String getJSON(String urlAddress) throws IOException {
         StringBuilder result = new StringBuilder();
         URL url = new URL(urlAddress);
