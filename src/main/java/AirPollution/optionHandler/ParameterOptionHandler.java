@@ -235,17 +235,17 @@ public class ParameterOptionHandler {
                 double minValue = 10000;
 
                 if (sensorData.values.length == 0) continue;
+
                 for (SensorData.Value value : sensorData.values) {
-                    if (value.value != null) {
-                        if (value.date.contains("-")) {
-                            Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                            if (actualDate != null) {
-                                if (actualDate.after(specificDate) || actualDate.equals(specificDate)) {
-                                    if (value.value < minValue && value.value > 0) {
-                                        minValue = value.value;
-                                    }
-                                }
-                            }
+                    if (value.value == null) continue;
+
+                    if (!value.date.contains("-")) continue;
+                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                    if (actualDate == null) continue;
+
+                    if (actualDate.equals(specificDate)) {
+                        if (value.value < minValue && value.value > 0) {
+                            minValue = value.value;
                         }
                     }
                 }
@@ -262,12 +262,15 @@ public class ParameterOptionHandler {
 
 
         return "Parameter with lowest value on \"" + date + "\" is " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey()
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).
+
+                        getKey()
                 + " and its value is: " +
-                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getValue();
+                Collections.min(fluctuations.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).
+
+                        getValue();
+
     }
-
-
 
 
     /**
