@@ -31,9 +31,13 @@ public class App implements Runnable {
 //    @Option(names = {"-2a"}, description = "give this option if you want to receive something for all parameters")
 //    private boolean forAllParameters;
 
-    @Option(names = {"-3"}, description = "give this option if you want to receive average pollution value " +
-            "of given parameters for given period of time and given stations")
+    @Option(names = {"-3"}, description = "give this option if you want to receive " +
+            "average pollution value of given parameters for given period of time and given stations")
     private boolean averagePollution_3;
+
+    @Option(names = {"-4"}, description = "give this option if you want to receive " +
+            "name of the parameter which values were the most fluctuating among all stations")
+    private boolean mostFluctuatingParameter_4;
 
     @Option(names = {"-F"}, description = "if you do not want to fetch data, use this option, " +
             "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
@@ -46,7 +50,8 @@ public class App implements Runnable {
             description = "Printing all available stations along with their sensors")
     private boolean allWithSensors;
 
-    @Option(names = {"-d", "--date"}, description = "Date of measurement, \nin format \"yyyy-MM-dd HH:mm:ss\"")
+    @Option(names = {"-d", "--date"}, description = "give this date when there are no specific requirements, " +
+            "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String date;
 
     @Option(names = {"-p", "--parameterName"}, description = "Name of the parameter")
@@ -60,15 +65,15 @@ public class App implements Runnable {
             "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String endDate;
 
-    @Option(names = {"-w", "--sinceWhen"},
-            description = "Since when we want to have information about which parameter " +
-                    "has biggest difference between maximum and minimum value of pollution, " +
-                    "\nin format \"yyyy-MM-dd HH:mm:ss\"")
-    private String sinceWhenDate;
-
-    @Option(names = {"-l", "--lowestWhen"}, description = "Give this date when you want to check which parameter's " +
-            "pollution was lowest at given time\nassuming that this value is higher than 0, \nin format \"yyyy-MM-dd HH:mm:ss\"")
-    private String dateForLowestParameter;
+//    @Option(names = {"-w", "--sinceWhen"},
+//            description = "Since when we want to have information about which parameter " +
+//                    "has biggest difference between maximum and minimum value of pollution, " +
+//                    "\nin format \"yyyy-MM-dd HH:mm:ss\"")
+//    private String sinceWhenDate;
+//
+//    @Option(names = {"-l", "--lowestWhen"}, description = "Give this date when you want to check which parameter's " +
+//            "pollution was lowest at given time\nassuming that this value is higher than 0, \nin format \"yyyy-MM-dd HH:mm:ss\"")
+//    private String dateForLowestParameter;
 
     @Option(names = {"-f", "--fragmentOfAddress"}, description = "Give fragment of address for instance " +
             "street name of city name that you want to find station in")
@@ -130,6 +135,9 @@ public class App implements Runnable {
             System.out.println(averagePollutionHandler.averagePollutionValueOfGivenParameterForGivenStations(beginDate, endDate, parameterName, listOfStations));
         }
 
+        if (mostFluctuatingParameter_4 && date != null) {
+            System.out.println(parameterOptionHandler.mostFluctuatingParameter(date, listOfStations));
+        }
 
 //        if (parameterName != null && beginDate != null && endDate != null) {
 //            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginDate, endDate, parameterName, listOfStations));

@@ -21,10 +21,10 @@ public class AveragePollutionHandler {
     }
 
     public double averagePollutionValueOfGivenParameterForGivenStations(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
-        final AtomicDouble sumOfValues = new AtomicDouble();
-        final AtomicInteger valuesCounter = new AtomicInteger();
+        double sumOfValues = 0;
+        int valuesCounter = 0;
 
-        Date realStartDate = Utils.parseAndCheckDate(beginDate);
+        Date realBeginDate = Utils.parseAndCheckDate(beginDate);
         Date realEndDate = Utils.parseAndCheckDate(endDate);
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
@@ -37,43 +37,39 @@ public class AveragePollutionHandler {
             return -1.0;
         }
 
-        LinkedList<Thread> threads = new LinkedList<>();
-
         for (Station station : allStations) {
             if (station == null) continue;
-            Thread thread = new Thread(() -> {
-                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
-                boolean foundParameter = false;
-                for (Sensor sensor : sensors) {
-                    if (sensor == null) continue;
+            boolean foundParameter = false;
 
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                    if (sensorData == null) continue;
+            for (Sensor sensor : sensors) {
+                if (sensor == null) continue;
 
-                    if (sensorData.key.equals(parameterName)) {
-                        foundParameter = true;
-                        for (SensorData.Value value : sensorData.values) {
-                            if (value.date.contains("-")) {
-                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                                // if date is between given period of time
-                                if (Utils.checkDateInterval(realStartDate, realEndDate, actualDate)) {
-                                    if (value.value != null) {
-                                        valuesCounter.incrementAndGet();
-                                        sumOfValues.addAndGet(value.value);
-                                    }
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                if (sensorData == null) continue;
+
+                if (sensorData.key.equals(parameterName)) {
+                    foundParameter = true;
+                    for (SensorData.Value value : sensorData.values) {
+                        if (value.date.contains("-")) {
+                            Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                            // if date is between given period of time
+                            if (Utils.checkDateInterval(realBeginDate, realEndDate, actualDate)) {
+                                if (value.value != null) {
+                                    valuesCounter++;
+                                    sumOfValues += value.value;
                                 }
                             }
                         }
                     }
                 }
-            });
-            threads.add(thread);
+            }
+            if (!foundParameter) {
+                System.out.println("There is no such parameter as: \"" + parameterName + " for station: " + station.stationName);
+                return -1.0;
+            }
         }
-
-
-        Utils.startAndJoinThreads(threads);
-
 
         if (validStations != null && validStations.size() > 0) {
             System.out.println("Average pollution value of parameter: " + parameterName + " for GIVEN stations: ");
@@ -85,6 +81,6 @@ public class AveragePollutionHandler {
             System.out.print("Average pollution value of parameter: " + parameterName + " for ALL stations is equal to: ");
         }
 
-        return sumOfValues.get() / valuesCounter.get();
+        return sumOfValues / valuesCounter;
     }
 }

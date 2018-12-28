@@ -96,10 +96,10 @@ public class Utils {
         return null;
     }
 
-    public static boolean checkDateInterval(Date startDate, Date endDate, Date actualDate) {
+    public static boolean checkDateInterval(Date beginDate, Date endDate, Date actualDate) {
         if (actualDate != null) {
             return (actualDate.before(endDate) || actualDate.equals(endDate)) &&
-                    (actualDate.after(startDate) || actualDate.equals(startDate));
+                    (actualDate.after(beginDate) || actualDate.equals(beginDate));
         }
         return false;
     }

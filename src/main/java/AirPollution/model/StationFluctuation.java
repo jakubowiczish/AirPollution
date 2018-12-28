@@ -16,6 +16,6 @@ public class StationFluctuation {
 
     @Override
     public String toString() {
-        return difference + "\n" + "It occurs for station:\n" + station.stationName;
+        return difference + "\n" + "This difference occurs for station:\n" + station.stationName;
     }
 }
