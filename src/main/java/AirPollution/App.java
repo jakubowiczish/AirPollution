@@ -47,6 +47,10 @@ public class App implements Runnable {
             "have printed sorted sensors with highest value of given parameter")
     private boolean sortedSensors_6;
 
+    @Option(names = {"-7"}, description = "give this option if you want to receive when and where" +
+            "occurred maximum and minimum pollution values of given parameter")
+    private boolean extremeValues_7;
+
     @Option(names = {"-N"}, description = "number of sensors for sorted sensors")
     private int N;
 
@@ -138,10 +142,6 @@ public class App implements Runnable {
             System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
         }
 
-//        if (forAllParameters && date != null) {
-//            System.out.println(parameterOptionHandler.valueOfAllParametersForGivenStationsAndDate(date, listOfStations));
-//        }
-
         if (averagePollution_3 && beginDate != null && endDate != null && parameterName != null) {
             System.out.println(averagePollutionHandler.averagePollutionValueOfGivenParameterForGivenStations(beginDate, endDate, parameterName, listOfStations));
         }
@@ -158,10 +158,9 @@ public class App implements Runnable {
             System.out.println(parameterOptionHandler.sortedStations(listOfStations, date, parameterName, N));
         }
 
-
-//        if (parameterName != null && beginDate != null && endDate != null) {
-//            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginDate, endDate, parameterName, listOfStations));
-//        }
+        if (extremeValues_7 && parameterName != null) {
+            System.out.println(parameterOptionHandler.parameterExtremeValues(parameterName));
+        }
 
         if (all) {
             printApiInformationOptionHandler.printNamesOfAllStations();
