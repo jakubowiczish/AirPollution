@@ -4,9 +4,7 @@ import AirPollution.storage.Storage;
 import AirPollution.utils.Utils;
 import AirPollution.model.*;
 import com.google.common.util.concurrent.AtomicDouble;
-import com.sun.source.tree.Tree;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -390,10 +388,10 @@ public class ParameterOptionHandler {
                             System.out.println("Key for station " + station.stationName + ", sensor: " +
                                     sensor.id + " and date " + realDate + " is null");
 
-                            Utils.addToList(parameterDataAtSpecificTime, -1.0, "STATION NAME: " + station.stationName);
+                            Utils.addToTreeWithDoubleAndString(parameterDataAtSpecificTime, -1.0, "STATION NAME: " + station.stationName);
 
                         } else {
-                            Utils.addToList(parameterDataAtSpecificTime, value.value, "STATION NAME: " + station.stationName);
+                            Utils.addToTreeWithDoubleAndString(parameterDataAtSpecificTime, value.value, "STATION NAME: " + station.stationName);
                         }
                     }
 

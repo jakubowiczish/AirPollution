@@ -51,6 +51,9 @@ public class App implements Runnable {
             "occurred maximum and minimum pollution values of given parameter")
     private boolean extremeValues_7;
 
+    @Option(names = {"-8"}, description = "give this option if you want to have graph printed")
+    private boolean graph;
+
     @Option(names = {"-N"}, description = "number of sensors for sorted sensors")
     private int N;
 
@@ -161,6 +164,12 @@ public class App implements Runnable {
         if (extremeValues_7 && parameterName != null) {
             System.out.println(parameterOptionHandler.parameterExtremeValues(parameterName));
         }
+
+        if (graph && beginDate != null && endDate != null) {
+            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime2(beginDate, endDate, parameterName, listOfStations));
+        }
+
+
 
         if (all) {
             printApiInformationOptionHandler.printNamesOfAllStations();

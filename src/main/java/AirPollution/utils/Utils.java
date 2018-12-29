@@ -12,6 +12,7 @@ import java.util.TreeMap;
 public class Utils {
 
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat usedHourDateFormat = new SimpleDateFormat("HH:mm:ss");
 
     public final static ArrayList<String> parameters = new ArrayList<>() {{
         add("NO2");
@@ -23,7 +24,7 @@ public class Utils {
         add("PM2.5");
     }};
 
-    public static synchronized void addToList(TreeMap<Double, ArrayList<String>> treeMap, Double key, String value) {
+    public static synchronized void addToTreeWithDoubleAndString(TreeMap<Double, ArrayList<String>> treeMap, Double key, String value) {
         ArrayList<String> list = treeMap.get(key);
 
         if (list == null) {
@@ -36,6 +37,22 @@ public class Utils {
             }
         }
     }
+
+
+    public static synchronized void addToTreeWithDateAndString(TreeMap<Date, ArrayList<String>> treeMap, Date key, String value) {
+        ArrayList<String> list = treeMap.get(key);
+
+        if (list == null) {
+            list = new ArrayList<>();
+            list.add(value);
+            treeMap.put(key, list);
+        } else {
+            if (!list.contains(value)) {
+                list.add(value);
+            }
+        }
+    }
+
 
     static boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
         for (Station station : allStations) {
@@ -106,10 +123,19 @@ public class Utils {
             return usedDateFormat.parse(date);
         } catch (ParseException e) {
             System.out.println("The date: " + date + " could not be parsed");
-            e.printStackTrace();
         }
         return null;
     }
+
+    public static Date parseStringToHour(String date) {
+        try {
+            return usedHourDateFormat.parse(date);
+        } catch (ParseException e) {
+            System.out.println("The date: " + date + " could not be parsed");
+        }
+        return null;
+    }
+
 
     public static boolean checkDateInterval(Date beginDate, Date endDate, Date actualDate) {
         if (actualDate != null) {
