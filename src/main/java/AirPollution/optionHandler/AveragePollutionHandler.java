@@ -5,13 +5,10 @@ import AirPollution.utils.Utils;
 import AirPollution.model.Sensor;
 import AirPollution.model.SensorData;
 import AirPollution.model.Station;
-import com.google.common.util.concurrent.AtomicDouble;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AveragePollutionHandler {
     private Storage storageReceiver;
@@ -41,7 +38,7 @@ public class AveragePollutionHandler {
             if (station == null) continue;
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
 
-            boolean foundParameter = false;
+//            boolean foundParameter = false;
 
             for (Sensor sensor : sensors) {
                 if (sensor == null) continue;
@@ -50,7 +47,7 @@ public class AveragePollutionHandler {
                 if (sensorData == null) continue;
 
                 if (sensorData.key.equals(parameterName)) {
-                    foundParameter = true;
+//                    foundParameter = true;
                     for (SensorData.Value value : sensorData.values) {
                         if (value.date.contains("-")) {
                             Date actualDate = Utils.multiThreadParseStringToDate(value.date);
@@ -65,20 +62,21 @@ public class AveragePollutionHandler {
                     }
                 }
             }
-            if (!foundParameter) {
-                System.out.println("There is no such parameter as: \"" + parameterName + " for station: " + station.stationName);
-                return -1.0;
-            }
+//            if (!foundParameter) {
+//                System.out.println("There is no such parameter as: \"" + parameterName + " for station: " + station.stationName);
+//            }
         }
 
         if (validStations != null && validStations.size() > 0) {
-            System.out.println("Average pollution value of parameter: " + parameterName + " for GIVEN stations: ");
+            System.out.println("Average pollution value of parameter: " + parameterName +
+                    "\nfrom: " + beginDate + " to: " + endDate + " for GIVEN stations: ");
             for (Station station : validStations) {
                 System.out.println(station.stationName);
             }
             System.out.print("is equal to: ");
         } else {
-            System.out.print("Average pollution value of parameter: " + parameterName + " for ALL stations is equal to: ");
+            System.out.print("Average pollution value of parameter: " + parameterName +
+                    "\nfrom: " + beginDate + " to: " + endDate + " for ALL stations is equal to: ");
         }
 
         return sumOfValues / valuesCounter;

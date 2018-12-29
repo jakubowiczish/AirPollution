@@ -22,7 +22,7 @@ public class DataReceiver {
      * @return sensor data for given sensor id
      */
     public SensorData getSensorDataForSpecificSensor(int sensorID, int attemptCounter) {
-        if (attemptCounter == 10) {
+        if (attemptCounter > 10) {
             System.out.println("UNABLE TO FETCH SENSOR DATA FOR SENSOR: " + sensorID);
             System.exit(1);
         }
@@ -46,7 +46,7 @@ public class DataReceiver {
      * @return air index for given station id
      */
     public AirIndex getAirIndexOfSpecificStation(int stationID, int attemptCounter) {
-        if (attemptCounter == 10) {
+        if (attemptCounter > 10) {
             System.out.println("UNABLE TO FETCH AIR INDEX FOR STATION: " + stationID);
             System.exit(1);
         }
@@ -70,7 +70,7 @@ public class DataReceiver {
      * @return List of all sensors for given station id
      */
     public CopyOnWriteArrayList<Sensor> getAllSensorsForSpecificStation(int stationID, int attemptCounter) {
-        if (attemptCounter == 10) {
+        if (attemptCounter > 10) {
             System.out.println("UNABLE TO FETCH ALL SENSORS FOR STATION: " + stationID);
             System.exit(1);
         }
@@ -105,6 +105,10 @@ public class DataReceiver {
      * @return List of all stations available in the system
      */
     public ArrayList<Station> getAllStations(int attemptCounter) {
+        if (attemptCounter > 10) {
+            System.out.println("UNABLE TO FETCH ALL STATIONS");
+            System.exit(1);
+        }
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
         Station[] allStations;

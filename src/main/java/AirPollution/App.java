@@ -51,8 +51,8 @@ public class App implements Runnable {
             "occurred maximum and minimum pollution values of given parameter")
     private boolean extremeValues_7;
 
-    @Option(names = {"-8"}, description = "give this option if you want to have graph printed")
-    private boolean graph;
+    @Option(names = {"-8"}, description = "give this option if you want to have graph_8 printed")
+    private boolean graph_8;
 
     @Option(names = {"-N"}, description = "number of sensors for sorted sensors")
     private int N;
@@ -82,6 +82,12 @@ public class App implements Runnable {
     @Option(names = {"-e", "--endDate"}, description = "End date of measurement, " +
             "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String endDate;
+
+    @Option(names = {"-B", "--beginHour"}, description = "Start hour for graph")
+    private String beginHour;
+
+    @Option(names = {"-E", "--endHour"}, description = "End hour for graph")
+    private String endHour;
 
 //    @Option(names = {"-w", "--sinceWhen"},
 //            description = "Since when we want to have information about which parameter " +
@@ -165,10 +171,9 @@ public class App implements Runnable {
             System.out.println(parameterOptionHandler.parameterExtremeValues(parameterName));
         }
 
-        if (graph && beginDate != null && endDate != null) {
-            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime2(beginDate, endDate, parameterName, listOfStations));
+        if (graph_8 && beginHour != null && endHour != null) {
+            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginHour, endHour, parameterName, listOfStations));
         }
-
 
 
         if (all) {
