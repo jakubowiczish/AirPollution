@@ -74,6 +74,10 @@ public class Station {
         return stationName;
     }
 
+    public void setStationName(String stationName) {
+        this.stationName = stationName;
+    }
+
     public int getId() {
         return id;
     }

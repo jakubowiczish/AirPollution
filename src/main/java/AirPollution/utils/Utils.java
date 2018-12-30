@@ -54,7 +54,7 @@ public class Utils {
     }
 
 
-    static boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
+    public static boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
         for (Station station : allStations) {
             if (station.getStationName().equals(stationName)) {
                 return true;
@@ -63,7 +63,7 @@ public class Utils {
         return false;
     }
 
-    static ArrayList<Station> checkValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
+    public static ArrayList<Station> checkValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
         ArrayList<Station> validStations = new ArrayList<>();
 
         if (listOfStations.size() > 0) {

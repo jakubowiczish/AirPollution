@@ -403,7 +403,8 @@ public class ParameterOptionHandler {
 
         StringBuilder result = new StringBuilder();
         result.append("Top ").append(N).
-                append(" stations with highest pollution of parameter \"").append(parameterName).append("\":\n");
+                append(" stations with highest pollution of parameter \"").
+                append(parameterName).append("\" on \"").append(date).append("\"\n");
 
         for (Map.Entry<Double, ArrayList<String>> entry : parameterDataAtSpecificTime.entrySet()) {
             N++;

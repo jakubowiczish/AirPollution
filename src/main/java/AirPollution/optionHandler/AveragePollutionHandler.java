@@ -17,7 +17,7 @@ public class AveragePollutionHandler {
         this.storageReceiver = storageReceiver;
     }
 
-    public double averagePollutionValueOfGivenParameterForGivenStations(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
+    public String averagePollutionValueOfGivenParameterForGivenStations(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
         double sumOfValues = 0;
         int valuesCounter = 0;
 
@@ -31,7 +31,7 @@ public class AveragePollutionHandler {
 
         if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
             System.out.println("Given parameter does not exist in the system");
-            return -1.0;
+            return null;
         }
 
         for (Station station : allStations) {
@@ -67,18 +67,22 @@ public class AveragePollutionHandler {
 //            }
         }
 
-        if (validStations != null && validStations.size() > 0) {
-            System.out.println("Average pollution value of parameter: " + parameterName +
-                    "\nfrom: " + beginDate + " to: " + endDate + " for GIVEN stations: ");
-            for (Station station : validStations) {
-                System.out.println(station.getStationName());
-            }
-            System.out.print("is equal to: ");
-        } else {
-            System.out.print("Average pollution value of parameter: " + parameterName +
-                    "\nfrom: " + beginDate + " to: " + endDate + " for ALL stations is equal to: ");
-        }
+        StringBuilder stringBuilder = new StringBuilder();
 
-        return sumOfValues / valuesCounter;
+        if (validStations != null && validStations.size() > 0) {
+            stringBuilder.
+                    append("Average pollution value of parameter: ").
+                    append(parameterName).append("\nfrom: ").append(beginDate).append(" to: ").append(endDate).
+                    append("\nfor GIVEN stations:\n");
+            for (Station station : validStations) {
+                stringBuilder.append(station.getStationName()).append("\n");
+            }
+            stringBuilder.append("is equal to: ");
+        } else {
+            stringBuilder.append("Average pollution value of parameter: ").append(parameterName).append("\nfrom: ").
+                    append(beginDate).append(" to: ").append(endDate).append(" for ALL stations is equal to: ");
+        }
+        stringBuilder.append(sumOfValues / valuesCounter);
+        return stringBuilder.toString();
     }
 }
