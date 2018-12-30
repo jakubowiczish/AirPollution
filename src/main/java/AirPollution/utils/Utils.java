@@ -56,7 +56,7 @@ public class Utils {
 
     static boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
         for (Station station : allStations) {
-            if (station.stationName.equals(stationName)) {
+            if (station.getStationName().equals(stationName)) {
                 return true;
             }
         }
@@ -70,7 +70,7 @@ public class Utils {
             for (String stationName : listOfStations) {
                 boolean stationNameFound = false;
                 for (Station station : allStations) {
-                    if (station.stationName.equals(stationName) && !validStations.contains(station)) {
+                    if (station.getStationName().equals(stationName) && !validStations.contains(station)) {
                         validStations.add(station);
                         stationNameFound = true;
                     }

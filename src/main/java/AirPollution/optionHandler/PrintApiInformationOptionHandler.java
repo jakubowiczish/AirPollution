@@ -14,14 +14,14 @@ public class PrintApiInformationOptionHandler {
 
     public void printNamesOfAllStations() {
         storageReceiver.getAllStations()
-                .forEach(station -> System.out.println(station.stationName));
+                .forEach(station -> System.out.println(station.getStationName()));
     }
 
     public void printAllStationsWithTheirSensors() {
         storageReceiver.getAllStations()
                 .forEach(station -> {
-                    System.out.println("\nSTATION NAME: " + station.stationName + "\nSensors for this station:");
-                    storageReceiver.getAllSensorsForSpecificStation(station.id)
+                    System.out.println("\nSTATION NAME: " + station.getStationName() + "\nSensors for this station:");
+                    storageReceiver.getAllSensorsForSpecificStation(station.getId())
                             .forEach(sensor -> System.out.println(sensor.toString()));
                 });
 
@@ -31,8 +31,8 @@ public class PrintApiInformationOptionHandler {
         boolean found = false;
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         for (Station station : allStations) {
-            if (station.stationName.contains(stationAddressFragment)) {
-                System.out.println(station.stationName);
+            if (station.getStationName().contains(stationAddressFragment)) {
+                System.out.println(station.getStationName());
                 found = true;
             }
         }

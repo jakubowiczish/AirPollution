@@ -30,13 +30,13 @@ public class Storage {
 
         for (Station station : stations) {
             Thread thread = new Thread(() -> {
-                CopyOnWriteArrayList<Sensor> sensors = getAllSensorsForSpecificStation(station.id);
+                CopyOnWriteArrayList<Sensor> sensors = getAllSensorsForSpecificStation(station.getId());
 
                 for (Sensor sensor : sensors) {
-                    getSensorDataForSpecificSensor(sensor.id);
+                    getSensorDataForSpecificSensor(sensor.getId());
                 }
 
-                getAirIndexOfSpecificStation(station.id);
+                getAirIndexOfSpecificStation(station.getId());
             });
 
             threads.add(thread);
@@ -58,7 +58,7 @@ public class Storage {
             }
 
             for (Station station : allStations) {
-                stationMemory.put(station.stationName, station);
+                stationMemory.put(station.getStationName(), station);
             }
 
         }

@@ -24,10 +24,10 @@ public class AirIndexOptionHandler {
         if (allStations == null) return null;
         for (Station station : allStations) {
             if (station == null) continue;
-            int stationID = Station.returnIdOfGivenStation(allStations, station.stationName);
+            int stationID = Station.returnIdOfGivenStation(allStations, station.getStationName());
             AirIndex airIndex = storageReceiver.getAirIndexOfSpecificStation(stationID);
             if (airIndex == null) continue;
-            stringBuilder.append("AIR INDEX FOR STATION: \"").append(station.stationName).append("\"\n").append(airIndex.toString()).append("\n");
+            stringBuilder.append("AIR INDEX FOR STATION: \"").append(station.getStationName()).append("\"\n").append(airIndex.toString()).append("\n");
         }
         return stringBuilder.toString();
     }

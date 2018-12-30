@@ -3,8 +3,8 @@ package AirPollution.model;
 import java.util.Arrays;
 
 public class SensorData {
-    public String key;
-    public Value[] values;
+    private  String key;
+    private  Value[] values;
 
     public class Value {
         public String date;
@@ -25,5 +25,13 @@ public class SensorData {
                 "key='" + key + '\'' +
                 ", values=" + Arrays.toString(values) +
                 '}';
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public Value[] getValues() {
+        return values;
     }
 }

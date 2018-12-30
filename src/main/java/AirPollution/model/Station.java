@@ -3,36 +3,36 @@ package AirPollution.model;
 import java.util.ArrayList;
 
 public class Station {
-    public int id;
-    public String stationName;
-    double gegrLat;
-    double gegrLon;
-    City city;
-    String addressStreet;
+    private int id;
+    private String stationName;
+    private double gegrLat;
+    private double gegrLon;
+    private City city;
+    private String addressStreet;
 
     class City {
-        int id;
-        String name;
-        Commune commune;
+        private int id;
+        private String name;
+        private Commune commune;
 
         @Override
         public String toString() {
-            return  "           id:" + id + "\n" +
+            return "           id:" + id + "\n" +
                     "           name:'" + name + '\'' + "\n" +
                     "           commune: {" + "\n" + commune + "\n" +
                     "       }";
         }
 
         class Commune {
-            String communeName;
-            String districtName;
-            String provinceName;
+            private String communeName;
+            private String districtName;
+            private String provinceName;
 
             @Override
             public String toString() {
-                return  "               communeName:'" + communeName + '\'' + "\n" +
+                return "               communeName:'" + communeName + '\'' + "\n" +
                         "               districtName:'" + districtName + '\'' + "\n" +
-                        "               provinceName:'"  + provinceName + '\'' + "\n" +
+                        "               provinceName:'" + provinceName + '\'' + "\n" +
                         "           }";
             }
         }
@@ -68,5 +68,13 @@ public class Station {
                 "       city: {" + "\n" + city + "\n" +
                 "       addressStreet:'" + addressStreet + '\'' + "\n" +
                 '}';
+    }
+
+    public String getStationName() {
+        return stationName;
+    }
+
+    public int getId() {
+        return id;
     }
 }

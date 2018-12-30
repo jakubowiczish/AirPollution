@@ -36,19 +36,19 @@ public class AveragePollutionHandler {
 
         for (Station station : allStations) {
             if (station == null) continue;
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
 
 //            boolean foundParameter = false;
 
             for (Sensor sensor : sensors) {
                 if (sensor == null) continue;
 
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
                 if (sensorData == null) continue;
 
-                if (sensorData.key.equals(parameterName)) {
+                if (sensorData.getKey().equals(parameterName)) {
 //                    foundParameter = true;
-                    for (SensorData.Value value : sensorData.values) {
+                    for (SensorData.Value value : sensorData.getValues()) {
                         if (value.date.contains("-")) {
                             Date actualDate = Utils.multiThreadParseStringToDate(value.date);
                             // if date is between given period of time
@@ -71,7 +71,7 @@ public class AveragePollutionHandler {
             System.out.println("Average pollution value of parameter: " + parameterName +
                     "\nfrom: " + beginDate + " to: " + endDate + " for GIVEN stations: ");
             for (Station station : validStations) {
-                System.out.println(station.stationName);
+                System.out.println(station.getStationName());
             }
             System.out.print("is equal to: ");
         } else {

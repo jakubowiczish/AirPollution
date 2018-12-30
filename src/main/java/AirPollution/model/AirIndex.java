@@ -1,39 +1,39 @@
 package AirPollution.model;
 
 public class AirIndex {
-    int id;
+    private int id;
 
-    IndexLevel stIndexLevel;
-    String stCalcDate;
-    String stSourceDataDate;
+    private IndexLevel stIndexLevel;
+    private String stCalcDate;
+    private String stSourceDataDate;
 
-    IndexLevel so2IndexLevel;
-    String so2CalcDate;
-    String so2SourceDataDate;
+    private IndexLevel so2IndexLevel;
+    private String so2CalcDate;
+    private String so2SourceDataDate;
 
-    IndexLevel no2IndexLevel;
-    String no2CalcDate;
-    String no2SourceDataDate;
+    private IndexLevel no2IndexLevel;
+    private String no2CalcDate;
+    private String no2SourceDataDate;
 
-    IndexLevel coIndexLevel;
-    String coCalcDate;
-    String coSourceDataDate;
+    private IndexLevel coIndexLevel;
+    private String coCalcDate;
+    private String coSourceDataDate;
 
-    IndexLevel pm10IndexLevel;
-    String pm10CalcDate;
-    String pm10SourceDataDate;
+    private IndexLevel pm10IndexLevel;
+    private String pm10CalcDate;
+    private String pm10SourceDataDate;
 
-    IndexLevel pm25IndexLevel;
-    String pm25CalcDate;
-    String pm25SourceDataDate;
+    private IndexLevel pm25IndexLevel;
+    private String pm25CalcDate;
+    private String pm25SourceDataDate;
 
-    IndexLevel o3IndexLevel;
-    String o3CalcDate;
-    String o3SourceDataDate;
+    private IndexLevel o3IndexLevel;
+    private String o3CalcDate;
+    private String o3SourceDataDate;
 
-    IndexLevel c6h6IndexLevel;
-    String c6h6CalcDate;
-    String c6h6SourceDataDate;
+    private IndexLevel c6h6IndexLevel;
+    private String c6h6CalcDate;
+    private String c6h6SourceDataDate;
 
     @Override
     public String toString() {
@@ -67,8 +67,8 @@ public class AirIndex {
     }
 
     class IndexLevel {
-        int id;
-        String indexLevelName;
+        private int id;
+        private String indexLevelName;
 
         @Override
         public String toString() {

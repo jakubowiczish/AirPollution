@@ -51,18 +51,18 @@ public class BarGraphHandler {
 
         for (Station station : allStations) {
             if (station == null) continue;
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
             if (sensors == null) continue;
             for (Sensor sensor : sensors) {
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                if (sensorData == null || sensorData.values.length == 0) continue;
-                if (!sensorData.key.equals(parameterName)) {
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
+                if (sensorData == null || sensorData.getValues().length == 0) continue;
+                if (!sensorData.getKey().equals(parameterName)) {
                     System.out.println("There is no such parameter as: " + parameterName +
-                            " for station: " + station.stationName +
-                            " and sensor: " + sensor.id);
+                            " for station: " + station.getStationName() +
+                            " and sensor: " + sensor.getId());
                     continue;
                 }
-                for (SensorData.Value value : sensorData.values) {
+                for (SensorData.Value value : sensorData.getValues()) {
                     if (!value.date.contains("-")) continue;
                     if (value.value == null) continue;
                     Date actualDate = Utils.multiThreadParseStringToDate(value.date);
@@ -75,13 +75,13 @@ public class BarGraphHandler {
 
                     int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
                     String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "\u25a0");
-                    int blankSpaceLength = longestStationNameLength - station.stationName.length() + 1;
+                    int blankSpaceLength = longestStationNameLength - station.getStationName().length() + 1;
 
 
                     if (isToday(actualDate)) {
                         Date keyDate = Utils.parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
-                                " TODAY               " + " (" + station.stationName + ")" +
+                                " TODAY               " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
                                 graphLine + " " + value.value +
                                 "\n";
@@ -90,7 +90,7 @@ public class BarGraphHandler {
                     } else if (wasYesterday(actualDate)) {
                         Date keyDate = Utils.parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
-                                " YESTERDAY           " + " (" + station.stationName + ")" +
+                                " YESTERDAY           " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
                                 graphLine + " " + value.value +
                                 "\n";
@@ -99,7 +99,7 @@ public class BarGraphHandler {
                     } else if (wasDayBeforeYesterday(actualDate)) {
                         Date keyDate = Utils.parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
-                                " DAY BEFORE YESTERDAY" + " (" + station.stationName + ")" +
+                                " DAY BEFORE YESTERDAY" + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
                                 graphLine + " " + value.value +
                                 "\n";
@@ -124,14 +124,14 @@ public class BarGraphHandler {
         double maxValue = -1.0;
         for (Station station : allStations) {
             if (station == null) continue;
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.id);
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
             if (sensors == null) continue;
             for (Sensor sensor : sensors) {
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.id);
-                if (sensorData == null || sensorData.values.length == 0 || !sensorData.key.equals(parameterName))
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
+                if (sensorData == null || sensorData.getValues().length == 0 || !sensorData.getKey().equals(parameterName))
                     continue;
 
-                for (SensorData.Value value : sensorData.values) {
+                for (SensorData.Value value : sensorData.getValues()) {
                     if (value.value == null) continue;
                     if (value.value > maxValue) {
                         maxValue = value.value;
@@ -145,8 +145,8 @@ public class BarGraphHandler {
     private int findLongestStationName(ArrayList<Station> allStations) {
         int maxLength = -1;
         for (Station station : allStations) {
-            if (station.stationName.length() > maxLength) {
-                maxLength = station.stationName.length();
+            if (station.getStationName().length() > maxLength) {
+                maxLength = station.getStationName().length();
             }
         }
         return maxLength;

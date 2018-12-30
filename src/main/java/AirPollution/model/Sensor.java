@@ -1,8 +1,8 @@
 package AirPollution.model;
 
 public class Sensor {
-    public int id;
-    int stationId;
+    private int id;
+    private int stationId;
     public Param param;
 
     @Override
@@ -29,5 +29,9 @@ public class Sensor {
                     "idParam:" + idParam +
                     "}";
         }
+    }
+
+    public int getId() {
+        return id;
     }
 }
