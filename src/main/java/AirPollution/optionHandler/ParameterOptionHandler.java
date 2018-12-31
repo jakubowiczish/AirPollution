@@ -5,9 +5,7 @@ import AirPollution.utils.Utils;
 import AirPollution.model.*;
 import com.google.common.util.concurrent.AtomicDouble;
 
-import java.text.DecimalFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -21,7 +19,6 @@ public class ParameterOptionHandler {
     public ParameterOptionHandler(Storage storageReceiver) {
         this.storageReceiver = storageReceiver;
     }
-
 
     /**
      * Provides user with information about the value of given parameter
@@ -78,15 +75,12 @@ public class ParameterOptionHandler {
                                         put(value.value, " - pollution value of parameter: " +
                                                 parameterName + " for station: \"" + station.getStationName() + "\"\n");
                             }
-
                         }
-
                     }
                     if (!validDate) {
                         System.out.println("There is no such date as \"" + date + "\"  in the system for station: " + station.getStationName());
                     }
                 }
-
             }
             if (!foundParameter) {
                 System.out.println("There is no such parameter as \"" + parameterName + "\" in the system for station: " + station.getStationName());
@@ -142,7 +136,12 @@ public class ParameterOptionHandler {
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-        ConcurrentHashMap<String, StationFluctuation> fluctuations = new ConcurrentHashMap<>();
+
+        String resultParameter = null;
+
+        double resultMinValue = 10000;
+        double resultMaxValue = -1;
+        double maxDifference = -1;
 
         for (Station station : allStations) {
 
@@ -152,34 +151,27 @@ public class ParameterOptionHandler {
                 if (sensorData == null) continue;
                 if (sensorData.getValues().length == 0) continue;
 
-                double maxValue = -1;
-                double minValue = 10000;
-
-
                 for (SensorData.Value value : sensorData.getValues()) {
-                    if (value.value != null && value.date.contains("-")) {
-                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                        if (actualDate == null) continue;
-                        if (actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate)) {
-                            if (value.value < minValue) {
-                                minValue = value.value;
-                            }
-                            if (value.value > maxValue) {
-                                maxValue = value.value;
+                    if (value.value == null || !value.date.contains("-")) continue;
 
-                            }
+                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                    if (actualDate == null) continue;
+
+                    if (Utils.checkSinceWhenDate(sinceWhenDate, actualDate)) {
+                        if (value.value < resultMinValue && value.value > 0) {
+                            resultMinValue = value.value;
                         }
+                        if (value.value > resultMaxValue) {
+                            resultMaxValue = value.value;
 
+                        }
                     }
                 }
-                Double difference = maxValue - minValue;
-                if (fluctuations.get(sensorData.getKey()) != null) {
-                    if (fluctuations.get(sensorData.getKey()).getDifference() < difference) {
-                        fluctuations.put(sensorData.getKey(), new StationFluctuation(station, difference));
-                    }
-                } else {
-                    fluctuations.put(sensorData.getKey(), new StationFluctuation(station, difference));
+                double difference = resultMaxValue - resultMinValue;
 
+                if (maxDifference < difference) {
+                    maxDifference = difference;
+                    resultParameter = sensorData.getKey();
                 }
             }
         }
@@ -199,15 +191,9 @@ public class ParameterOptionHandler {
                     append(sinceWhenString).append("\" for all stations is ");
         }
 
-        String resultParameter = Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
-        StationFluctuation resultStationFluctuation = Collections.max(fluctuations.entrySet(),
-                Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue();
-
         return resultString + resultParameter +
-                ",\nthe difference between maximum and minimum pollution for this parameter amounts to: " +
-                resultStationFluctuation;
-
-
+                ",\nthe difference between maximum and minimum pollution for this parameter amounts to: " + Utils.decimalFormat.format(maxDifference) + ",\n" +
+                "with maximum value of: " + Utils.decimalFormat.format(resultMaxValue) + " and minimum value of: " + Utils.decimalFormat.format(resultMinValue);
     }
 
 
@@ -223,6 +209,7 @@ public class ParameterOptionHandler {
         Date specificDate = Utils.parseAndCheckDate(date);
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
+
         String lowestParameterName = null, highestParameterName = null;
         String lowestStationName = null, highestStationName = null;
 
@@ -261,7 +248,6 @@ public class ParameterOptionHandler {
                 }
 
             }
-
         }
 
         String lowestValueString = "Parameter with lowest value on \"" + date + "\" is " + lowestParameterName +
@@ -325,7 +311,6 @@ public class ParameterOptionHandler {
             }
 
         }
-
 
         StringBuilder result = new StringBuilder();
         result.append("Top ").append(N).
@@ -404,7 +389,6 @@ public class ParameterOptionHandler {
 
             });
             threads.add(thread);
-
         }
 
         Utils.startAndJoinThreads(threads);

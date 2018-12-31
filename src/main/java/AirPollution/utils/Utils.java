@@ -150,6 +150,13 @@ public class Utils {
         return false;
     }
 
+    public static boolean checkSinceWhenDate(Date sinceWhenDate, Date actualDate) {
+        if (actualDate != null) {
+            return actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate);
+        }
+        return false;
+    }
+
     public static Date parseAndCheckDate(String dateString) {
         Date date = parseStringToDate(dateString);
         if (date == null) {
