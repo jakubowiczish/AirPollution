@@ -10,6 +10,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
+/**
+ * Class that contains various methods and fields that may be useful for other classes
+ */
 public class Utils {
 
     public static DecimalFormat decimalFormat = new DecimalFormat("#0.0000");

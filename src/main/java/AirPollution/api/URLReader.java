@@ -15,7 +15,7 @@ public class URLReader {
      *
      * @param urlAddress desired URL Address
      * @return fetched content from URL Address to String
-     * @throws IOException
+     * @throws IOException exception
      */
     public static String getJSON(String urlAddress) throws IOException {
         StringBuilder result = new StringBuilder();
