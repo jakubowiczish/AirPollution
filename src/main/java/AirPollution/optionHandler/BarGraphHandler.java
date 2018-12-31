@@ -40,7 +40,7 @@ public class BarGraphHandler {
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-        int maxLengthOfLine = 100;
+        int maxLengthOfLine = 150;
         int longestStationNameLength = findLongestStationName(allStations);
 
         double maxValue = findMaximumValueOfGivenParameter(allStations, parameterName);
@@ -57,9 +57,9 @@ public class BarGraphHandler {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
                 if (sensorData == null || sensorData.getValues().length == 0) continue;
                 if (!sensorData.getKey().equals(parameterName)) {
-                    System.out.println("There is no such parameter as: " + parameterName +
-                            " for station: " + station.getStationName() +
-                            " and sensor: " + sensor.getId());
+//                    System.out.println("There is no such parameter as: " + parameterName +
+//                            " for station: " + station.getStationName() +
+//                            " and sensor: " + sensor.getId());
                     continue;
                 }
                 for (SensorData.Value value : sensorData.getValues()) {

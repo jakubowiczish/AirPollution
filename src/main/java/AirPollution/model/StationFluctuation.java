@@ -1,5 +1,7 @@
 package AirPollution.model;
 
+import AirPollution.utils.Utils;
+
 public class StationFluctuation {
 
     private final Double difference;
@@ -16,6 +18,6 @@ public class StationFluctuation {
 
     @Override
     public String toString() {
-        return difference + "\n" + "This difference occurs for station:\n" + station.getStationName();
+        return Utils.decimalFormat.format(difference) + "\n" + "This difference occurs for station:\n" + station.getStationName();
     }
 }

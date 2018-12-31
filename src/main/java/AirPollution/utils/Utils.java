@@ -2,6 +2,7 @@ package AirPollution.utils;
 
 import AirPollution.model.Station;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.TreeMap;
 
 public class Utils {
 
+    public static DecimalFormat decimalFormat = new DecimalFormat("#0.0000");
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat usedHourDateFormat = new SimpleDateFormat("HH:mm:ss");
 

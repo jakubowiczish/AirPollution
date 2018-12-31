@@ -22,7 +22,6 @@ public class ParameterOptionHandler {
         this.storageReceiver = storageReceiver;
     }
 
-    DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
 
     /**
      * Provides user with information about the value of given parameter
@@ -94,7 +93,7 @@ public class ParameterOptionHandler {
             }
         }
         for (Map.Entry<Double, String> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
-            stringBuilder.append(entry.getKey()).append(entry.getValue());
+            stringBuilder.append(Utils.decimalFormat.format(entry.getKey())).append(entry.getValue());
         }
 
         return stringBuilder.toString();
@@ -200,12 +199,15 @@ public class ParameterOptionHandler {
                     append(sinceWhenString).append("\" for all stations is ");
         }
 
+        String resultParameter = Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey();
+        StationFluctuation resultStationFluctuation = Collections.max(fluctuations.entrySet(),
+                Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue();
 
-        return resultString +
-                Collections.max(fluctuations.entrySet(), Comparator.comparingDouble(o -> o.getValue().getDifference())).getKey() +
+        return resultString + resultParameter +
                 ",\nthe difference between maximum and minimum pollution for this parameter amounts to: " +
-                Collections.max(fluctuations.entrySet(),
-                        Comparator.comparingDouble(o -> o.getValue().getDifference())).getValue();
+                resultStationFluctuation;
+
+
     }
 
 
@@ -226,7 +228,6 @@ public class ParameterOptionHandler {
 
         double resultMinValue = 10000;
         double resultMaxValue = -1;
-
 
         for (Station station : allStations) {
 
@@ -264,86 +265,11 @@ public class ParameterOptionHandler {
         }
 
         String lowestValueString = "Parameter with lowest value on \"" + date + "\" is " + lowestParameterName +
-                " and its value is: " + resultMinValue + ", it occurs for station: " + lowestStationName;
+                " and its value is: " + Utils.decimalFormat.format(resultMinValue) + ", it occurs for station: " + lowestStationName;
         String highestValueString = "\nParameter with highest value on \"" + date + "\" is " + highestParameterName +
-                " and its value is: " + resultMaxValue + ", it occurs for station: " + highestStationName;
+                " and its value is: " + Utils.decimalFormat.format(resultMaxValue) + ", it occurs for station: " + highestStationName;
 
         return lowestValueString + highestValueString;
-    }
-
-
-    /**
-     * Returns String that contains information about extreme values of parameter
-     * (maximum and minimum values).
-     * This information consists of names of the stations where such extreme values occur together with
-     * date when they occur and pollution values for this specific parameter
-     *
-     * @param parameterName name of the parameter that we want to have extreme values' information about
-     * @return Information about extreme values for given parameter
-     */
-    public String parameterExtremeValues(String parameterName) {
-        final Container<Date> minDate = new Container<>();
-        final Container<Date> maxDate = new Container<>();
-        final Container<Station> minStation = new Container<>();
-        final Container<Station> maxStation = new Container<>();
-
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        LinkedList<Thread> threads = new LinkedList<>();
-        final AtomicDouble maxValue = new AtomicDouble(0);
-        final AtomicDouble minValue = new AtomicDouble(10000);
-
-        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
-            System.out.println("There is no such parameter as \"" + parameterName + "\" in system");
-            return null;
-        }
-
-        for (Station station : allStations) {
-            Thread thread = new Thread(() -> {
-                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
-                for (Sensor sensor : sensors) {
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
-                    if (sensorData == null) continue;
-                    if (sensorData.getValues().length == 0) continue;
-                    if (sensorData.getKey().equals(parameterName)) {
-                        for (SensorData.Value value : sensorData.getValues()) {
-                            if (value.date.contains("-") && value.value != null) {
-                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                                if (value.value < minValue.get()) {
-                                    minValue.set(value.value);
-                                    synchronized (minDate) {
-                                        minDate.set(actualDate);
-                                    }
-                                    synchronized (minStation) {
-                                        minStation.set(station);
-                                    }
-                                }
-                                if (value.value > maxValue.get()) {
-                                    maxValue.set(value.value);
-                                    synchronized (maxDate) {
-                                        maxDate.set(actualDate);
-                                    }
-                                    synchronized (maxStation) {
-                                        maxStation.set(station);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-            });
-            threads.add(thread);
-
-        }
-
-        Utils.startAndJoinThreads(threads);
-
-        return "Minimum value of parameter \"" + parameterName + "\" occurs on " +
-                Utils.convertDateToString(minDate.getValue()) +
-                " for station: \"" + minStation.getValue().getStationName() + "\" and its value is: " + minValue.get() +
-                "\nMaximum value of parameter \"" + parameterName + "\" occurs on " +
-                Utils.convertDateToString(maxDate.getValue()) +
-                " for station: \"" + maxStation.getValue().getStationName() + "\" and its value is: " + maxValue.get();
     }
 
 
@@ -386,7 +312,7 @@ public class ParameterOptionHandler {
                     if (actualDate.equals(realDate)) {
                         if (value.value == null) {
                             System.out.println("Key for station " + station.getStationName() + ", sensor: " +
-                                    sensor.getId() + " and date " + realDate + " is null");
+                                    sensor.getId() + " and date \"" + date + "\" is null");
 
                             Utils.addToTreeWithDoubleAndString(parameterDataAtSpecificTime, -1.0, "STATION NAME: " + station.getStationName());
 
@@ -410,10 +336,85 @@ public class ParameterOptionHandler {
             N++;
             if (parameterDataAtSpecificTime.entrySet().size() - N < 0) {
                 result.append(entry.getValue()).append(" Value of parameter ").
-                        append(parameterName).append(" is equal to ").append(entry.getKey()).append("\n");
+                        append(parameterName).append(" is equal to ").append(Utils.decimalFormat.format(entry.getKey())).append("\n");
             }
         }
         return result.toString();
+    }
+
+
+    /**
+     * Returns String that contains information about extreme values of parameter
+     * (maximum and minimum values).
+     * This information consists of names of the stations where such extreme values occur together with
+     * date when they occur and pollution values for this specific parameter
+     *
+     * @param parameterName name of the parameter that we want to have extreme values' information about
+     * @return Information about extreme values for given parameter
+     */
+    public String parameterExtremeValues(String parameterName) {
+        final Container<Date> minDate = new Container<>();
+        final Container<Date> maxDate = new Container<>();
+        final Container<Station> minStation = new Container<>();
+        final Container<Station> maxStation = new Container<>();
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        LinkedList<Thread> threads = new LinkedList<>();
+        final AtomicDouble maxValue = new AtomicDouble(0);
+        final AtomicDouble minValue = new AtomicDouble(10000);
+
+        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
+            System.out.println("There is no such parameter as \"" + parameterName + "\" in system");
+            return null;
+        }
+
+        for (Station station : allStations) {
+            Thread thread = new Thread(() -> {
+                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+                for (Sensor sensor : sensors) {
+                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
+                    if (sensorData == null) continue;
+                    if (sensorData.getValues().length == 0) continue;
+                    if (sensorData.getKey().equals(parameterName)) {
+                        for (SensorData.Value value : sensorData.getValues()) {
+                            if (value.date.contains("-") && value.value != null) {
+                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                                if (value.value < minValue.get() && value.value > 0) {
+                                    minValue.set(value.value);
+                                    synchronized (minDate) {
+                                        minDate.set(actualDate);
+                                    }
+                                    synchronized (minStation) {
+                                        minStation.set(station);
+                                    }
+                                }
+                                if (value.value > maxValue.get()) {
+                                    maxValue.set(value.value);
+                                    synchronized (maxDate) {
+                                        maxDate.set(actualDate);
+                                    }
+                                    synchronized (maxStation) {
+                                        maxStation.set(station);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            });
+            threads.add(thread);
+
+        }
+
+        Utils.startAndJoinThreads(threads);
+
+        return "Minimum value of parameter \"" + parameterName + "\" occurs on " +
+                Utils.convertDateToString(minDate.getValue()) +
+                " for station: \"" + minStation.getValue().getStationName() + "\" and its value is: " + Utils.decimalFormat.format(minValue.get()) +
+                "\nMaximum value of parameter \"" + parameterName + "\" occurs on " +
+                Utils.convertDateToString(maxDate.getValue()) +
+                " for station: \"" + maxStation.getValue().getStationName() + "\" and its value is: " + Utils.decimalFormat.format(maxValue.get());
     }
 
 

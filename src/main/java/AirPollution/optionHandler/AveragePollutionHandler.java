@@ -6,6 +6,7 @@ import AirPollution.model.Sensor;
 import AirPollution.model.SensorData;
 import AirPollution.model.Station;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -16,6 +17,7 @@ public class AveragePollutionHandler {
     public AveragePollutionHandler(Storage storageReceiver) {
         this.storageReceiver = storageReceiver;
     }
+
 
     public String averagePollutionValueOfGivenParameterForGivenStations(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
         double sumOfValues = 0;
@@ -36,18 +38,14 @@ public class AveragePollutionHandler {
 
         for (Station station : allStations) {
             if (station == null) continue;
+
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
-
-//            boolean foundParameter = false;
-
             for (Sensor sensor : sensors) {
                 if (sensor == null) continue;
 
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
                 if (sensorData == null) continue;
-
                 if (sensorData.getKey().equals(parameterName)) {
-//                    foundParameter = true;
                     for (SensorData.Value value : sensorData.getValues()) {
                         if (value.date.contains("-")) {
                             Date actualDate = Utils.multiThreadParseStringToDate(value.date);
@@ -62,9 +60,6 @@ public class AveragePollutionHandler {
                     }
                 }
             }
-//            if (!foundParameter) {
-//                System.out.println("There is no such parameter as: \"" + parameterName + " for station: " + station.stationName);
-//            }
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -82,7 +77,7 @@ public class AveragePollutionHandler {
             stringBuilder.append("Average pollution value of parameter: ").append(parameterName).append("\nfrom: ").
                     append(beginDate).append(" to: ").append(endDate).append(" for ALL stations is equal to: ");
         }
-        stringBuilder.append(sumOfValues / valuesCounter);
+        stringBuilder.append(Utils.decimalFormat.format(sumOfValues / valuesCounter));
         return stringBuilder.toString();
     }
 }

@@ -25,8 +25,8 @@ public class App implements Runnable {
     @Option(names = {"-1"}, description = "give this option if you want to receive AIR INDEX")
     private boolean airIndex_1;
 
-    @Option(names = {"-2"}, description = "give this option if you want to receive current value of given parameter")
-    private boolean currentValueOfParameter_2;
+    @Option(names = {"-2"}, description = "give this option if you want to receive value of given parameter for the given date")
+    private boolean valueOfParameter_2;
 
 //    @Option(names = {"-2a"}, description = "give this option if you want to receive something for all parameters")
 //    private boolean forAllParameters;
@@ -45,7 +45,7 @@ public class App implements Runnable {
 
     @Option(names = {"-6"}, description = "give this option when you want to " +
             "have printed sorted sensors with highest value of given parameter")
-    private boolean sortedSensors_6;
+    private boolean sortedStations_6;
 
     @Option(names = {"-7"}, description = "give this option if you want to receive when and where" +
             "occurred maximum and minimum pollution values of given parameter")
@@ -147,7 +147,7 @@ public class App implements Runnable {
             System.out.println(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations));
         }
 
-        if (currentValueOfParameter_2 && date != null && parameterName != null) {
+        if (valueOfParameter_2 && date != null && parameterName != null) {
             System.out.println(parameterOptionHandler.valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName));
         }
 
@@ -163,7 +163,7 @@ public class App implements Runnable {
             System.out.println(parameterOptionHandler.parametersWithLowestAndHighestValuesAtSpecificTime(date));
         }
 
-        if (sortedSensors_6 && date != null && parameterName != null) {
+        if (sortedStations_6 && date != null && parameterName != null) {
             System.out.println(parameterOptionHandler.sortedStations(listOfStations, date, parameterName, N));
         }
 
