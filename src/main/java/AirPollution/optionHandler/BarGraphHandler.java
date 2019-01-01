@@ -23,9 +23,9 @@ public class BarGraphHandler {
         this.storageReceiver = storageReceiver;
     }
 
-    LocalDate today = LocalDate.now(); // 2018-12-27
-    LocalDate yesterday = LocalDate.now().minusDays(1);
-    LocalDate dayBeforeYesterday = LocalDate.now().minusDays(2);
+    private LocalDate today = LocalDate.now(); // 2018-12-27
+    private LocalDate yesterday = LocalDate.now().minusDays(1);
+    private LocalDate dayBeforeYesterday = LocalDate.now().minusDays(2);
 
     public String barGraphForGivenParameterStationsAndPeriodOfTime(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
         Date hourBeginDate = Utils.parseStringToHour(beginDate);
@@ -55,13 +55,9 @@ public class BarGraphHandler {
             if (sensors == null) continue;
             for (Sensor sensor : sensors) {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
-                if (sensorData == null || sensorData.getValues().length == 0) continue;
-                if (!sensorData.getKey().equals(parameterName)) {
-//                    System.out.println("There is no such parameter as: " + parameterName +
-//                            " for station: " + station.getStationName() +
-//                            " and sensor: " + sensor.getId());
+                if (sensorData == null || sensorData.getValues().length == 0 || !sensorData.getKey().equals(parameterName))
                     continue;
-                }
+
                 for (SensorData.Value value : sensorData.getValues()) {
                     if (!value.date.contains("-")) continue;
                     if (value.value == null) continue;
@@ -70,8 +66,6 @@ public class BarGraphHandler {
                     String[] dateParts = value.date.split(" ");
                     Date actualHourDate = Utils.parseStringToHour(dateParts[1]);
                     if (!Utils.checkDateInterval(hourBeginDate, hourEndDate, actualHourDate)) continue;
-
-//                    if (!Utils.checkDateInterval(realBeginDate, realEndDate, actualDate)) continue;
 
                     int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
                     String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "\u25a0");

@@ -6,7 +6,6 @@ import AirPollution.model.Sensor;
 import AirPollution.model.SensorData;
 import AirPollution.model.Station;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -47,14 +46,13 @@ public class AveragePollutionHandler {
                 if (sensorData == null) continue;
                 if (sensorData.getKey().equals(parameterName)) {
                     for (SensorData.Value value : sensorData.getValues()) {
-                        if (value.date.contains("-")) {
-                            Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                            // if date is between given period of time
-                            if (Utils.checkDateInterval(realBeginDate, realEndDate, actualDate)) {
-                                if (value.value != null) {
-                                    valuesCounter++;
-                                    sumOfValues += value.value;
-                                }
+                        if (!value.date.contains("-")) continue;
+                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                        // if date is between given period of time
+                        if (Utils.checkDateInterval(realBeginDate, realEndDate, actualDate)) {
+                            if (value.value != null) {
+                                valuesCounter++;
+                                sumOfValues += value.value;
                             }
                         }
                     }
