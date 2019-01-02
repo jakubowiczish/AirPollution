@@ -120,10 +120,9 @@ public class App implements Runnable {
 
     @Override
     public void run() {
-        DecimalFormat decimalFormat = new DecimalFormat("#0.000000");
-
         PhysicalStorage physicalStorage = new PhysicalStorage();
         Storage storage = physicalStorage.loadStorageFromFile();
+
         if (!noDataFetching) {
             if (storage == null || (System.currentTimeMillis() - storage.lastLoadDate.getTime() > 3600 * 1000)) {
 
@@ -133,7 +132,6 @@ public class App implements Runnable {
                 physicalStorage.saveStorageToFile(storage);
             }
         }
-
 
         AirIndexOptionHandler airIndexOptionHandler = new AirIndexOptionHandler(storage);
         PrintApiInformationOptionHandler printApiInformationOptionHandler = new PrintApiInformationOptionHandler(storage);

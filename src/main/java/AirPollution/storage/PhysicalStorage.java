@@ -5,9 +5,17 @@ import com.google.gson.GsonBuilder;
 
 import java.io.*;
 
+/**
+ * Class that is responsible for loading and saving fetched data to .json file
+ */
 public class PhysicalStorage {
     private static final String filePath = "/home/plotnikowski/IdeaProjects/AirPollution/src/PhysicalStorage.json";
 
+    /**
+     * Loads storage from created file
+     *
+     * @return storage that contains fetched data
+     */
     public Storage loadStorageFromFile() {
         Storage storage;
         Gson gson = new Gson();
@@ -20,6 +28,11 @@ public class PhysicalStorage {
         return storage;
     }
 
+    /**
+     * Saves given storage to file
+     *
+     * @param storage storage that is to be stored in a file
+     */
     public void saveStorageToFile(Storage storage) {
         Writer writer = null;
         try {

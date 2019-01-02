@@ -31,7 +31,7 @@ public class BarGraphHandler {
      * Returns a graph that contains information about pollution,
      * dates of measurements and names of the stations,
      * everything for desired period of time.
-     * for beginDate: "00:00:00", endDate: "02:00:00", parameter CO and one station name - "Zgierz-Śródmieście" there is an exemplary graph:
+     * For arguments: beginDate: "00:00:00", endDate: "02:00:00", parameter CO and one station name - "Zgierz-Śródmieście" there is an exemplary graph:
      * 00:00:00 TODAY     (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 398.0
      * 00:00:00 YESTERDAY (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 565.0
      * 01:00:00 TODAY     (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 379.0
@@ -41,7 +41,7 @@ public class BarGraphHandler {
      * @param endDate end date of period of time for which the graph will be created
      * @param parameterName name of the parameter for which the graph will be created
      * @param listOfStations names of the stations for which you want the graph to be created
-     * @return String that is a graph that contains information about pollution, dates of measurement and names of the station
+     * @return String that is a graph that contains information about pollution, dates of measurement and names of the stations
      */
     public String barGraphForGivenParameterStationsAndPeriodOfTime(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
         Date hourBeginDate = Utils.parseStringToHour(beginDate);

@@ -13,6 +13,9 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * Class that is responsible for storing fetched data
+ */
 public class Storage {
     public Date lastLoadDate;
 
@@ -23,6 +26,9 @@ public class Storage {
 
     private transient DataReceiver dataReceiver = new DataReceiver();
 
+    /**
+     * Loads all available data
+     */
     public void loadAllData() {
         ArrayList<Station> stations = getAllStations();
 
@@ -48,6 +54,11 @@ public class Storage {
         lastLoadDate = new Date();
     }
 
+    /**
+     * Returns list that contains all stations currently available in the system
+     *
+     * @return ArrayList with all stations currently available in the system
+     */
     public ArrayList<Station> getAllStations() {
         if (stationMemory.size() == 0) {
             ArrayList<Station> allStations = dataReceiver.getAllStations(0);
@@ -66,6 +77,12 @@ public class Storage {
         return new ArrayList<>(stationMemory.values());
     }
 
+    /**
+     * Returns list of sensors currently available for given station id
+     *
+     * @param stationID id of station for which sensors will be fetched
+     * @return CopyOnWriteArrayList with all sensors fetched for given station id
+     */
     public CopyOnWriteArrayList<Sensor> getAllSensorsForSpecificStation(int stationID) {
         if (sensorMemory.containsKey(stationID)) {
             return sensorMemory.get(stationID);
@@ -80,6 +97,12 @@ public class Storage {
         return getAllSensorsForSpecificStation(stationID);
     }
 
+    /**
+     * Returns SensorData for specific sensor id
+     *
+     * @param sensorID id of sensor for which SensorData will be fetched
+     * @return SensorData for given sensor id
+     */
     public SensorData getSensorDataForSpecificSensor(int sensorID) {
         if (sensorDataMemory.containsKey(sensorID)) {
             return sensorDataMemory.get(sensorID);
@@ -96,6 +119,12 @@ public class Storage {
         return getSensorDataForSpecificSensor(sensorID);
     }
 
+    /**
+     * Returns AirIndex for specific station id
+     *
+     * @param stationID id of station for which you want to fetch
+     * @return AirIndex for given station id
+     */
     public AirIndex getAirIndexOfSpecificStation(int stationID) {
         if (airIndexMemory.containsKey(stationID)) {
             return airIndexMemory.get(stationID);
