@@ -35,7 +35,7 @@ public class Utils {
     /**
      * Adds given key and value to given TreeMap
      *
-     * @param treeMap tree map that contains Double and ArrayList<String>
+     * @param treeMap tree map that contains Double and ArrayList of Strings
      * @param key     key
      * @param value   value
      */
@@ -57,7 +57,7 @@ public class Utils {
     /**
      * Adds given key and value to given TreeMap
      *
-     * @param treeMap tree map that contains Date and ArrayList<String>
+     * @param treeMap tree map that contains Date and ArrayList of Strings
      * @param key     key
      * @param value   value
      */
@@ -124,7 +124,7 @@ public class Utils {
      *
      * @param listOfStations given names of stations
      * @param allStations    list of all stations currently available in the system
-     * @return
+     * @return list of valid stations
      */
     public static ArrayList<Station> assignValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
         ArrayList<Station> validStations = null;

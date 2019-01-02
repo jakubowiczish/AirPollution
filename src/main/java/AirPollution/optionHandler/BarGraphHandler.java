@@ -31,11 +31,15 @@ public class BarGraphHandler {
      * Returns a graph that contains information about pollution,
      * dates of measurements and names of the stations,
      * everything for desired period of time.
-     * For arguments: beginDate: "00:00:00", endDate: "02:00:00", parameter CO and one station name - "Zgierz-Śródmieście" there is an exemplary graph:
-     * 00:00:00 TODAY     (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 398.0
-     * 00:00:00 YESTERDAY (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 565.0
-     * 01:00:00 TODAY     (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 379.0
-     * 01:00:00 YESTERDAY (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 516.0
+     * For arguments: beginDate: "05:00:00", endDate: "05:00:00", parameter CO and station names:
+     * "Szczecin_Piłsudskiego;Radom-Tochtermana" there is an exemplary graph:
+     *
+     * 05:00:00 TODAY                (Szczecin_Piłsudskiego)                        ■■■ 2.7803
+     * 05:00:00 YESTERDAY            (Szczecin_Piłsudskiego)                        ■■■■■■■■■ 7.8078
+     * 05:00:00 DAY BEFORE YESTERDAY (Szczecin_Piłsudskiego)                        ■■■■■■■■■■■■ 10.8047
+     * 05:00:00 TODAY                (Radom-Tochtermana)                            ■■■ 2.5300
+     * 05:00:00 YESTERDAY            (Radom-Tochtermana)                            ■■■■■■■■■■■■■■■■ 14.1700
+     * 05:00:00 DAY BEFORE YESTERDAY (Radom-Tochtermana)                            ■■■■■■ 5.7300
      *
      * @param beginDate start date of period of time for which the graph will be created
      * @param endDate end date of period of time for which the graph will be created
@@ -93,7 +97,7 @@ public class BarGraphHandler {
                         String valueString = dateParts[1] +
                                 " TODAY               " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + value.value +
+                                graphLine + " " + Utils.decimalFormat.format(value.value) +
                                 "\n";
                         Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
@@ -102,7 +106,7 @@ public class BarGraphHandler {
                         String valueString = dateParts[1] +
                                 " YESTERDAY           " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + value.value +
+                                graphLine + " " + Utils.decimalFormat.format(value.value) +
                                 "\n";
                         Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
@@ -111,7 +115,7 @@ public class BarGraphHandler {
                         String valueString = dateParts[1] +
                                 " DAY BEFORE YESTERDAY" + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + value.value +
+                                graphLine + " " + Utils.decimalFormat.format(value.value) +
                                 "\n";
                         Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
                     }
