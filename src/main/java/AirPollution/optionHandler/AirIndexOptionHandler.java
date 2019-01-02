@@ -7,6 +7,9 @@ import AirPollution.model.Station;
 
 import java.util.ArrayList;
 
+/**
+ * Class that is used to provide information about air index
+ */
 public class AirIndexOptionHandler {
     private Storage storageReceiver;
 
@@ -14,6 +17,12 @@ public class AirIndexOptionHandler {
         this.storageReceiver = storageReceiver;
     }
 
+    /**
+     * Returns String containing content of all air indices for given list of stations
+     *
+     * @param listOfStations list of names of stations which air indices we want to be shown
+     * @return String representation of air indices for given stations
+     */
     public String airIndicesOfGivenStations(ArrayList<String> listOfStations) {
         ArrayList<Station> allStations = storageReceiver.getAllStations();
 
@@ -27,7 +36,8 @@ public class AirIndexOptionHandler {
             int stationID = Station.returnIdOfGivenStation(allStations, station.getStationName());
             AirIndex airIndex = storageReceiver.getAirIndexOfSpecificStation(stationID);
             if (airIndex == null) continue;
-            stringBuilder.append("AIR INDEX FOR STATION: \"").append(station.getStationName()).append("\"\n").append(airIndex.toString()).append("\n");
+            stringBuilder.append("AIR INDEX FOR STATION: \"").
+                    append(station.getStationName()).append("\"\n").append(airIndex.toString()).append("\n");
         }
         return stringBuilder.toString();
     }

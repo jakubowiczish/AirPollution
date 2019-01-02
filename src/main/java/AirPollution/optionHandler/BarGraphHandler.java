@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Class that can be used to print graph which presents information about pollution, its date and place
+ * Provides method that can be used to print graph which presents information about pollution, its date and place
  */
 public class BarGraphHandler {
 
@@ -27,6 +27,22 @@ public class BarGraphHandler {
     private LocalDate yesterday = LocalDate.now().minusDays(1);
     private LocalDate dayBeforeYesterday = LocalDate.now().minusDays(2);
 
+    /**
+     * Returns a graph that contains information about pollution,
+     * dates of measurements and names of the stations,
+     * everything for desired period of time.
+     * for beginDate: "00:00:00", endDate: "02:00:00", parameter CO and one station name - "Zgierz-Śródmieście" there is an exemplary graph:
+     * 00:00:00 TODAY     (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 398.0
+     * 00:00:00 YESTERDAY (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 565.0
+     * 01:00:00 TODAY     (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 379.0
+     * 01:00:00 YESTERDAY (Zgierz-Śródmieście) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 516.0
+     *
+     * @param beginDate start date of period of time for which the graph will be created
+     * @param endDate end date of period of time for which the graph will be created
+     * @param parameterName name of the parameter for which the graph will be created
+     * @param listOfStations names of the stations for which you want the graph to be created
+     * @return String that is a graph that contains information about pollution, dates of measurement and names of the station
+     */
     public String barGraphForGivenParameterStationsAndPeriodOfTime(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
         Date hourBeginDate = Utils.parseStringToHour(beginDate);
         Date hourEndDate = Utils.parseStringToHour(endDate);
@@ -150,17 +166,34 @@ public class BarGraphHandler {
         return Strings.repeat(character, length);
     }
 
-
+    /**
+     * Returns information about whether the given date was yesterday
+     *
+     * @param actualDate date to check
+     * @return boolean value, 1 - if the given date was yesterday, 0 - if it was not
+     */
     public boolean wasYesterday(Date actualDate) {
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return yesterday.equals(realDate);
     }
 
+    /**
+     * Returns information about whether the given date is today
+     *
+     * @param actualDate date to check
+     * @return boolean value, 1 - if the given date is today, 0 - if it is not
+     */
     public boolean isToday(Date actualDate) {
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return today.equals(realDate);
     }
 
+    /**
+     * Returns information about whether the given date was day before yesterday
+     *
+     * @param actualDate date to check
+     * @return boolean value, 1 - if the given date was the day before yesterday, 0 - if it was not
+     */
     public boolean wasDayBeforeYesterday(Date actualDate) {
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return dayBeforeYesterday.equals(realDate);

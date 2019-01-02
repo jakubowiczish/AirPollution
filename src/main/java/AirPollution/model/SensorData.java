@@ -2,6 +2,9 @@ package AirPollution.model;
 
 import java.util.Arrays;
 
+/**
+ * Class used to store parsed sensor data
+ */
 public class SensorData {
     private  String key;
     private  Value[] values;

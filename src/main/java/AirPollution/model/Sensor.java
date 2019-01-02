@@ -1,5 +1,8 @@
 package AirPollution.model;
 
+/**
+ * Class used to store parsed information about sensor
+ */
 public class Sensor {
     private int id;
     private int stationId;

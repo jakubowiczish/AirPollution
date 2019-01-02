@@ -2,11 +2,9 @@ package AirPollution.optionHandlerTest;
 
 import AirPollution.model.AirIndex;
 import AirPollution.model.Station;
-import AirPollution.optionHandler.AirIndexOptionHandler;
+import AirPollution.storage.Storage;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -22,19 +20,19 @@ public class AirIndexOptionHandlerTest {
         station.setStationName(EXAMPLE_STATION_NAME);
         station.setId(5);
 
-        ArrayList<String> listOfStations = new ArrayList<>(List.of(station.getStationName()));
 
         AirIndex airIndex = new AirIndex();
         airIndex.setId(5);
         airIndex.setStCalcDate("2019-01-01 21:20:26");
         airIndex.setStSourceDataDate("2019-01-01 20:00:00");
 
-        AirIndexOptionHandler airIndexOptionHandler = mock(AirIndexOptionHandler.class);
-        when(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations)).
-                thenReturn("AIR INDEX FOR STATION: \"" + station.getStationName() + "\"\n" + airIndex.toString() + "\n");
+        Storage storageReceiver = mock(Storage.class);
 
-        String expectedResult = airIndexOptionHandler.airIndicesOfGivenStations(listOfStations);
-        String actualResult = "AIR INDEX FOR STATION: \"exampleStationName\"\n" +
+        when(storageReceiver.getAirIndexOfSpecificStation(station.getId())).thenReturn(airIndex);
+
+        AirIndex resultIndex = storageReceiver.getAirIndexOfSpecificStation(station.getId());
+        String actualResult = "AIR INDEX FOR STATION: \"" + station.getStationName() + "\"\n" + resultIndex.toString() + "\n";
+        String expectedResult = "AIR INDEX FOR STATION: \"exampleStationName\"\n" +
                 "{\n" +
                 "   id:                 5\n" +
                 "   stIndexLevel:       null\n" +
@@ -65,6 +63,5 @@ public class AirIndexOptionHandlerTest {
 
 
         assertEquals(expectedResult, actualResult);
-
     }
 }

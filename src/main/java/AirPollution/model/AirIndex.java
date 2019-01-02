@@ -1,5 +1,8 @@
 package AirPollution.model;
 
+/**
+ * Class used to store information about air index
+ */
 public class AirIndex {
     private int id;
 
