@@ -50,6 +50,7 @@ public class AveragePollutionHandler {
             if (station == null) continue;
 
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+            if (sensors == null) continue;
             for (Sensor sensor : sensors) {
                 if (sensor == null) continue;
 

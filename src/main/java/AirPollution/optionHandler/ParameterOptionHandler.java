@@ -52,6 +52,7 @@ public class ParameterOptionHandler {
             int stationID = Station.returnIdOfGivenStation(allStations, station.getStationName());
 
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(stationID);
+            if (sensors == null) continue;
 
             boolean foundParameter = false;
 
@@ -146,6 +147,8 @@ public class ParameterOptionHandler {
         for (Station station : allStations) {
 
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+            if (sensors == null) continue;
+
             for (Sensor sensor : sensors) {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
                 if (sensorData == null) continue;
@@ -219,6 +222,7 @@ public class ParameterOptionHandler {
         for (Station station : allStations) {
 
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+            if (sensors == null) continue;
 
             for (Sensor sensor : sensors) {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
@@ -286,6 +290,7 @@ public class ParameterOptionHandler {
 
         for (Station station : allStations) {
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+            if (sensors == null) continue;
 
             for (Sensor sensor : sensors) {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
@@ -356,30 +361,33 @@ public class ParameterOptionHandler {
         for (Station station : allStations) {
             Thread thread = new Thread(() -> {
                 CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
-                for (Sensor sensor : sensors) {
-                    SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
-                    if (sensorData == null) continue;
-                    if (sensorData.getValues().length == 0) continue;
-                    if (sensorData.getKey().equals(parameterName)) {
-                        for (SensorData.Value value : sensorData.getValues()) {
-                            if (value.date.contains("-") && value.value != null) {
-                                Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                                if (value.value < minValue.get() && value.value > 0) {
-                                    minValue.set(value.value);
-                                    synchronized (minDate) {
-                                        minDate.set(actualDate);
+                if (sensors != null) {
+
+                    for (Sensor sensor : sensors) {
+                        SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
+                        if (sensorData == null) continue;
+                        if (sensorData.getValues().length == 0) continue;
+                        if (sensorData.getKey().equals(parameterName)) {
+                            for (SensorData.Value value : sensorData.getValues()) {
+                                if (value.date.contains("-") && value.value != null) {
+                                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                                    if (value.value < minValue.get() && value.value > 0) {
+                                        minValue.set(value.value);
+                                        synchronized (minDate) {
+                                            minDate.set(actualDate);
+                                        }
+                                        synchronized (minStation) {
+                                            minStation.set(station);
+                                        }
                                     }
-                                    synchronized (minStation) {
-                                        minStation.set(station);
-                                    }
-                                }
-                                if (value.value > maxValue.get()) {
-                                    maxValue.set(value.value);
-                                    synchronized (maxDate) {
-                                        maxDate.set(actualDate);
-                                    }
-                                    synchronized (maxStation) {
-                                        maxStation.set(station);
+                                    if (value.value > maxValue.get()) {
+                                        maxValue.set(value.value);
+                                        synchronized (maxDate) {
+                                            maxDate.set(actualDate);
+                                        }
+                                        synchronized (maxStation) {
+                                            maxStation.set(station);
+                                        }
                                     }
                                 }
                             }
@@ -412,6 +420,7 @@ public class ParameterOptionHandler {
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         for (Station station : allStations) {
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+            if (sensors == null) continue;
             for (Sensor sensor : sensors) {
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
                 if (sensorData == null) continue;

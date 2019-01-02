@@ -1,9 +1,12 @@
 package AirPollution.optionHandler;
 
+import AirPollution.model.Sensor;
 import AirPollution.storage.Storage;
 import AirPollution.model.Station;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 /**
  * Class that is used to print some information provided by api
@@ -28,10 +31,24 @@ public class PrintApiInformationOptionHandler {
      */
     public void printAllStationsWithTheirSensors() {
         storageReceiver.getAllStations()
-                .forEach(station -> {
-                    System.out.println("\nSTATION NAME: " + station.getStationName() + "\nSensors for this station:");
-                    storageReceiver.getAllSensorsForSpecificStation(station.getId())
-                            .forEach(sensor -> System.out.println(sensor.toString()));
+                .forEach(new Consumer<Station>() {
+                    @Override
+                    public void accept(Station station) {
+                        if (station != null) {
+                            System.out.println("\nSTATION NAME: " + station.getStationName() + "\nSensors for this station:");
+                            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+                            if (sensors != null) {
+                                sensors.forEach(new Consumer<Sensor>() {
+                                    @Override
+                                    public void accept(Sensor sensor) {
+                                        if (sensor != null) {
+                                            System.out.println(sensor.toString());
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
                 });
 
     }
