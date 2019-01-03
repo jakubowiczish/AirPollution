@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 public class ParameterOptionHandlerTest {
     private static final String EXAMPLE_STATION_NAME = "exampleStationName";
+    private static final String EXAMPLE_STATION_NAME_2 = "exampleStationName_2";
 
     @Test
     public void valueOfGivenParameterForGivenStationsAndDateTest() {
@@ -60,8 +61,7 @@ public class ParameterOptionHandlerTest {
         String actualResult = parameterOptionHandler.
                 valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName);
 
-        String expectedResult = "For Parameter: SO2\n" +
-                "Date: 2019-01-01 17:00:00\n" +
+        String expectedResult = "For Date: 2019-01-01 17:00:00\n" +
                 "56.7000 - pollution value of parameter: SO2 for station: \"exampleStationName\"\n";
 
         assertEquals(expectedResult, actualResult);
@@ -77,6 +77,12 @@ public class ParameterOptionHandlerTest {
                 valueOfGivenParameterForGivenStationsAndDate(date, listOfStations, parameterName_2);
 
         assertNull(actualResult_3);
+
+        String date_3 = "2019-01-04 16:00:00";
+        String actualResult_4 = parameterOptionHandler.
+                valueOfGivenParameterForGivenStationsAndDate(date_3, listOfStations, parameterName);
+
+        assertNull(actualResult_4);
     }
 
     @Test
@@ -151,5 +157,93 @@ public class ParameterOptionHandlerTest {
         String actualResult_3 = parameterOptionHandler.mostFluctuatingParameter(sinceWhen_3, listOfStations);
         assertNull(actualResult_3);
     }
+
+    @Test
+    public void parametersWithLowestAndHighestValuesAtSpecificTime() {
+
+        Station station = new Station(1, EXAMPLE_STATION_NAME);
+        Station station_2 = new Station(2, EXAMPLE_STATION_NAME_2);
+
+        ArrayList<Station> stations = new ArrayList<>();
+        stations.add(station);
+        stations.add(station_2);
+
+        Sensor sensor = new Sensor(11);
+        CopyOnWriteArrayList<Sensor> sensors = new CopyOnWriteArrayList<>();
+        sensors.add(sensor);
+
+        SensorData sensorData = new SensorData();
+        sensorData.setKey("PM10");
+        sensorData.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 189.50),
+                new SensorData.Value("2019-01-01 16:00:00", 34.20),
+                new SensorData.Value("2019-01-01 16:00:00", 9.50),
+                new SensorData.Value("2019-01-01 18:00:00", 1.30),
+                new SensorData.Value("2019-01-01 18:00:00", 95.30),
+        });
+
+        Sensor sensor_2 = new Sensor(12);
+        CopyOnWriteArrayList<Sensor> sensors_2 = new CopyOnWriteArrayList<>();
+        sensors_2.add(sensor_2);
+
+        SensorData sensorData_2 = new SensorData();
+        sensorData_2.setKey("CO");
+        sensorData_2.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 6.42),
+                new SensorData.Value("2019-01-01 16:00:00", 97.65),
+                new SensorData.Value("2019-01-01 16:00:00", 18.64),
+                new SensorData.Value("2019-01-01 16:00:00", 75.59),
+                new SensorData.Value("2019-01-01 18:00:00", 9.74),
+                new SensorData.Value("2019-01-01 18:00:00", 101.34),
+        });
+
+        Storage storageReceiver = mock(Storage.class);
+        when(storageReceiver.getAllStations()).thenReturn(stations);
+
+        when(storageReceiver.getAllSensorsForSpecificStation(station.getId())).thenReturn(sensors);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor.getId())).thenReturn(sensorData);
+
+        when(storageReceiver.getAllSensorsForSpecificStation(station_2.getId())).thenReturn(sensors_2);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor_2.getId())).thenReturn(sensorData_2);
+
+        ParameterOptionHandler parameterOptionHandler = new ParameterOptionHandler(storageReceiver);
+        String date = "2019-01-01 16:00:00";
+
+        String actualResult = parameterOptionHandler.
+                parametersWithLowestAndHighestValuesAtSpecificTime(date);
+
+        String expectedResult =
+                "Parameter with lowest value on \"2019-01-01 16:00:00\" " +
+                "is CO and its value is: 6.4200, " +
+                "it occurs for station: exampleStationName_2\n" +
+                "Parameter with highest value on \"2019-01-01 16:00:00\" " +
+                "is PM10 and its value is: 189.5000, " +
+                "it occurs for station: exampleStationName";
+
+        assertEquals(expectedResult, actualResult);
+
+
+        String date_2 = "2019-01-01 18:00:00";
+
+        String actualResult_2 = parameterOptionHandler.
+                parametersWithLowestAndHighestValuesAtSpecificTime(date_2);
+
+        String expectedResult_2 =
+                "Parameter with lowest value on \"2019-01-01 18:00:00\" " +
+                        "is PM10 and its value is: 1.3000, " +
+                        "it occurs for station: exampleStationName\n" +
+                        "Parameter with highest value on \"2019-01-01 18:00:00\" " +
+                        "is CO and its value is: 101.3400, " +
+                        "it occurs for station: exampleStationName_2";
+
+        assertEquals(expectedResult_2, actualResult_2);
+
+        String date_3 = "2019-01-01 14:00:00";
+
+        String actualResult_3 = parameterOptionHandler.parametersWithLowestAndHighestValuesAtSpecificTime(date_3);
+        assertNull(actualResult_3);
+    }
+
+
 
 }

@@ -233,6 +233,7 @@ public class ParameterOptionHandler {
         double resultMinValue = 10000;
         double resultMaxValue = -1;
 
+        boolean foundDate = false;
         for (Station station : allStations) {
 
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
@@ -251,6 +252,7 @@ public class ParameterOptionHandler {
                     if (actualDate == null) continue;
 
                     if (actualDate.equals(specificDate)) {
+                        foundDate = true;
                         if (value.value < resultMinValue && value.value > 0) {
                             resultMinValue = value.value;
                             lowestParameterName = sensorData.getKey();
@@ -266,6 +268,10 @@ public class ParameterOptionHandler {
                 }
 
             }
+        }
+        if (!foundDate) {
+            System.out.println("There is no such date as " + date + " in the system");
+            return null;
         }
 
         String lowestValueString = "Parameter with lowest value on \"" + date + "\" is " + lowestParameterName +
