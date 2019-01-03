@@ -174,7 +174,6 @@ public class App implements Runnable {
             System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginHour, endHour, parameterName, listOfStations, LocalDate.now()));
         }
 
-
         if (all) {
             printApiInformationOptionHandler.printNamesOfAllStations();
         }

@@ -244,6 +244,88 @@ public class ParameterOptionHandlerTest {
         assertNull(actualResult_3);
     }
 
+    @Test
+    public void sortedStationsTest() {
+        Station station = new Station(1, EXAMPLE_STATION_NAME);
+        Station station_2 = new Station(2, EXAMPLE_STATION_NAME_2);
+
+        ArrayList<String> listOfStations = new ArrayList<>();
+        listOfStations.add(station.getStationName());
+        listOfStations.add(station_2.getStationName());
+
+        ArrayList<Station> stations = new ArrayList<>();
+        stations.add(station);
+        stations.add(station_2);
+
+        Sensor sensor = new Sensor(11);
+        CopyOnWriteArrayList<Sensor> sensors = new CopyOnWriteArrayList<>();
+        sensors.add(sensor);
+
+        SensorData sensorData = new SensorData();
+        sensorData.setKey("PM10");
+        sensorData.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 189.50),
+                new SensorData.Value("2019-01-01 16:00:00", 34.20),
+                new SensorData.Value("2019-01-01 16:00:00", 9.50),
+                new SensorData.Value("2019-01-01 18:00:00", 1.30),
+                new SensorData.Value("2019-01-01 18:00:00", 95.30),
+        });
+
+        Sensor sensor_2 = new Sensor(12);
+        CopyOnWriteArrayList<Sensor> sensors_2 = new CopyOnWriteArrayList<>();
+        sensors_2.add(sensor_2);
+
+        SensorData sensorData_2 = new SensorData();
+        sensorData_2.setKey("CO");
+        sensorData_2.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 6.42),
+                new SensorData.Value("2019-01-01 16:00:00", 97.65),
+                new SensorData.Value("2019-01-01 16:00:00", 18.64),
+                new SensorData.Value("2019-01-01 16:00:00", 75.59),
+                new SensorData.Value("2019-01-01 18:00:00", 9.74),
+                new SensorData.Value("2019-01-01 18:00:00", 101.34),
+        });
+
+        Storage storageReceiver = mock(Storage.class);
+        when(storageReceiver.getAllStations()).thenReturn(stations);
+
+        when(storageReceiver.getAllSensorsForSpecificStation(station.getId())).thenReturn(sensors);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor.getId())).thenReturn(sensorData);
+
+        when(storageReceiver.getAllSensorsForSpecificStation(station_2.getId())).thenReturn(sensors_2);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor_2.getId())).thenReturn(sensorData_2);
+
+        ParameterOptionHandler parameterOptionHandler = new ParameterOptionHandler(storageReceiver);
+
+        String date = "2019-01-01 16:00:00";
+        String parameterName = "CO";
+        int N = 3;
+
+        String actualResult = parameterOptionHandler.sortedStations(listOfStations, date, parameterName, N);
+
+        String expectedResult = "Top 3 stations with highest pollution of parameter \"CO\" on \"2019-01-01 16:00:00\"\n" +
+                "[STATION NAME: exampleStationName_2] Value of parameter CO is equal to 18.6400\n" +
+                "[STATION NAME: exampleStationName_2] Value of parameter CO is equal to 75.5900\n" +
+                "[STATION NAME: exampleStationName_2] Value of parameter CO is equal to 97.6500\n";
+
+        assertEquals(expectedResult, actualResult);
+
+
+
+        String parameterName_2 = "PM10";
+        int N_2 = 2;
+        String actualResult_2 = parameterOptionHandler.sortedStations(listOfStations, date, parameterName_2, N_2);
+
+        String expectedResult_2 = "Top 2 stations with highest pollution of parameter \"PM10\" on \"2019-01-01 16:00:00\"\n" +
+                "[STATION NAME: exampleStationName] Value of parameter PM10 is equal to 34.2000\n" +
+                "[STATION NAME: exampleStationName] Value of parameter PM10 is equal to 189.5000\n";
+
+        assertEquals(expectedResult_2, actualResult_2);
+
+        String parameterName_3 = "O2";
+        String actualResult_3 = parameterOptionHandler.sortedStations(listOfStations, date, parameterName_3, N);
+        assertNull(actualResult_3);
+    }
 
 
 }

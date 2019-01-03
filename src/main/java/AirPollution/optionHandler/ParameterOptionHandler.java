@@ -70,11 +70,11 @@ public class ParameterOptionHandler {
                                 Utils.addToTreeWithDoubleAndString
                                         (valuesOfParameterForGivenStationsAndDate, -1.0,
                                                 " - NULL pollution value of parameter: " +
-                                        parameterName + " for station: \"" + station.getStationName() + "\"\n");
+                                                        parameterName + " for station: \"" + station.getStationName() + "\"\n");
                             } else {
                                 Utils.addToTreeWithDoubleAndString(valuesOfParameterForGivenStationsAndDate, value.value,
                                         " - pollution value of parameter: " +
-                                                parameterName + " for station: \"" + station.getStationName() + "\"\n" );
+                                                parameterName + " for station: \"" + station.getStationName() + "\"\n");
                             }
                         }
                     }
@@ -308,6 +308,7 @@ public class ParameterOptionHandler {
 
         TreeMap<Double, ArrayList<String>> parameterDataAtSpecificTime = new TreeMap<>();
 
+        boolean foundDate = false;
         for (Station station : allStations) {
             CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
             if (sensors == null) continue;
@@ -321,6 +322,7 @@ public class ParameterOptionHandler {
                     Date actualDate = Utils.multiThreadParseStringToDate(value.date);
                     if (actualDate == null) continue;
                     if (actualDate.equals(realDate)) {
+                        foundDate = true;
                         if (value.value == null) {
                             System.out.println("Key for station " + station.getStationName() + ", sensor: " +
                                     sensor.getId() + " and date \"" + date + "\" is null");
@@ -331,10 +333,13 @@ public class ParameterOptionHandler {
                             Utils.addToTreeWithDoubleAndString(parameterDataAtSpecificTime, value.value, "STATION NAME: " + station.getStationName());
                         }
                     }
-
                 }
             }
+        }
 
+        if (!foundDate) {
+            System.out.println("There is no such date as " + date + " in the system");
+            return null;
         }
 
         StringBuilder result = new StringBuilder();
