@@ -8,6 +8,12 @@ public class Sensor {
     private int stationId;
     public Param param;
 
+    public Sensor() {}
+
+    public Sensor(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "Sensor{" +
@@ -36,5 +42,9 @@ public class Sensor {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

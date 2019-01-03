@@ -60,7 +60,6 @@ public class AveragePollutionHandler {
                     for (SensorData.Value value : sensorData.getValues()) {
                         if (!value.date.contains("-")) continue;
                         Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                        // if date is between given period of time
                         if (Utils.checkDateInterval(realBeginDate, realEndDate, actualDate)) {
                             if (value.value != null) {
                                 valuesCounter++;

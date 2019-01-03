@@ -13,6 +13,13 @@ public class Station {
     private City city;
     private String addressStreet;
 
+    public Station() {}
+
+    public Station(int id, String stationName) {
+        this.id = id;
+        this.stationName = stationName;
+    }
+
     class City {
         private int id;
         private String name;
