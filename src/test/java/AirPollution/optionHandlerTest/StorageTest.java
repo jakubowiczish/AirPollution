@@ -9,8 +9,6 @@ import AirPollution.optionHandler.AveragePollutionHandler;
 import AirPollution.storage.Storage;
 import org.junit.Test;
 
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -27,20 +25,27 @@ public class StorageTest {
     public void allIndicesOfGivenStationsTest() {
 
         Station station = new Station(5, EXAMPLE_STATION_NAME);
+        ArrayList<String> listOfStations = new ArrayList<>();
+        listOfStations.add(station.getStationName());
+
+        ArrayList<Station> stations = new ArrayList<>();
+        stations.add(station);
+
+        Storage storageReceiver = mock(Storage.class);
+        when(storageReceiver.getAllStations()).thenReturn(stations);
 
         AirIndex airIndex = new AirIndex();
         airIndex.setId(5);
         airIndex.setStCalcDate("2019-01-01 21:20:26");
         airIndex.setStSourceDataDate("2019-01-01 20:00:00");
-
-        Storage storageReceiver = mock(Storage.class);
-
         when(storageReceiver.getAirIndexOfSpecificStation(station.getId())).thenReturn(airIndex);
 
-        AirIndex resultIndex = storageReceiver.getAirIndexOfSpecificStation(station.getId());
-        String actualResult = resultIndex.toString();
+        AirIndexOptionHandler airIndexOptionHandler = new AirIndexOptionHandler(storageReceiver);
+
+        String actualResult = airIndexOptionHandler.airIndicesOfGivenStations(listOfStations);
         String expectedResult =
-                "{\n" +
+                "AIR INDEX FOR STATION: \"exampleStationName\"\n" +
+                        "{\n" +
                         "   id:                 5\n" +
                         "   stIndexLevel:       null\n" +
                         "   stCalcDate:         2019-01-01 21:20:26\n" +
@@ -66,8 +71,7 @@ public class StorageTest {
                         "   c6h6IndexLevel:     null\n" +
                         "   c6h6CalcDate:       null\n" +
                         "   c6h6SourceDataDate: null\n" +
-                        "}";
-
+                        "}\n";
 
         assertEquals(expectedResult, actualResult);
     }
