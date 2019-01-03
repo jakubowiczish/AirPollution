@@ -214,11 +214,11 @@ public class ParameterOptionHandlerTest {
 
         String expectedResult =
                 "Parameter with lowest value on \"2019-01-01 16:00:00\" " +
-                "is CO and its value is: 6.4200, " +
-                "it occurs for station: exampleStationName_2\n" +
-                "Parameter with highest value on \"2019-01-01 16:00:00\" " +
-                "is PM10 and its value is: 189.5000, " +
-                "it occurs for station: exampleStationName";
+                        "is CO and its value is: 6.4200, " +
+                        "it occurs for station: exampleStationName_2\n" +
+                        "Parameter with highest value on \"2019-01-01 16:00:00\" " +
+                        "is PM10 and its value is: 189.5000, " +
+                        "it occurs for station: exampleStationName";
 
         assertEquals(expectedResult, actualResult);
 
@@ -311,7 +311,6 @@ public class ParameterOptionHandlerTest {
         assertEquals(expectedResult, actualResult);
 
 
-
         String parameterName_2 = "PM10";
         int N_2 = 2;
         String actualResult_2 = parameterOptionHandler.sortedStations(listOfStations, date, parameterName_2, N_2);
@@ -327,5 +326,88 @@ public class ParameterOptionHandlerTest {
         assertNull(actualResult_3);
     }
 
+    @Test
+    public void parameterExtremeValuesTest() {
+        Station station = new Station(1, EXAMPLE_STATION_NAME);
+        Station station_2 = new Station(2, EXAMPLE_STATION_NAME_2);
 
+        ArrayList<String> listOfStations = new ArrayList<>();
+        listOfStations.add(station.getStationName());
+        listOfStations.add(station_2.getStationName());
+
+        ArrayList<Station> stations = new ArrayList<>();
+        stations.add(station);
+        stations.add(station_2);
+
+        Sensor sensor = new Sensor(11);
+        CopyOnWriteArrayList<Sensor> sensors = new CopyOnWriteArrayList<>();
+        sensors.add(sensor);
+
+        SensorData sensorData = new SensorData();
+        sensorData.setKey("PM10");
+        sensorData.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 189.50),
+                new SensorData.Value("2019-01-01 16:00:00", 34.20),
+                new SensorData.Value("2019-01-01 16:00:00", 9.50),
+                new SensorData.Value("2019-01-01 18:00:00", 1.30),
+                new SensorData.Value("2019-01-01 18:00:00", 95.30),
+        });
+
+        Sensor sensor_2 = new Sensor(12);
+        CopyOnWriteArrayList<Sensor> sensors_2 = new CopyOnWriteArrayList<>();
+        sensors_2.add(sensor_2);
+
+        SensorData sensorData_2 = new SensorData();
+        sensorData_2.setKey("CO");
+        sensorData_2.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 6.42),
+                new SensorData.Value("2019-01-01 16:00:00", 97.65),
+                new SensorData.Value("2019-01-01 16:00:00", 18.64),
+                new SensorData.Value("2019-01-01 16:00:00", 75.59),
+                new SensorData.Value("2019-01-01 18:00:00", 9.74),
+                new SensorData.Value("2019-01-01 18:00:00", 101.34),
+        });
+
+
+        Storage storageReceiver = mock(Storage.class);
+        when(storageReceiver.getAllStations()).thenReturn(stations);
+
+        when(storageReceiver.getAllSensorsForSpecificStation(station.getId())).thenReturn(sensors);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor.getId())).thenReturn(sensorData);
+
+        when(storageReceiver.getAllSensorsForSpecificStation(station_2.getId())).thenReturn(sensors_2);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor_2.getId())).thenReturn(sensorData_2);
+
+        ParameterOptionHandler parameterOptionHandler = new ParameterOptionHandler(storageReceiver);
+
+        String parameterName = "PM10";
+        String actualResult = parameterOptionHandler.parameterExtremeValues(parameterName);
+
+        String expectedResult = "Minimum value of parameter \"PM10\" " +
+                "occurs on 2019-01-01 18:00:00 for station: " +
+                "\"exampleStationName\" and its value is: 1.3000\n" +
+                "Maximum value of parameter \"PM10\" " +
+                "occurs on 2019-01-01 16:00:00 for station: " +
+                "\"exampleStationName\" and its value is: 189.5000";
+
+        assertEquals(expectedResult, actualResult);
+
+        String parameterName_2 = "CO";
+
+        String actualResult_2 = parameterOptionHandler.parameterExtremeValues(parameterName_2);
+
+        String expectedResult_2 = "Minimum value of parameter \"CO\" " +
+                "occurs on 2019-01-01 16:00:00 for station: " +
+                "\"exampleStationName_2\" and its value is: 6.4200\n" +
+                "Maximum value of parameter \"CO\" " +
+                "occurs on 2019-01-01 18:00:00 for station: " +
+                "\"exampleStationName_2\" and its value is: 101.3400";
+
+        assertEquals(expectedResult_2, actualResult_2);
+
+        String parameterName_3 = "O4";
+
+        String actualResult_3 = parameterOptionHandler.parameterExtremeValues(parameterName_3);
+        assertNull(actualResult_3);
+    }
 }
