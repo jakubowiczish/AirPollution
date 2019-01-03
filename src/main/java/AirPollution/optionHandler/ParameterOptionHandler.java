@@ -129,19 +129,21 @@ public class ParameterOptionHandler {
     public String mostFluctuatingParameter(String sinceWhenString, ArrayList<String> listOfStations) {
         Date sinceWhenDate = Utils.parseStringToDate(sinceWhenString);
         if (sinceWhenDate == null) {
-            throw new IllegalArgumentException("This date is not valid: " + sinceWhenString);
+            System.out.println("This date is not valid: " + sinceWhenString);
+            return null;
         }
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-
         String resultParameter = null;
 
         double resultMinValue = 10000;
         double resultMaxValue = -1;
         double maxDifference = -1;
+
+        boolean foundDate = false;
 
         for (Station station : allStations) {
 
@@ -160,6 +162,7 @@ public class ParameterOptionHandler {
                     if (actualDate == null) continue;
 
                     if (Utils.checkSinceWhenDate(sinceWhenDate, actualDate)) {
+                        foundDate = true;
                         if (value.value < resultMinValue && value.value > 0) {
                             resultMinValue = value.value;
                         }
@@ -176,6 +179,11 @@ public class ParameterOptionHandler {
                     resultParameter = sensorData.getKey();
                 }
             }
+        }
+
+        if (!foundDate) {
+            System.out.println("Date: " + sinceWhenString + " was not found in the system");
+            return null;
         }
 
         StringBuilder resultString = new StringBuilder();

@@ -79,4 +79,77 @@ public class ParameterOptionHandlerTest {
         assertNull(actualResult_3);
     }
 
+    @Test
+    public void mostFluctuatingParameterTest() {
+        Station station = new Station(1, EXAMPLE_STATION_NAME);
+
+        ArrayList<String> listOfStations = new ArrayList<>();
+        listOfStations.add(station.getStationName());
+
+        ArrayList<Station> stations = new ArrayList<>();
+        stations.add(station);
+
+        Sensor sensor = new Sensor(10);
+        CopyOnWriteArrayList<Sensor> sensors = new CopyOnWriteArrayList<>();
+        sensors.add(sensor);
+
+        SensorData sensorData = new SensorData();
+        sensorData.setKey("PM10");
+        sensorData.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 189.50),
+                new SensorData.Value("2019-01-02 17:00:00", 34.20),
+                new SensorData.Value("2019-01-03 19:00:00", 9.50),
+        });
+
+        Sensor sensor_2 = new Sensor(11);
+        sensors.add(sensor_2);
+
+        SensorData sensorData_2 = new SensorData();
+        sensorData_2.setKey("CO");
+        sensorData_2.setValues(new SensorData.Value[]{
+                new SensorData.Value("2019-01-01 16:00:00", 6.42),
+                new SensorData.Value("2019-01-02 17:00:00", 97.65),
+                new SensorData.Value("2019-01-03 19:00:00", 18.64),
+        });
+
+        Storage storageReceiver = mock(Storage.class);
+        when(storageReceiver.getAllStations()).thenReturn(stations);
+        when(storageReceiver.getAllSensorsForSpecificStation(station.getId())).thenReturn(sensors);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor.getId())).thenReturn(sensorData);
+        when(storageReceiver.getSensorDataForSpecificSensor(sensor_2.getId())).thenReturn(sensorData_2);
+
+        ParameterOptionHandler parameterOptionHandler = new ParameterOptionHandler(storageReceiver);
+
+        String sinceWhen = "2019-01-01 15:00:00";
+        String actualResult = parameterOptionHandler.mostFluctuatingParameter(sinceWhen, listOfStations);
+
+        String expectedResult = "Most fluctuating parameter since \"2019-01-01 15:00:00\" for stations:\n" +
+                "exampleStationName\n" +
+                "is CO,\n" +
+                "the difference between maximum and minimum pollution for this parameter amounts to: 183.0800,\n" +
+                "with maximum value of: 189.5000 and minimum value of: 6.4200";
+
+        assertNotNull(expectedResult);
+        assertNotNull(actualResult);
+        assertEquals(expectedResult, actualResult);
+
+
+        String sinceWhen_2 = "2019-01-01 17:00:00";
+        String actualResult_2 = parameterOptionHandler.mostFluctuatingParameter(sinceWhen_2, listOfStations);
+
+        String expectedResult_2 = "Most fluctuating parameter since \"2019-01-01 17:00:00\" for stations:\n" +
+                "exampleStationName\n" +
+                "is CO,\n" +
+                "the difference between maximum and minimum pollution for this parameter amounts to: 88.1500,\n" +
+                "with maximum value of: 97.6500 and minimum value of: 9.5000";
+
+        assertNotNull(expectedResult_2);
+        assertNotNull(actualResult_2);
+        assertEquals(expectedResult_2, actualResult_2);
+
+        String sinceWhen_3 = "2019-01-04 20:00:00";
+        String actualResult_3 = parameterOptionHandler.mostFluctuatingParameter(sinceWhen_3, listOfStations);
+        assertNull(actualResult_3);
+    }
+
 }
