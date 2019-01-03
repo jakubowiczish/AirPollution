@@ -8,6 +8,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Command
@@ -170,7 +171,7 @@ public class App implements Runnable {
         }
 
         if (graph_8 && beginHour != null && endHour != null) {
-            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginHour, endHour, parameterName, listOfStations));
+            System.out.println(barGraphHandler.barGraphForGivenParameterStationsAndPeriodOfTime(beginHour, endHour, parameterName, listOfStations, LocalDate.now()));
         }
 
 

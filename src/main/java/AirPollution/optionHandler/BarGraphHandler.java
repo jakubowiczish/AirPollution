@@ -23,9 +23,6 @@ public class BarGraphHandler {
         this.storageReceiver = storageReceiver;
     }
 
-    private LocalDate today = LocalDate.now(); // 2018-12-27
-    private LocalDate yesterday = LocalDate.now().minusDays(1);
-    private LocalDate dayBeforeYesterday = LocalDate.now().minusDays(2);
 
     /**
      * Returns a graph that contains information about pollution,
@@ -33,7 +30,6 @@ public class BarGraphHandler {
      * everything for desired period of time.
      * For arguments: beginDate: "05:00:00", endDate: "05:00:00", parameter CO and station names:
      * "Szczecin_Piłsudskiego;Radom-Tochtermana" there is an exemplary graph:
-     *
      * 05:00:00 TODAY                (Szczecin_Piłsudskiego)                        ■■■ 2.7803
      * 05:00:00 YESTERDAY            (Szczecin_Piłsudskiego)                        ■■■■■■■■■ 7.8078
      * 05:00:00 DAY BEFORE YESTERDAY (Szczecin_Piłsudskiego)                        ■■■■■■■■■■■■ 10.8047
@@ -41,15 +37,16 @@ public class BarGraphHandler {
      * 05:00:00 YESTERDAY            (Radom-Tochtermana)                            ■■■■■■■■■■■■■■■■ 14.1700
      * 05:00:00 DAY BEFORE YESTERDAY (Radom-Tochtermana)                            ■■■■■■ 5.7300
      *
-     * @param beginDate start date of period of time for which the graph will be created
-     * @param endDate end date of period of time for which the graph will be created
-     * @param parameterName name of the parameter for which the graph will be created
+     * @param beginHour      start date of period of time for which the graph will be created
+     * @param endHour        end date of period of time for which the graph will be created
+     * @param parameterName  name of the parameter for which the graph will be created
      * @param listOfStations names of the stations for which you want the graph to be created
      * @return String that is a graph that contains information about pollution, dates of measurement and names of the stations
      */
-    public String barGraphForGivenParameterStationsAndPeriodOfTime(String beginDate, String endDate, String parameterName, ArrayList<String> listOfStations) {
-        Date hourBeginDate = Utils.parseStringToHour(beginDate);
-        Date hourEndDate = Utils.parseStringToHour(endDate);
+    public String barGraphForGivenParameterStationsAndPeriodOfTime
+    (String beginHour, String endHour, String parameterName, ArrayList<String> listOfStations, LocalDate localDate) {
+        Date hourBeginDate = Utils.parseStringToHour(beginHour);
+        Date hourEndDate = Utils.parseStringToHour(endHour);
 
         if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
             System.out.println("Given parameter name: \"" + parameterName + "\" is not valid");
@@ -60,7 +57,7 @@ public class BarGraphHandler {
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-        int maxLengthOfLine = 150;
+        int maxLengthOfLine = 110;
         int longestStationNameLength = findLongestStationName(allStations);
 
         double maxValue = findMaximumValueOfGivenParameter(allStations, parameterName);
@@ -92,7 +89,7 @@ public class BarGraphHandler {
                     int blankSpaceLength = longestStationNameLength - station.getStationName().length() + 1;
 
 
-                    if (isToday(actualDate)) {
+                    if (isToday(localDate, actualDate)) {
                         Date keyDate = Utils.parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
                                 " TODAY               " + " (" + station.getStationName() + ")" +
@@ -101,7 +98,7 @@ public class BarGraphHandler {
                                 "\n";
                         Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
-                    } else if (wasYesterday(actualDate)) {
+                    } else if (wasYesterday(localDate, actualDate)) {
                         Date keyDate = Utils.parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
                                 " YESTERDAY           " + " (" + station.getStationName() + ")" +
@@ -110,7 +107,7 @@ public class BarGraphHandler {
                                 "\n";
                         Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
-                    } else if (wasDayBeforeYesterday(actualDate)) {
+                    } else if (wasDayBeforeYesterday(localDate, actualDate)) {
                         Date keyDate = Utils.parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
                                 " DAY BEFORE YESTERDAY" + " (" + station.getStationName() + ")" +
@@ -176,7 +173,8 @@ public class BarGraphHandler {
      * @param actualDate date to check
      * @return boolean value, 1 - if the given date was yesterday, 0 - if it was not
      */
-    public boolean wasYesterday(Date actualDate) {
+    public boolean wasYesterday(LocalDate localDate, Date actualDate) {
+        LocalDate yesterday = localDate.minusDays(1);
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return yesterday.equals(realDate);
     }
@@ -187,7 +185,8 @@ public class BarGraphHandler {
      * @param actualDate date to check
      * @return boolean value, 1 - if the given date is today, 0 - if it is not
      */
-    public boolean isToday(Date actualDate) {
+    public boolean isToday(LocalDate localDate, Date actualDate) {
+        LocalDate today = localDate; // 2018-12-27
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return today.equals(realDate);
     }
@@ -198,12 +197,13 @@ public class BarGraphHandler {
      * @param actualDate date to check
      * @return boolean value, 1 - if the given date was the day before yesterday, 0 - if it was not
      */
-    public boolean wasDayBeforeYesterday(Date actualDate) {
+    public boolean wasDayBeforeYesterday(LocalDate localDate, Date actualDate) {
+        LocalDate dayBeforeYesterday = localDate.minusDays(2);
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return dayBeforeYesterday.equals(realDate);
     }
 
-    private String replaceChar(String str, Character ch, int index) {
+    private String replaceChar(String str, String ch, int index) {
         return str.substring(0, index) + ch + str.substring(index + 1);
     }
 
@@ -222,8 +222,7 @@ public class BarGraphHandler {
 
             if (bracketCounter % 2 == 0) {
                 if (resultString.charAt(i - 1) == ',' && resultString.charAt(i) == ' ') {
-                    resultString = replaceChar(resultString, Character.MIN_VALUE, i - 1);
-                    resultString = replaceChar(resultString, Character.MIN_VALUE, i);
+                    resultString = replaceChar(resultString, "", i - 1);
 
 
                 }
