@@ -19,6 +19,35 @@ public class Utils {
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat usedHourDateFormat = new SimpleDateFormat("HH:mm:ss");
 
+
+    public static String replaceChar(String str, String ch, int index) {
+        return str.substring(0, index) + ch + str.substring(index + 1);
+    }
+
+    public static String cleanUpGraphString(String resultString) {
+        resultString = resultString.replaceAll("\\[", "");
+        resultString = resultString.replaceAll("]", "");
+
+        int bracketCounter = 0;
+        for (int i = 1; i < resultString.length(); i++) {
+            if (resultString.charAt(i) == '(') {
+                bracketCounter++;
+            }
+            if (resultString.charAt(i) == ')') {
+                bracketCounter--;
+            }
+
+            if (bracketCounter % 2 == 0) {
+                if (resultString.charAt(i - 1) == ',' && resultString.charAt(i) == ' ') {
+                    resultString = replaceChar(resultString, "", i - 1);
+
+
+                }
+            }
+        }
+        return resultString;
+    }
+
     /**
      * List of parameters used in the system
      */

@@ -125,7 +125,7 @@ public class BarGraphHandler {
         }
 
         String resultString = stringBuilder.toString();
-        resultString = cleanUpGraphString(resultString);
+        resultString = Utils.cleanUpGraphString(resultString);
 
         return resultString;
     }
@@ -203,31 +203,5 @@ public class BarGraphHandler {
         return dayBeforeYesterday.equals(realDate);
     }
 
-    private String replaceChar(String str, String ch, int index) {
-        return str.substring(0, index) + ch + str.substring(index + 1);
-    }
 
-    private String cleanUpGraphString(String resultString) {
-        resultString = resultString.replaceAll("\\[", "");
-        resultString = resultString.replaceAll("]", "");
-
-        int bracketCounter = 0;
-        for (int i = 1; i < resultString.length(); i++) {
-            if (resultString.charAt(i) == '(') {
-                bracketCounter++;
-            }
-            if (resultString.charAt(i) == ')') {
-                bracketCounter--;
-            }
-
-            if (bracketCounter % 2 == 0) {
-                if (resultString.charAt(i - 1) == ',' && resultString.charAt(i) == ' ') {
-                    resultString = replaceChar(resultString, "", i - 1);
-
-
-                }
-            }
-        }
-        return resultString;
-    }
 }

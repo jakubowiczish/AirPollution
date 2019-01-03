@@ -43,10 +43,11 @@ public class ParameterOptionHandler {
         ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
         allStations = Utils.assignAllStations(allStations, validStations);
 
-        stringBuilder.append("For Parameter: ").append(parameterName).append("\nDate: ").append(date).append("\n");
+        stringBuilder.append("For Date: ").append(date).append("\n");
 
-        ConcurrentSkipListMap<Double, String> valuesOfParameterForGivenStationsAndDate = new ConcurrentSkipListMap<>();
+        TreeMap<Double, ArrayList<String>> valuesOfParameterForGivenStationsAndDate = new TreeMap<>();
 
+        boolean foundDate = false;
         for (Station station : allStations) {
             if (station == null) continue;
             int stationID = Station.returnIdOfGivenStation(allStations, station.getStationName());
@@ -57,28 +58,25 @@ public class ParameterOptionHandler {
             boolean foundParameter = false;
 
             for (Sensor sensor : sensors) {
-                foundParameter = true;
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
                 if (sensorData == null) continue;
                 if (sensorData.getKey().equals(parameterName)) {
-                    boolean validDate = false;
+                    foundParameter = true;
                     for (SensorData.Value value : sensorData.getValues()) {
                         if (value == null) continue;
                         if (value.date.equals(date)) {
-                            validDate = true;
+                            foundDate = true;
                             if (value.value == null) {
-                                valuesOfParameterForGivenStationsAndDate.
-                                        put(-1.0, " NULL pollution value of parameter: " +
-                                                parameterName + " for station: \"" + station.getStationName() + "\"\n");
+                                Utils.addToTreeWithDoubleAndString
+                                        (valuesOfParameterForGivenStationsAndDate, -1.0,
+                                                " - NULL pollution value of parameter: " +
+                                        parameterName + " for station: \"" + station.getStationName() + "\"\n");
                             } else {
-                                valuesOfParameterForGivenStationsAndDate.
-                                        put(value.value, " - pollution value of parameter: " +
-                                                parameterName + " for station: \"" + station.getStationName() + "\"\n");
+                                Utils.addToTreeWithDoubleAndString(valuesOfParameterForGivenStationsAndDate, value.value,
+                                        " - pollution value of parameter: " +
+                                                parameterName + " for station: \"" + station.getStationName() + "\"\n" );
                             }
                         }
-                    }
-                    if (!validDate) {
-                        System.out.println("There is no such date as \"" + date + "\"  in the system for station: " + station.getStationName());
                     }
                 }
             }
@@ -86,11 +84,20 @@ public class ParameterOptionHandler {
                 System.out.println("There is no such parameter as \"" + parameterName + "\" in the system for station: " + station.getStationName());
             }
         }
-        for (Map.Entry<Double, String> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
+
+        if (!foundDate) {
+            System.out.println("There is no such date as: " + date + " in the system");
+            return null;
+        }
+
+        for (Map.Entry<Double, ArrayList<String>> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
             stringBuilder.append(Utils.decimalFormat.format(entry.getKey())).append(entry.getValue());
         }
 
-        return stringBuilder.toString();
+        String result = stringBuilder.toString();
+        result = Utils.cleanUpGraphString(result);
+
+        return result;
     }
 
     /**
