@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 
 public class AveragePollutionHandlerTest {
     private static final String EXAMPLE_STATION_NAME = "exampleStationName";
-    private static final String EXAMPLE_STATION_NAME_2 = "exampleStationName_2";
 
     @Test
     public void averagePollutionValueOfGivenParameterForGivenStationsTest() {

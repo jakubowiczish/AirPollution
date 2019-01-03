@@ -57,7 +57,6 @@ public class ParameterOptionHandler {
             boolean foundParameter = false;
 
             for (Sensor sensor : sensors) {
-                if (!sensor.param.paramFormula.equals(parameterName)) continue;
                 foundParameter = true;
                 SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
                 if (sensorData == null) continue;

@@ -23,7 +23,14 @@ public class BarGraphHandlerTest {
     public void barGraphForGivenParameterStationsAndPeriodOfTimeTest() {
         Station station = new Station(1, EXAMPLE_STATION_NAME);
 
+        ArrayList<String> listOfStations = new ArrayList<>();
+        listOfStations.add(station.getStationName());
+        ArrayList<Station> stations = new ArrayList<>();
+        stations.add(station);
+
         Sensor sensor = new Sensor(10);
+        CopyOnWriteArrayList<Sensor> sensors = new CopyOnWriteArrayList<>();
+        sensors.add(sensor);
 
         SensorData sensorData = new SensorData();
         sensorData.setKey("O3");
@@ -49,15 +56,6 @@ public class BarGraphHandlerTest {
 
         LocalDate localDate = LocalDate.of(2019, 1, 3);
 
-        ArrayList<String> listOfStations = new ArrayList<>();
-        listOfStations.add(station.getStationName());
-
-        ArrayList<Station> stations = new ArrayList<>();
-        stations.add(station);
-
-        CopyOnWriteArrayList<Sensor> sensors = new CopyOnWriteArrayList<>();
-        sensors.add(sensor);
-
         Storage storageReceiver = mock(Storage.class);
 
         when(storageReceiver.getAllStations()).thenReturn(stations);
@@ -68,7 +66,6 @@ public class BarGraphHandlerTest {
 
         String actualResult = barGraphHandler.
                 barGraphForGivenParameterStationsAndPeriodOfTime(beginHour, endHour, parameterName, listOfStations, localDate);
-
 
         String expectedResult =
                 "16:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 89.5000\n" +
