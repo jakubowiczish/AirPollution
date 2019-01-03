@@ -43,7 +43,7 @@ public class BarGraphHandlerTest {
         });
 
         String beginHour = "15:00:00";
-        String beginDate_2 = "2019-01-01 22:00:00";
+        String beginHour_2 = "17:00:00";
         String endHour = "20:00:00";
         String parameterName = "O3";
 
@@ -86,5 +86,9 @@ public class BarGraphHandlerTest {
 
         assertEquals(expectedResult, actualResult);
 
+        String actualResult_2 = barGraphHandler.
+                barGraphForGivenParameterStationsAndPeriodOfTime(beginHour_2, endHour, parameterName, listOfStations, localDate);
+
+        assertNotEquals(expectedResult, actualResult_2);
     }
 }
