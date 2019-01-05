@@ -86,6 +86,7 @@ public class AveragePollutionHandler {
             stringBuilder.append("Average pollution value of parameter: ").append(parameterName).append("\nfrom: ").
                     append(beginDate).append(" to: ").append(endDate).append(" for ALL stations is equal to: ");
         }
+
         stringBuilder.append(Utils.getInstance().getDecimalFormat().format(sumOfValues / valuesCounter));
         return stringBuilder.toString();
     }

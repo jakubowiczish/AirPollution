@@ -81,6 +81,7 @@ public class Utils {
      * @param key     key
      * @param value   value
      */
+    @SuppressWarnings("Duplicates")
     public synchronized void addToTreeWithDoubleAndString(TreeMap<Double, ArrayList<String>> treeMap, Double key, String value) {
         ArrayList<String> list = treeMap.get(key);
 
@@ -103,6 +104,7 @@ public class Utils {
      * @param key     key
      * @param value   value
      */
+    @SuppressWarnings("Duplicates")
     public synchronized void addToTreeWithDateAndString(TreeMap<Date, ArrayList<String>> treeMap, Date key, String value) {
         ArrayList<String> list = treeMap.get(key);
 
