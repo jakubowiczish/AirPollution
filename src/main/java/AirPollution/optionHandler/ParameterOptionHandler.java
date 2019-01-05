@@ -373,15 +373,15 @@ public class ParameterOptionHandler {
      * @return Information about extreme values for given parameter
      */
     public String parameterExtremeValues(String parameterName) {
-        final Container<Date> minDate = new Container<>();
-        final Container<Date> maxDate = new Container<>();
-        final Container<Station> minStation = new Container<>();
-        final Container<Station> maxStation = new Container<>();
+        Date minDate = new Date();
+        Date maxDate = new Date();
+        Station minStation = new Station();
+        Station maxStation = new Station();
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
-        LinkedList<Thread> threads = new LinkedList<>();
-        final AtomicDouble maxValue = new AtomicDouble(0);
-        final AtomicDouble minValue = new AtomicDouble(10000);
+
+        double maxValue = 0;
+        double minValue = 10000;
 
         if (!Utils.getInstance().checkWhetherParameterNameIsValid(parameterName)) {
             System.out.println("There is no such parameter as \"" + parameterName + "\" in system");
@@ -389,56 +389,43 @@ public class ParameterOptionHandler {
         }
 
         for (Station station : allStations) {
-            Thread thread = new Thread(() -> {
-                CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
-                if (sensors != null) {
 
-                    for (Sensor sensor : sensors) {
-                        SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
-                        if (sensorData == null) continue;
-                        if (sensorData.getValues().length == 0) continue;
-                        if (sensorData.getKey().equals(parameterName)) {
-                            for (SensorData.Value value : sensorData.getValues()) {
-                                if (value.date.contains("-") && value.value != null) {
-                                    Date actualDate = Utils.getInstance().multiThreadParseStringToDate(value.date);
-                                    if (value.value < minValue.get() && value.value > 0) {
-                                        minValue.set(value.value);
-                                        synchronized (minDate) {
-                                            minDate.set(actualDate);
-                                        }
-                                        synchronized (minStation) {
-                                            minStation.set(station);
-                                        }
-                                    }
-                                    if (value.value > maxValue.get()) {
-                                        maxValue.set(value.value);
-                                        synchronized (maxDate) {
-                                            maxDate.set(actualDate);
-                                        }
-                                        synchronized (maxStation) {
-                                            maxStation.set(station);
-                                        }
-                                    }
-                                }
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+            if (sensors == null) continue;
+
+            for (Sensor sensor : sensors) {
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
+                if (sensorData == null || sensorData.getValues().length == 0) continue;
+
+                if (sensorData.getKey().equals(parameterName)) {
+                    for (SensorData.Value value : sensorData.getValues()) {
+                        if (value.date.contains("-") && value.value != null) {
+                            Date actualDate = Utils.getInstance().multiThreadParseStringToDate(value.date);
+                            if (value.value < minValue && value.value > 0) {
+                                minValue = value.value;
+                                minDate = actualDate;
+                                minStation = station;
+                            }
+                            if (value.value > maxValue) {
+                                maxValue = value.value;
+                                maxDate = actualDate;
+                                maxStation = station;
                             }
                         }
                     }
                 }
-
-            });
-            threads.add(thread);
+            }
         }
 
-        Utils.getInstance().startAndJoinThreads(threads);
 
         return "Minimum value of parameter \"" + parameterName + "\" occurs on " +
-                Utils.getInstance().convertDateToString(minDate.getValue()) +
-                " for station: \"" + minStation.getValue().getStationName() + "\" and its value is: " +
-                Utils.getInstance().getDecimalFormat().format(minValue.get()) +
+                Utils.getInstance().convertDateToString(minDate) +
+                " for station: \"" + minStation.getStationName() + "\" and its value is: " +
+                Utils.getInstance().getDecimalFormat().format(minValue) +
                 "\nMaximum value of parameter \"" + parameterName + "\" occurs on " +
-                Utils.getInstance().convertDateToString(maxDate.getValue()) +
-                " for station: \"" + maxStation.getValue().getStationName() + "\" and its value is: " +
-                Utils.getInstance().getDecimalFormat().format(maxValue.get());
+                Utils.getInstance().convertDateToString(maxDate) +
+                " for station: \"" + maxStation.getStationName() + "\" and its value is: " +
+                Utils.getInstance().getDecimalFormat().format(maxValue);
     }
 
 
