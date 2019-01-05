@@ -20,6 +20,7 @@ public class DataReceiver {
      * @param sensorID       of sensor which data we want to collect
      * @param attemptCounter parameter used for recursive callings of the method, leads to system exit if too many attempts occurred
      * @return sensor data for given sensor id
+     * @see SensorData
      */
     public SensorData getSensorDataForSpecificSensor(int sensorID, int attemptCounter) {
         if (attemptCounter > 10) {
@@ -44,6 +45,7 @@ public class DataReceiver {
      * @param stationID      of station which air index we want to collect
      * @param attemptCounter parameter used for recursive callings of the method, leads to system exit if too many attempts occurred
      * @return air index for given station id
+     * @see AirIndex
      */
     public AirIndex getAirIndexOfSpecificStation(int stationID, int attemptCounter) {
         if (attemptCounter > 10) {
@@ -68,6 +70,7 @@ public class DataReceiver {
      * @param stationID      of station which sensors we want to collect
      * @param attemptCounter parameter used for recursive callings of the method, leads to system exit if too many attempts occurred
      * @return List of all sensors for given station id
+     * @see Sensor
      */
     public CopyOnWriteArrayList<Sensor> getAllSensorsForSpecificStation(int stationID, int attemptCounter) {
         if (attemptCounter > 10) {
@@ -103,6 +106,7 @@ public class DataReceiver {
      *
      * @param attemptCounter parameter used for recursive callings of the method, leads to system exit if too many attempts occurred
      * @return List of all stations available in the system
+     * @see Station
      */
     public ArrayList<Station> getAllStations(int attemptCounter) {
         if (attemptCounter > 10) {

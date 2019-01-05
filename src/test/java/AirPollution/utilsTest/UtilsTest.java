@@ -24,7 +24,7 @@ public class UtilsTest {
         ArrayList<Station> stations = new ArrayList<>(List.of(station));
 
         // when
-        boolean result = Utils.checkWhetherStationExists(stations, EXAMPLE_STATION_NAME);
+        boolean result = Utils.getInstance().checkWhetherStationExists(stations, EXAMPLE_STATION_NAME);
 
         // then
         assertTrue(result);
@@ -41,7 +41,7 @@ public class UtilsTest {
         ArrayList<String> listOfStations = new ArrayList<>(List.of(EXAMPLE_STATION_NAME));
         ArrayList<Station> allStations = new ArrayList<>(List.of(station1, station2));
 
-        ArrayList<Station> expectedStations = Utils.checkValidStations(listOfStations, allStations);
+        ArrayList<Station> expectedStations = Utils.getInstance().checkValidStations(listOfStations, allStations);
         ArrayList<Station> actualStations = new ArrayList<>(List.of(station1));
 
         assertEquals(expectedStations, actualStations);

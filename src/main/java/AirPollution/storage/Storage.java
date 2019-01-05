@@ -1,11 +1,11 @@
 package AirPollution.storage;
 
-import AirPollution.utils.Utils;
 import AirPollution.api.DataReceiver;
 import AirPollution.model.AirIndex;
 import AirPollution.model.Sensor;
 import AirPollution.model.SensorData;
 import AirPollution.model.Station;
+import AirPollution.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,7 +49,7 @@ public class Storage {
         }
 
         System.out.println("Starting " + threads.size() + " threads");
-        Utils.startAndJoinThreads(threads);
+        Utils.getInstance().startAndJoinThreads(threads);
         System.out.println("Loading all of the data is now finished");
         lastLoadDate = new Date();
     }

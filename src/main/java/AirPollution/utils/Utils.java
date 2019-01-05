@@ -14,17 +14,30 @@ import java.util.TreeMap;
  * Class that contains various methods and fields that may be useful for other classes
  */
 public class Utils {
+    private static Utils ourInstance = new Utils();
 
-    public static DecimalFormat decimalFormat = new DecimalFormat("#0.0000");
+    public static Utils getInstance() {
+        return ourInstance;
+    }
+
+    private Utils() {
+    }
+
+    private DecimalFormat decimalFormat = new DecimalFormat("#0.0000");
+
+    public DecimalFormat getDecimalFormat() {
+        return decimalFormat;
+    }
+
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat usedHourDateFormat = new SimpleDateFormat("HH:mm:ss");
 
 
-    public static String replaceChar(String str, String ch, int index) {
+    public String replaceChar(String str, String ch, int index) {
         return str.substring(0, index) + ch + str.substring(index + 1);
     }
 
-    public static String cleanUpGraphString(String resultString) {
+    public String cleanUpGraphString(String resultString) {
         resultString = resultString.replaceAll("\\[", "");
         resultString = resultString.replaceAll("]", "");
 
@@ -51,7 +64,7 @@ public class Utils {
     /**
      * List of parameters used in the system
      */
-    public final static ArrayList<String> parameters = new ArrayList<>() {{
+    public final ArrayList<String> parameters = new ArrayList<>() {{
         add("NO2");
         add("O3");
         add("PM10");
@@ -68,7 +81,7 @@ public class Utils {
      * @param key     key
      * @param value   value
      */
-    public static synchronized void addToTreeWithDoubleAndString(TreeMap<Double, ArrayList<String>> treeMap, Double key, String value) {
+    public synchronized void addToTreeWithDoubleAndString(TreeMap<Double, ArrayList<String>> treeMap, Double key, String value) {
         ArrayList<String> list = treeMap.get(key);
 
         if (list == null) {
@@ -90,7 +103,7 @@ public class Utils {
      * @param key     key
      * @param value   value
      */
-    public static synchronized void addToTreeWithDateAndString(TreeMap<Date, ArrayList<String>> treeMap, Date key, String value) {
+    public synchronized void addToTreeWithDateAndString(TreeMap<Date, ArrayList<String>> treeMap, Date key, String value) {
         ArrayList<String> list = treeMap.get(key);
 
         if (list == null) {
@@ -112,7 +125,7 @@ public class Utils {
      * @param stationName station name that is to be checked
      * @return true if stationName exists in the system, false otherwise
      */
-    public static boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
+    public boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
         for (Station station : allStations) {
             if (station.getStationName().equals(stationName)) {
                 return true;
@@ -128,7 +141,7 @@ public class Utils {
      * @param allStations    list of all stations currently available in the system
      * @return ArrayList of stations that contains all stations with valid names that occur in the system
      */
-    public static ArrayList<Station> checkValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
+    public ArrayList<Station> checkValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
         ArrayList<Station> validStations = new ArrayList<>();
 
         if (listOfStations.size() > 0) {
@@ -155,15 +168,15 @@ public class Utils {
      * @param allStations    list of all stations currently available in the system
      * @return list of valid stations
      */
-    public static ArrayList<Station> assignValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
+    public ArrayList<Station> assignValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
         ArrayList<Station> validStations = null;
         if (listOfStations != null && listOfStations.size() > 0) {
-            validStations = Utils.checkValidStations(listOfStations, allStations);
+            validStations = checkValidStations(listOfStations, allStations);
         }
         return validStations;
     }
 
-    public static ArrayList<Station> assignAllStations(ArrayList<Station> allStations, ArrayList<Station> validStations) {
+    public ArrayList<Station> assignAllStations(ArrayList<Station> allStations, ArrayList<Station> validStations) {
         if (validStations != null && validStations.size() > 0) {
             return validStations;
         }
@@ -177,11 +190,11 @@ public class Utils {
      * @param parameterName name of parameter which we want to check
      * @return true if given name of parameter is valid, false otherwise
      */
-    public static boolean checkWhetherParameterNameIsValid(String parameterName) {
+    public boolean checkWhetherParameterNameIsValid(String parameterName) {
         return parameters.contains(parameterName);
     }
 
-    public static Date multiThreadParseStringToDate(String date) {
+    public Date multiThreadParseStringToDate(String date) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
         } catch (ParseException e) {
@@ -198,7 +211,7 @@ public class Utils {
      * @param date date that is to be converted
      * @return String in format "yyyy-MM-dd HH:mm:ss"
      */
-    public static String convertDateToString(Date date) {
+    public String convertDateToString(Date date) {
         return usedDateFormat.format(date);
     }
 
@@ -208,7 +221,7 @@ public class Utils {
      * @param date String in format "yyyy-MM-dd HH:mm:ss" that will be converted
      * @return Date variable parsed from given String
      */
-    public static Date parseStringToDate(String date) {
+    public Date parseStringToDate(String date) {
         try {
             return usedDateFormat.parse(date);
         } catch (ParseException e) {
@@ -223,7 +236,7 @@ public class Utils {
      * @param date String in format "HH:mm:ss" that will be converted
      * @return Date variable parsed from given String
      */
-    public static Date parseStringToHour(String date) {
+    public Date parseStringToHour(String date) {
         try {
             return usedHourDateFormat.parse(date);
         } catch (ParseException e) {
@@ -241,7 +254,7 @@ public class Utils {
      * @param actualDate date that is to be checked know whether it is between beginDate and endDate
      * @return true if actualDate is between beginDate and endDate, false otherwise
      */
-    public static boolean checkDateInterval(Date beginDate, Date endDate, Date actualDate) {
+    public boolean checkDateInterval(Date beginDate, Date endDate, Date actualDate) {
         if (actualDate != null) {
             return (actualDate.before(endDate) || actualDate.equals(endDate)) &&
                     (actualDate.after(beginDate) || actualDate.equals(beginDate));
@@ -253,17 +266,17 @@ public class Utils {
      * Checks whether actualDate is after sinceWhenDate
      *
      * @param sinceWhenDate date from which actualDate will be checked
-     * @param actualDate date that is to be checked
+     * @param actualDate    date that is to be checked
      * @return true if actualDate is after sinceWhenDate, false otherwise
      */
-    public static boolean checkSinceWhenDate(Date sinceWhenDate, Date actualDate) {
+    public boolean checkSinceWhenDate(Date sinceWhenDate, Date actualDate) {
         if (actualDate != null) {
             return actualDate.after(sinceWhenDate) || actualDate.equals(sinceWhenDate);
         }
         return false;
     }
 
-    public static Date parseAndCheckDate(String dateString) {
+    public Date parseAndCheckDate(String dateString) {
         Date date = parseStringToDate(dateString);
         if (date == null) {
             throw new IllegalArgumentException("This date: " + dateString + " is not valid");
@@ -276,7 +289,7 @@ public class Utils {
      *
      * @param threads list of threads that will start and join later
      */
-    public static void startAndJoinThreads(LinkedList<Thread> threads) {
+    public void startAndJoinThreads(LinkedList<Thread> threads) {
         for (Thread thread : threads) {
             thread.start();
         }

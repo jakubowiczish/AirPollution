@@ -57,6 +57,5 @@ public class Factory {
     public AirIndex createAirIndex(String stationsString) {
         Gson gson = new Gson();
         return gson.fromJson(stationsString, AirIndex.class);
-
     }
 }

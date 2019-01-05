@@ -1,10 +1,10 @@
 package AirPollution.optionHandler;
 
 import AirPollution.storage.Storage;
-import AirPollution.utils.Utils;
 import AirPollution.model.Sensor;
 import AirPollution.model.SensorData;
 import AirPollution.model.Station;
+import AirPollution.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,15 +33,15 @@ public class AveragePollutionHandler {
         double sumOfValues = 0;
         int valuesCounter = 0;
 
-        Date realBeginDate = Utils.parseAndCheckDate(beginDate);
-        Date realEndDate = Utils.parseAndCheckDate(endDate);
+        Date realBeginDate = Utils.getInstance().parseAndCheckDate(beginDate);
+        Date realEndDate = Utils.getInstance().parseAndCheckDate(endDate);
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
-        allStations = Utils.assignAllStations(allStations, validStations);
+        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
 
-        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
+        if (!Utils.getInstance().checkWhetherParameterNameIsValid(parameterName)) {
             System.out.println("Given parameter does not exist in the system");
             return null;
         }
@@ -59,8 +59,8 @@ public class AveragePollutionHandler {
                 if (sensorData.getKey().equals(parameterName)) {
                     for (SensorData.Value value : sensorData.getValues()) {
                         if (!value.date.contains("-")) continue;
-                        Date actualDate = Utils.multiThreadParseStringToDate(value.date);
-                        if (Utils.checkDateInterval(realBeginDate, realEndDate, actualDate)) {
+                        Date actualDate = Utils.getInstance().multiThreadParseStringToDate(value.date);
+                        if (Utils.getInstance().checkDateInterval(realBeginDate, realEndDate, actualDate)) {
                             if (value.value != null) {
                                 valuesCounter++;
                                 sumOfValues += value.value;
@@ -86,7 +86,7 @@ public class AveragePollutionHandler {
             stringBuilder.append("Average pollution value of parameter: ").append(parameterName).append("\nfrom: ").
                     append(beginDate).append(" to: ").append(endDate).append(" for ALL stations is equal to: ");
         }
-        stringBuilder.append(Utils.decimalFormat.format(sumOfValues / valuesCounter));
+        stringBuilder.append(Utils.getInstance().getDecimalFormat().format(sumOfValues / valuesCounter));
         return stringBuilder.toString();
     }
 }

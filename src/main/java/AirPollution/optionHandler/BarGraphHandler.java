@@ -1,10 +1,10 @@
 package AirPollution.optionHandler;
 
 import AirPollution.storage.Storage;
-import AirPollution.utils.Utils;
 import AirPollution.model.Sensor;
 import AirPollution.model.SensorData;
 import AirPollution.model.Station;
+import AirPollution.utils.Utils;
 import com.google.common.base.Strings;
 
 import java.time.LocalDate;
@@ -45,17 +45,17 @@ public class BarGraphHandler {
      */
     public String barGraphForGivenParameterStationsAndPeriodOfTime
     (String beginHour, String endHour, String parameterName, ArrayList<String> listOfStations, LocalDate localDate) {
-        Date hourBeginDate = Utils.parseStringToHour(beginHour);
-        Date hourEndDate = Utils.parseStringToHour(endHour);
+        Date hourBeginDate = Utils.getInstance().parseStringToHour(beginHour);
+        Date hourEndDate = Utils.getInstance().parseStringToHour(endHour);
 
-        if (!Utils.checkWhetherParameterNameIsValid(parameterName)) {
+        if (!Utils.getInstance().checkWhetherParameterNameIsValid(parameterName)) {
             System.out.println("Given parameter name: \"" + parameterName + "\" is not valid");
             return null;
         }
 
         ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
-        allStations = Utils.assignAllStations(allStations, validStations);
+        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
         int maxLengthOfLine = 110;
         int longestStationNameLength = findLongestStationName(allStations);
@@ -78,11 +78,11 @@ public class BarGraphHandler {
                 for (SensorData.Value value : sensorData.getValues()) {
                     if (!value.date.contains("-")) continue;
                     if (value.value == null) continue;
-                    Date actualDate = Utils.multiThreadParseStringToDate(value.date);
+                    Date actualDate = Utils.getInstance().multiThreadParseStringToDate(value.date);
 
                     String[] dateParts = value.date.split(" ");
-                    Date actualHourDate = Utils.parseStringToHour(dateParts[1]);
-                    if (!Utils.checkDateInterval(hourBeginDate, hourEndDate, actualHourDate)) continue;
+                    Date actualHourDate = Utils.getInstance().parseStringToHour(dateParts[1]);
+                    if (!Utils.getInstance().checkDateInterval(hourBeginDate, hourEndDate, actualHourDate)) continue;
 
                     int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
                     String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "\u25a0");
@@ -90,31 +90,31 @@ public class BarGraphHandler {
 
 
                     if (isToday(localDate, actualDate)) {
-                        Date keyDate = Utils.parseStringToHour(dateParts[1]);
+                        Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
                                 " TODAY               " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + Utils.decimalFormat.format(value.value) +
+                                graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
                                 "\n";
-                        Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
+                        Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
                     } else if (wasYesterday(localDate, actualDate)) {
-                        Date keyDate = Utils.parseStringToHour(dateParts[1]);
+                        Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
                                 " YESTERDAY           " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + Utils.decimalFormat.format(value.value) +
+                                graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
                                 "\n";
-                        Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
+                        Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
                     } else if (wasDayBeforeYesterday(localDate, actualDate)) {
-                        Date keyDate = Utils.parseStringToHour(dateParts[1]);
+                        Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
                         String valueString = dateParts[1] +
                                 " DAY BEFORE YESTERDAY" + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + Utils.decimalFormat.format(value.value) +
+                                graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
                                 "\n";
-                        Utils.addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
+                        Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
                     }
                 }
             }
@@ -125,7 +125,7 @@ public class BarGraphHandler {
         }
 
         String resultString = stringBuilder.toString();
-        resultString = Utils.cleanUpGraphString(resultString);
+        resultString = Utils.getInstance().cleanUpGraphString(resultString);
 
         return resultString;
     }

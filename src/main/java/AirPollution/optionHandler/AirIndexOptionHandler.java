@@ -1,9 +1,9 @@
 package AirPollution.optionHandler;
 
 import AirPollution.storage.Storage;
-import AirPollution.utils.Utils;
 import AirPollution.model.AirIndex;
 import AirPollution.model.Station;
+import AirPollution.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -26,8 +26,8 @@ public class AirIndexOptionHandler {
     public String airIndicesOfGivenStations(ArrayList<String> listOfStations) {
         ArrayList<Station> allStations = storageReceiver.getAllStations();
 
-        ArrayList<Station> validStations = Utils.assignValidStations(listOfStations, allStations);
-        allStations = Utils.assignAllStations(allStations, validStations);
+        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        allStations = Utils.getInstance().assignAllStations(allStations, validStations);
         StringBuilder stringBuilder = new StringBuilder();
 
         if (allStations == null) return null;
