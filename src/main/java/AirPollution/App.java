@@ -133,14 +133,19 @@ public class App implements Runnable {
                 storage.loadAllData();
 
                 physicalStorage.saveStorageToFile(storage);
-            }
-        } else {
-            if(storage == null) {
-                storage = new Storage();
+            } else {
+                storage.setDataReceiver(new DataReceiver());
             }
         }
 
-        storage.setDataReceiver(new DataReceiver());
+        if(storage == null) {
+            storage= new Storage();
+            storage.setDataReceiver(new DataReceiver());
+        } else {
+            storage.setDataReceiver(new DataReceiver());
+        }
+
+
 
         AirIndexOptionHandler airIndexOptionHandler = new AirIndexOptionHandler(storage);
         PrintApiInformationOptionHandler printApiInformationOptionHandler = new PrintApiInformationOptionHandler(storage);
