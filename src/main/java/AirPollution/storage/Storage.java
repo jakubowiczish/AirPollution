@@ -26,7 +26,7 @@ public class Storage {
 
     private transient DataReceiver dataReceiver;
 
-    public Storage(DataReceiver dataReceiver) {
+    public void setDataReceiver(DataReceiver dataReceiver) {
         this.dataReceiver = dataReceiver;
     }
 

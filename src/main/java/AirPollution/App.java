@@ -128,12 +128,19 @@ public class App implements Runnable {
         if (!noDataFetching) {
             if (storage == null || (System.currentTimeMillis() - storage.lastLoadDate.getTime() > 3600 * 1000)) {
 
-                storage = new Storage(new DataReceiver());
+                storage = new Storage();
+                storage.setDataReceiver(new DataReceiver());
                 storage.loadAllData();
 
                 physicalStorage.saveStorageToFile(storage);
             }
+        } else {
+            if(storage == null) {
+                storage = new Storage();
+            }
         }
+
+        storage.setDataReceiver(new DataReceiver());
 
         AirIndexOptionHandler airIndexOptionHandler = new AirIndexOptionHandler(storage);
         PrintApiInformationOptionHandler printApiInformationOptionHandler = new PrintApiInformationOptionHandler(storage);

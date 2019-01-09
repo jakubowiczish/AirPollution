@@ -22,7 +22,9 @@ public class StorageTest {
     public void getAllStationsTest() {
         DataReceiver dataReceiver = mock(DataReceiver.class);
 
-        Storage storage = new Storage(dataReceiver);
+        Storage storage = new Storage();
+        storage.setDataReceiver(dataReceiver);
+
         Station station = new Station();
         station.setStationName(EXAMPLE_STATION_NAME);
 
@@ -42,7 +44,8 @@ public class StorageTest {
     @Test
     public void getAllSensorsTest() {
         DataReceiver dataReceiver = mock(DataReceiver.class);
-        Storage storage = new Storage(dataReceiver);
+        Storage storage = new Storage();
+        storage.setDataReceiver(dataReceiver);
 
         Sensor sensor = new Sensor();
         sensor.setId(5);
@@ -61,7 +64,8 @@ public class StorageTest {
     @Test
     public void getAirIndexTest() {
         DataReceiver dataReceiver = mock(DataReceiver.class);
-        Storage storage = new Storage(dataReceiver);
+        Storage storage = new Storage();
+        storage.setDataReceiver(dataReceiver);
 
         AirIndex airIndex = new AirIndex();
         airIndex.setStCalcDate("2019-01-01 19:00:00");
@@ -78,7 +82,8 @@ public class StorageTest {
     @Test
     public void getSensorDataTest() {
         DataReceiver dataReceiver = mock(DataReceiver.class);
-        Storage storage = new Storage(dataReceiver);
+        Storage storage = new Storage();
+        storage.setDataReceiver(dataReceiver);
 
         SensorData sensorData = new SensorData();
         sensorData.setKey("CO");
