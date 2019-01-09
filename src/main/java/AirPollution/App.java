@@ -166,6 +166,11 @@ public class App implements Runnable {
             System.out.println(parameterOptionHandler.sortedStations(listOfStations, date, parameterName, N));
         }
 
+        if (sortedStations_6 && date != null) {
+            System.out.println(parameterOptionHandler.stationsAboveStandardPollutionValue(listOfStations, date, N));
+
+        }
+
         if (extremeValues_7 && parameterName != null) {
             System.out.println(parameterOptionHandler.parameterExtremeValues(parameterName));
         }

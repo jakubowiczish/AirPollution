@@ -125,7 +125,7 @@ public class BarGraphHandler {
         }
 
         String resultString = stringBuilder.toString();
-        resultString = Utils.getInstance().cleanUpGraphString(resultString);
+        resultString = Utils.getInstance().cleanUpString(resultString);
 
         return resultString;
     }

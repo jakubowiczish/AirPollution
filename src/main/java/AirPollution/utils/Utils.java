@@ -5,10 +5,7 @@ import AirPollution.model.Station;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Class that contains various methods and fields that may be useful for other classes
@@ -29,6 +26,28 @@ public class Utils {
         return decimalFormat;
     }
 
+    /**
+     * List of parameters used in the system
+     */
+    public final ArrayList<String> parameters = new ArrayList<>() {{
+        add("NO2");
+        add("O3");
+        add("PM10");
+        add("SO2");
+        add("C6H6");
+        add("CO");
+        add("PM2.5");
+    }};
+
+    public final Map<String, Double> standardPollutionValuesForParameters = new TreeMap<>() {{
+        put("C6H6", 5.0);
+        put("NO2", 200.0);
+        put("SO2", 350.0);
+        put("CO", 10000.0);
+        put("PM10", 50.0);
+        put("PM2.5", 25.0);
+    }};
+
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat usedHourDateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -37,7 +56,7 @@ public class Utils {
         return str.substring(0, index) + ch + str.substring(index + 1);
     }
 
-    public String cleanUpGraphString(String resultString) {
+    public String cleanUpString(String resultString) {
         resultString = resultString.replaceAll("\\[", "");
         resultString = resultString.replaceAll("]", "");
 
@@ -61,18 +80,6 @@ public class Utils {
         return resultString;
     }
 
-    /**
-     * List of parameters used in the system
-     */
-    public final ArrayList<String> parameters = new ArrayList<>() {{
-        add("NO2");
-        add("O3");
-        add("PM10");
-        add("SO2");
-        add("C6H6");
-        add("CO");
-        add("PM2.5");
-    }};
 
     /**
      * Adds given key and value to given TreeMap

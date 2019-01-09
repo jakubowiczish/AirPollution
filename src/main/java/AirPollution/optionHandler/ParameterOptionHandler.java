@@ -3,7 +3,6 @@ package AirPollution.optionHandler;
 import AirPollution.storage.Storage;
 import AirPollution.model.*;
 import AirPollution.utils.Utils;
-import com.google.common.util.concurrent.AtomicDouble;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -94,7 +93,7 @@ public class ParameterOptionHandler {
         }
 
         String result = stringBuilder.toString();
-        result = Utils.getInstance().cleanUpGraphString(result);
+        result = Utils.getInstance().cleanUpString(result);
 
         return result;
     }
@@ -299,6 +298,7 @@ public class ParameterOptionHandler {
      * @param N              number of stations that we want them to be printed
      * @return String containing sorted stations in ascending order
      */
+    @SuppressWarnings("Duplicates")
     public String sortedStations(ArrayList<String> listOfStations, String date, String parameterName, int N) {
         Date realDate = Utils.getInstance().parseAndCheckDate(date);
 
@@ -360,6 +360,80 @@ public class ParameterOptionHandler {
             }
         }
         return result.toString();
+    }
+
+
+    @SuppressWarnings("Duplicates")
+    public String stationsAboveStandardPollutionValue(ArrayList<String> listOfStations, String date, int N) {
+        Date realDate = Utils.getInstance().parseAndCheckDate(date);
+
+        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        allStations = Utils.getInstance().assignAllStations(allStations, validStations);
+
+        TreeMap<Double, ArrayList<String>> parametersAboveStandardValues = new TreeMap<>();
+
+        boolean foundDate = false;
+
+        for (Station station : allStations) {
+            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+            if (sensors == null) continue;
+
+            for (Sensor sensor : sensors) {
+                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
+                if (sensorData == null) continue;
+
+                for (SensorData.Value value : sensorData.getValues()) {
+                    if (!value.date.contains("-")) continue;
+                    Date actualDate = Utils.getInstance().multiThreadParseStringToDate(value.date);
+                    if (actualDate == null) continue;
+
+                    if (actualDate.equals(realDate)) {
+                        foundDate = true;
+                        if (value.value == null) continue;
+
+                        String currentParameterName = sensorData.getKey();
+                        if (!Utils.getInstance().standardPollutionValuesForParameters.containsKey(currentParameterName))
+                            continue;
+
+                        Double valueOfParameter = Utils.getInstance().standardPollutionValuesForParameters.get(currentParameterName);
+
+                        if (value.value > valueOfParameter) {
+                            Utils.getInstance().
+                                    addToTreeWithDoubleAndString
+                                            (
+                                                    parametersAboveStandardValues,
+                                                    value.value,
+                                                    " - value above standard pollution for parameter "
+                                                            + currentParameterName + ", station " + station.getStationName()
+                                                            + " and sensor " + sensor.getId()
+                                            );
+                        }
+
+                    }
+                }
+            }
+        }
+
+        if (!foundDate) {
+            System.out.println("There is no such date as " + date + " in the system");
+            return null;
+        }
+
+        StringBuilder result = new StringBuilder();
+        result.append("Top ").append(N).append(" sensors which pollution is above normal value:").append("\n");
+        for (Map.Entry<Double, ArrayList<String>> entry : parametersAboveStandardValues.entrySet()) {
+            N++;
+            if (parametersAboveStandardValues.entrySet().size() - N < 0) {
+                result.append(Utils.getInstance().getDecimalFormat().format(entry.getKey())).
+                        append(entry.getValue()).append("\n");
+            }
+        }
+        String resultString = result.toString();
+        resultString = Utils.getInstance().cleanUpString(resultString);
+
+        return resultString;
+
     }
 
 
