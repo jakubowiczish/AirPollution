@@ -68,18 +68,18 @@ public class BarGraphHandlerTest {
                 barGraphForGivenParameterStationsAndPeriodOfTime(beginHour, endHour, parameterName, listOfStations, localDate);
 
         String expectedResult =
-                "16:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 89.5000\n" +
-                        " 16:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 50.5000\n" +
-                        " 16:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 29.5000\n" +
-                        "17:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 56.7000\n" +
-                        " 17:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 34.2000\n" +
-                        " 17:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 27.5000\n" +
-                        "18:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 47.9000\n" +
-                        " 18:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■ 21.6000\n" +
-                        " 18:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■■■■ 11.5000\n" +
-                        "19:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 32.0000\n" +
-                        " 19:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■ 19.0000\n" +
-                        " 19:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■ 9.5000\n";
+                "\r16:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 89.5000\n" +
+                        " \r16:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 50.5000\n" +
+                        " \r16:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 29.5000\n" +
+                        "\r17:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 56.7000\n" +
+                        " \r17:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 34.2000\n" +
+                        " \r17:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 27.5000\n" +
+                        "\r18:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 47.9000\n" +
+                        " \r18:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■ 21.6000\n" +
+                        " \r18:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■■■■ 11.5000\n" +
+                        "\r19:00:00 DAY BEFORE YESTERDAY (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 32.0000\n" +
+                        " \r19:00:00 YESTERDAY            (exampleStationName) ■■■■■■■■■■■■■■■■■■■■■■■ 19.0000\n" +
+                        " \r19:00:00 TODAY                (exampleStationName) ■■■■■■■■■■■ 9.5000\n";
 
         assertEquals(expectedResult, actualResult);
 

@@ -1,5 +1,6 @@
 package AirPollution;
 
+import AirPollution.api.DataReceiver;
 import AirPollution.optionHandler.*;
 import AirPollution.storage.PhysicalStorage;
 import AirPollution.storage.Storage;
@@ -127,7 +128,7 @@ public class App implements Runnable {
         if (!noDataFetching) {
             if (storage == null || (System.currentTimeMillis() - storage.lastLoadDate.getTime() > 3600 * 1000)) {
 
-                storage = new Storage();
+                storage = new Storage(new DataReceiver());
                 storage.loadAllData();
 
                 physicalStorage.saveStorageToFile(storage);

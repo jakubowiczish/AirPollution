@@ -24,7 +24,11 @@ public class Storage {
     private ConcurrentHashMap<Integer, CopyOnWriteArrayList<Sensor>> sensorMemory = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Integer, SensorData> sensorDataMemory = new ConcurrentHashMap<>();
 
-    private transient DataReceiver dataReceiver = new DataReceiver();
+    private transient DataReceiver dataReceiver;
+
+    public Storage(DataReceiver dataReceiver) {
+        this.dataReceiver = dataReceiver;
+    }
 
     /**
      * Loads all available data

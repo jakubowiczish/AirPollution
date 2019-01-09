@@ -91,7 +91,7 @@ public class BarGraphHandler {
 
                     if (isToday(localDate, actualDate)) {
                         Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
-                        String valueString = dateParts[1] +
+                        String valueString = "\r" + dateParts[1] +
                                 " TODAY               " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
                                 graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
@@ -100,7 +100,7 @@ public class BarGraphHandler {
 
                     } else if (wasYesterday(localDate, actualDate)) {
                         Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
-                        String valueString = dateParts[1] +
+                        String valueString = "\r" + dateParts[1] +
                                 " YESTERDAY           " + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
                                 graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
@@ -109,7 +109,7 @@ public class BarGraphHandler {
 
                     } else if (wasDayBeforeYesterday(localDate, actualDate)) {
                         Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
-                        String valueString = dateParts[1] +
+                        String valueString = "\r" + dateParts[1] +
                                 " DAY BEFORE YESTERDAY" + " (" + station.getStationName() + ")" +
                                 createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
                                 graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
