@@ -25,9 +25,8 @@ public class App implements Runnable {
 
     @Option(names = {"-1"},
             description = "use this option if you want to receive AIR INDEX, " +
-                    "if no stations given, works for all given stations" +
                     "\nWORKS WITH OPTION: -S" +
-                    "if -S is not provided, works for all stations available in the system")
+                    "\nif -S is not provided, works for all stations available in the system")
     private boolean airIndex_1;
 
     @Option(names = {"-2"},
@@ -135,7 +134,7 @@ public class App implements Runnable {
     private boolean allParameters;
 
     @Option(names = {"-S"},
-            description = "List of stations", split = ";")
+            description = "List of stations (; used as delimiter between stations) ", split = ";")
     private ArrayList<String> listOfStations;
 
     public static void main(String[] args) {
