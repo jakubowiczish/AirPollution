@@ -8,7 +8,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -24,82 +23,108 @@ import java.util.ArrayList;
         )
 public class App implements Runnable {
 
-    @Option(names = {"-1"}, description = "give this option if you want to receive AIR INDEX")
+    @Option(names = {"-1"},
+            description = "use this option if you want to receive AIR INDEX, " +
+                    "if no stations given, works for all given stations" +
+                    "WORKS WITH OPTION: -S" +
+                    "if -S is not provided, works for all stations available in the system")
     private boolean airIndex_1;
 
-    @Option(names = {"-2"}, description = "give this option if you want to receive value of given parameter for the given date")
+    @Option(names = {"-2"},
+            description = "use this option if you want to " +
+                    "receive value of given parameter for the given date" +
+                    "WORKS WITH OPTIONS: -d, -p, -S" +
+                    "if -S is not provided, works for all stations available in the system")
     private boolean valueOfParameter_2;
 
-//    @Option(names = {"-2a"}, description = "give this option if you want to receive something for all parameters")
-//    private boolean forAllParameters;
-
-    @Option(names = {"-3"}, description = "give this option if you want to receive " +
-            "average pollution value of given parameters for given period of time and given stations")
+    @Option(names = {"-3"},
+            description = "use this option if you want to receive " +
+                    "average pollution value of given parameters " +
+                    "for given period of time and given stations" +
+                    "WORKS WITH OPTIONS: -b, -d, -p, -S" +
+                    "if -S is not provided, works for all stations available in the system")
     private boolean averagePollution_3;
 
-    @Option(names = {"-4"}, description = "give this option if you want to receive " +
-            "name of the parameter which values were the most fluctuating among all stations")
+    @Option(names = {"-4"},
+            description = "use this option if you want to receive " +
+                    "name of the parameter which values were the most fluctuating among all stations" +
+                    "WORKS WITH OPTIONS: -d, -S" +
+                    "if -S is not provided, works for all stations available in the system")
     private boolean mostFluctuatingParameter_4;
 
-    @Option(names = {"-5"}, description = "give this option if you want to receive" +
-            "information about which parameter had lowest and highest pollution at given time")
+    @Option(names = {"-5"},
+            description = "use this option if you want to receive" +
+                    "information about which parameter had lowest and highest pollution at given time" +
+                    "WORKS WITH OPTIONS: -d")
     private boolean lowestAndHighestValue_5;
 
-    @Option(names = {"-6"}, description = "give this option when you want to " +
-            "have printed sorted sensors with highest value of given parameter")
+    @Option(names = {"-6"},
+            description = "use this option when you want to " +
+                    "have sorted sensors to be printed  - sensors with the highest values of given parameter" +
+                    "WORKS WITH OPTIONS: -d, -p, -S, -N" +
+                    "using this without -N >= 1 is pointless inasmuch as no information will be printed" +
+                    "if -S is not provided, works for all stations available in the system")
     private boolean sortedStations_6;
 
-    @Option(names = {"-7"}, description = "give this option if you want to receive when and where" +
-            "occurred maximum and minimum pollution values of given parameter")
+    @Option(names = {"-7"},
+            description = "use this option if you want to receive when and where" +
+                    "occurred maximum and minimum pollution values of given parameter" +
+                    "WORKS WITH OPTION: -p")
     private boolean extremeValues_7;
 
-    @Option(names = {"-8"}, description = "give this option if you want to have graph_8 printed")
+    @Option(names = {"-8"},
+            description = "use this option if you want to print a graph which presents information about pollution" +
+                    "for specified begin hour and end hour and given list of stations" +
+                    "WORKS WITH OPTIONS: -B, -E, -S, -p" +
+                    "if -S is not provided, works for all stations available in the system")
     private boolean graph_8;
 
-    @Option(names = {"-N"}, description = "number of sensors for sorted sensors")
+    @Option(names = {"-N"},
+            description = "number of sensors for sorted sensors")
     private int N;
 
-    @Option(names = {"-F"}, description = "if you do not want to fetch data, use this option, " +
-            "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
+    @Option(names = {"-F"},
+            description = "if you do not want to fetch data, use this option, " +
+                    "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
     private boolean noDataFetching;
 
-    @Option(names = {"-a", "-allStations"}, description = "Printing all available stations")
+    @Option(names = {"-a", "-allStations"},
+            description = "Printing all available stations")
     private boolean all;
 
     @Option(names = {"-q", "-allStationsWithSensors"},
             description = "Printing all available stations along with their sensors")
     private boolean allWithSensors;
 
-    @Option(names = {"-d", "--date"}, description = "give this date when there are no specific requirements, " +
-            "\nin format \"yyyy-MM-dd HH:mm:ss\"")
+    @Option(names = {"-d", "--date"},
+            description = "give this date when there are no specific requirements about the date, " +
+                    "" +
+                    "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String date;
 
-    @Option(names = {"-p", "--parameterName"}, description = "Name of the parameter")
+    @Option(names = {"-p", "--parameterName"},
+            description = "Name of the parameter")
     private String parameterName;
 
-    @Option(names = {"-b", "--beginDate"}, description = "Start date of measurement, " +
-            "\nin format \"yyyy-MM-dd HH:mm:ss\"")
+    @Option(names = {"-b", "--beginDate"},
+            description = "Start date of measurement, " +
+                    "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String beginDate;
 
-    @Option(names = {"-e", "--endDate"}, description = "End date of measurement, " +
-            "\nin format \"yyyy-MM-dd HH:mm:ss\"")
+    @Option(names = {"-e", "--endDate"},
+            description = "End date of measurement, " +
+                    "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String endDate;
 
-    @Option(names = {"-B", "--beginHour"}, description = "Start hour for graph")
+    @Option(names = {"-B", "--beginHour"},
+            description = "Start hour for graph, " +
+                    "\nin format \"HH:mm:ss\"")
     private String beginHour;
 
-    @Option(names = {"-E", "--endHour"}, description = "End hour for graph")
+    @Option(names = {"-E", "--endHour"},
+            description = "End hour for graph, " +
+                    "\nin format \"HH:mm:ss\"")
     private String endHour;
-
-//    @Option(names = {"-w", "--sinceWhen"},
-//            description = "Since when we want to have information about which parameter " +
-//                    "has biggest difference between maximum and minimum value of pollution, " +
-//                    "\nin format \"yyyy-MM-dd HH:mm:ss\"")
-//    private String sinceWhenDate;
-//
-//    @Option(names = {"-l", "--lowestWhen"}, description = "Give this date when you want to check which parameter's " +
-//            "pollution was lowest at given time\nassuming that this value is higher than 0, \nin format \"yyyy-MM-dd HH:mm:ss\"")
-//    private String dateForLowestParameter;
 
     @Option(names = {"-f", "--fragmentOfAddress"}, description = "Give fragment of address for instance " +
             "street name of city name that you want to find station in")
@@ -138,13 +163,12 @@ public class App implements Runnable {
             }
         }
 
-        if(storage == null) {
-            storage= new Storage();
+        if (storage == null) {
+            storage = new Storage();
             storage.setDataReceiver(new DataReceiver());
         } else {
             storage.setDataReceiver(new DataReceiver());
         }
-
 
 
         AirIndexOptionHandler airIndexOptionHandler = new AirIndexOptionHandler(storage);
@@ -153,8 +177,10 @@ public class App implements Runnable {
         AveragePollutionHandler averagePollutionHandler = new AveragePollutionHandler(storage);
         BarGraphHandler barGraphHandler = new BarGraphHandler(storage);
 
-//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami" -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00" -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
-//
+//java -jar AirPollution-1.0-all.jar -s "Tarnów, ul. Bitwy pod Studziankami"
+// -p "O3" -d "2018-12-18 21:00:00" -b "2018-12-18 17:00:00" -e "2018-12-18 21:00:00"
+// -w "2018-12-16 07:00:00" -l  "2018-12-17 12:00:00"
+
         if (airIndex_1) {
             System.out.println(airIndexOptionHandler.airIndicesOfGivenStations(listOfStations));
         }
@@ -181,7 +207,6 @@ public class App implements Runnable {
 
         if (sortedStations_6 && date != null) {
             System.out.println(parameterOptionHandler.stationsAboveStandardPollutionValue(listOfStations, date, N));
-
         }
 
         if (extremeValues_7 && parameterName != null) {
@@ -207,7 +232,5 @@ public class App implements Runnable {
         if (allParameters) {
             System.out.println(parameterOptionHandler.parameterNames());
         }
-
     }
-
 }
