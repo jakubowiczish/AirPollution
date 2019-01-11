@@ -7,7 +7,7 @@ uses http://powietrze.gios.gov.pl/pjp/content/api
 
 List of program options:
 ![options1](https://user-images.githubusercontent.com/29823037/51058617-a9180e00-15e9-11e9-8b04-f7074ae88af9.png)
-![options2](https://user-images.githubusercontent.com/29823037/51057747-cc8d8980-15e6-11e9-821a-4a7a6cc1a6fa.png)
+![options2](https://user-images.githubusercontent.com/29823037/51059703-66f0cb80-15ed-11e9-82ea-b5c8adc8b8b7.png)
 
 Some basic examples of program usage:
 ![usage1](https://user-images.githubusercontent.com/29823037/51057701-a5cf5300-15e6-11e9-8316-088f42ccd14f.png)
