@@ -144,6 +144,11 @@ public class ParameterOptionHandler {
 
         String resultParameter = null;
 
+        String minParameter = null;
+        String maxParameter = null;
+
+        double minValue = 10000;
+        double maxValue = -1;
         double resultMinValue = 10000;
         double resultMaxValue = -1;
         double maxDifference = -1;
@@ -168,21 +173,26 @@ public class ParameterOptionHandler {
 
                     if (Utils.getInstance().checkSinceWhenDate(sinceWhenDate, actualDate)) {
                         foundDate = true;
-                        if (value.value < resultMinValue && value.value > 0) {
-                            resultMinValue = value.value;
+                        if (value.value < minValue && value.value > 0) {
+                            minValue = value.value;
+                            minParameter = sensorData.getKey();
                         }
-                        if (value.value > resultMaxValue) {
-                            resultMaxValue = value.value;
+                        if (value.value > maxValue) {
+                            maxValue = value.value;
+                            maxParameter = sensorData.getKey();
+                        }
 
+                        double difference = maxValue - minValue;
+
+                        if (maxDifference < difference && minParameter != null && minParameter.equals(maxParameter)) {
+                            maxDifference = difference;
+                            resultParameter = sensorData.getKey();
+                            resultMaxValue = maxValue;
+                            resultMinValue = minValue;
                         }
                     }
                 }
-                double difference = resultMaxValue - resultMinValue;
 
-                if (maxDifference < difference) {
-                    maxDifference = difference;
-                    resultParameter = sensorData.getKey();
-                }
             }
         }
 

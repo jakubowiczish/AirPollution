@@ -131,9 +131,9 @@ public class ParameterOptionHandlerTest {
 
         String expectedResult = "Most fluctuating parameter since \"2019-01-01 15:00:00\" for stations:\n" +
                 "exampleStationName\n" +
-                "is CO,\n" +
-                "the difference between maximum and minimum pollution for this parameter amounts to: 183.0800,\n" +
-                "with maximum value of: 189.5000 and minimum value of: 6.4200";
+                "is PM10,\n" +
+                "the difference between maximum and minimum pollution for this parameter amounts to: 180.0000,\n" +
+                "with maximum value of: 189.5000 and minimum value of: 9.5000";
 
         assertNotNull(expectedResult);
         assertNotNull(actualResult);
@@ -145,9 +145,9 @@ public class ParameterOptionHandlerTest {
 
         String expectedResult_2 = "Most fluctuating parameter since \"2019-01-01 17:00:00\" for stations:\n" +
                 "exampleStationName\n" +
-                "is CO,\n" +
-                "the difference between maximum and minimum pollution for this parameter amounts to: 88.1500,\n" +
-                "with maximum value of: 97.6500 and minimum value of: 9.5000";
+                "is PM10,\n" +
+                "the difference between maximum and minimum pollution for this parameter amounts to: 24.7000,\n" +
+                "with maximum value of: 34.2000 and minimum value of: 9.5000";
 
         assertNotNull(expectedResult_2);
         assertNotNull(actualResult_2);
