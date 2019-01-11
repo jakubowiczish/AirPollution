@@ -17,6 +17,4 @@ Some basic examples of program usage:
 ![usage5](https://user-images.githubusercontent.com/29823037/51057811-fc3c9180-15e6-11e9-9ced-97ca0cd050e2.png)
 ![usage6](https://user-images.githubusercontent.com/29823037/51057822-0494cc80-15e7-11e9-9b56-6291d68ff65f.png)
 ![usage7](https://user-images.githubusercontent.com/29823037/51057827-0c547100-15e7-11e9-8cbf-02fe0d3750a1.png)
-![usage8](https://user-images.githubusercontent.com/29823037/51057837-124a5200-15e7-11e9-82d5-07bb8360831a.png)
-
-
+![usage8](https://user-images.githubusercontent.com/29823037/51058993-ec26b100-15ea-11e9-8d6a-76971601e8a2.png)
