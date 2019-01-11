@@ -26,57 +26,57 @@ public class App implements Runnable {
     @Option(names = {"-1"},
             description = "use this option if you want to receive AIR INDEX, " +
                     "if no stations given, works for all given stations" +
-                    "WORKS WITH OPTION: -S" +
+                    "\nWORKS WITH OPTION: -S" +
                     "if -S is not provided, works for all stations available in the system")
     private boolean airIndex_1;
 
     @Option(names = {"-2"},
             description = "use this option if you want to " +
                     "receive value of given parameter for the given date" +
-                    "WORKS WITH OPTIONS: -d, -p, -S" +
-                    "if -S is not provided, works for all stations available in the system")
+                    "\nWORKS WITH OPTIONS: -d, -p, -S" +
+                    "\nif -S is not provided, works for all stations available in the system")
     private boolean valueOfParameter_2;
 
     @Option(names = {"-3"},
             description = "use this option if you want to receive " +
                     "average pollution value of given parameters " +
                     "for given period of time and given stations" +
-                    "WORKS WITH OPTIONS: -b, -d, -p, -S" +
-                    "if -S is not provided, works for all stations available in the system")
+                    "\nWORKS WITH OPTIONS: -b, -d, -p, -S" +
+                    "\nif -S is not provided, works for all stations available in the system")
     private boolean averagePollution_3;
 
     @Option(names = {"-4"},
             description = "use this option if you want to receive " +
                     "name of the parameter which values were the most fluctuating among all stations" +
-                    "WORKS WITH OPTIONS: -d, -S" +
-                    "if -S is not provided, works for all stations available in the system")
+                    "\nWORKS WITH OPTIONS: -d, -S" +
+                    "\nif -S is not provided, works for all stations available in the system")
     private boolean mostFluctuatingParameter_4;
 
     @Option(names = {"-5"},
             description = "use this option if you want to receive" +
                     "information about which parameter had lowest and highest pollution at given time" +
-                    "WORKS WITH OPTIONS: -d")
+                    "\nWORKS WITH OPTION: -d")
     private boolean lowestAndHighestValue_5;
 
     @Option(names = {"-6"},
             description = "use this option when you want to " +
                     "have sorted sensors to be printed  - sensors with the highest values of given parameter" +
-                    "WORKS WITH OPTIONS: -d, -p, -S, -N" +
-                    "using this without -N >= 1 is pointless inasmuch as no information will be printed" +
-                    "if -S is not provided, works for all stations available in the system")
+                    "\nWORKS WITH OPTIONS: -d, -p, -S, -N" +
+                    "\nusing this when -N < 1 is pointless inasmuch as no information will be printed" +
+                    "\nif -S is not provided, works for all stations available in the system")
     private boolean sortedStations_6;
 
     @Option(names = {"-7"},
             description = "use this option if you want to receive when and where" +
                     "occurred maximum and minimum pollution values of given parameter" +
-                    "WORKS WITH OPTION: -p")
+                    "\nWORKS WITH OPTION: -p")
     private boolean extremeValues_7;
 
     @Option(names = {"-8"},
             description = "use this option if you want to print a graph which presents information about pollution" +
                     "for specified begin hour and end hour and given list of stations" +
-                    "WORKS WITH OPTIONS: -B, -E, -S, -p" +
-                    "if -S is not provided, works for all stations available in the system")
+                    "\nWORKS WITH OPTIONS: -B, -E, -S, -p" +
+                    "\nif -S is not provided, works for all stations available in the system")
     private boolean graph_8;
 
     @Option(names = {"-N"},
@@ -85,7 +85,8 @@ public class App implements Runnable {
 
     @Option(names = {"-F"},
             description = "if you do not want to fetch data, use this option, " +
-                    "program will use previously stored data, DATA MAY NOT BE UP-TO-DATE")
+                    "program will use previously stored data, " +
+                    "\nDATA MAY NOT BE UP-TO-DATE")
     private boolean noDataFetching;
 
     @Option(names = {"-a", "-allStations"},
@@ -98,7 +99,6 @@ public class App implements Runnable {
 
     @Option(names = {"-d", "--date"},
             description = "give this date when there are no specific requirements about the date, " +
-                    "" +
                     "\nin format \"yyyy-MM-dd HH:mm:ss\"")
     private String date;
 
@@ -130,10 +130,12 @@ public class App implements Runnable {
             "street name of city name that you want to find station in")
     private String addressFragment;
 
-    @Option(names = {"-r"}, description = "All parameters available in the system at this very moment")
+    @Option(names = {"-r"},
+            description = "All parameters available in the system at this very moment")
     private boolean allParameters;
 
-    @Option(names = {"-S"}, description = "List of stations", split = ";")
+    @Option(names = {"-S"},
+            description = "List of stations", split = ";")
     private ArrayList<String> listOfStations;
 
     public static void main(String[] args) {
