@@ -1,15 +1,21 @@
 package AirPollution.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.Arrays;
 
 /**
  * Class used to store parsed sensor data
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class SensorData {
+
     private String key;
     private Value[] values;
-
-    public SensorData() {}
 
     public SensorData(String key, Value[] values) {
         this.key = key;
@@ -40,21 +46,5 @@ public class SensorData {
                 "key='" + key + '\'' +
                 ", values=" + Arrays.toString(values) +
                 '}';
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public Value[] getValues() {
-        return values;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setValues(Value[] values) {
-        this.values = values;
     }
 }

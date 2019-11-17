@@ -6,8 +6,13 @@ import AirPollution.model.SensorData;
 import AirPollution.model.Station;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * Class used to collect desirable data from the Internet
@@ -27,9 +32,11 @@ public class DataReceiver {
             System.out.println("UNABLE TO FETCH SENSOR DATA FOR SENSOR: " + sensorID);
             System.exit(1);
         }
+
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
         SensorData sensorData;
+
         try {
             sensorData = factory.createSensorData(jsonFetcher.getSensorData(sensorID));
         } catch (IOException e) {
@@ -52,15 +59,18 @@ public class DataReceiver {
             System.out.println("UNABLE TO FETCH AIR INDEX FOR STATION: " + stationID);
             System.exit(1);
         }
+
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
         AirIndex airIndex;
+
         try {
             airIndex = factory.createAirIndex(jsonFetcher.getQualityIndex(stationID));
         } catch (IOException e) {
             System.out.println("There is no AirIndex for this station: " + stationID);
             return getAirIndexOfSpecificStation(stationID, attemptCounter + 1);
         }
+
         return airIndex;
     }
 
@@ -77,6 +87,7 @@ public class DataReceiver {
             System.out.println("UNABLE TO FETCH ALL SENSORS FOR STATION: " + stationID);
             System.exit(1);
         }
+
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
         Sensor[] allSensors;
@@ -87,16 +98,16 @@ public class DataReceiver {
             System.out.println("System was unable to fetch all sensors for station with stationID: " + stationID);
             return getAllSensorsForSpecificStation(stationID, attemptCounter + 1);
         }
-        CopyOnWriteArrayList<Sensor> validSensors = new CopyOnWriteArrayList<>();
-        for (Sensor sensor : allSensors) {
-            if (sensor != null) {
-                validSensors.add(sensor);
-            }
-        }
+
+        CopyOnWriteArrayList<Sensor> validSensors = Arrays.stream(allSensors)
+                .filter(Objects::nonNull)
+                .collect(toCollection(CopyOnWriteArrayList::new));
+
         if (validSensors.size() == 0) {
             System.out.println("None of the sensors were found for station: " + stationID);
             return null;
         }
+
         return validSensors;
     }
 
@@ -108,13 +119,15 @@ public class DataReceiver {
      * @return List of all stations available in the system
      * @see Station
      */
-    public ArrayList<Station> getAllStations(int attemptCounter) {
+    public List<Station> getAllStations(int attemptCounter) {
         if (attemptCounter > 10) {
             System.out.println("UNABLE TO FETCH ALL STATIONS");
             System.exit(1);
         }
+
         Factory factory = new Factory();
         JsonFetcher jsonFetcher = new JsonFetcher();
+
         Station[] allStations;
         try {
             allStations = factory.createStations(jsonFetcher.getAllStations());
@@ -122,16 +135,16 @@ public class DataReceiver {
             System.out.println("System was unable to fetch all stations");
             return getAllStations(attemptCounter + 1);
         }
-        ArrayList<Station> validStations = new ArrayList<>();
-        for (Station station : allStations) {
-            if (station != null) {
-                validStations.add(station);
-            }
-        }
+
+        List<Station> validStations = Arrays.stream(allStations)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
         if (validStations.size() == 0) {
             System.out.println("None of stations were found, something probably went wrong");
             return null;
         }
+
         return validStations;
     }
 }

@@ -13,7 +13,7 @@ public class JsonFetcher {
      * @throws IOException exception
      * @see AirPollution.model.Station
      */
-    public String getAllStations() throws IOException {
+    String getAllStations() throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/station/findAll");
     }
 
@@ -27,7 +27,7 @@ public class JsonFetcher {
      * @throws IOException exception
      * @see AirPollution.model.Sensor
      */
-    public String getSensors(int stationID) throws IOException {
+    String getSensors(int stationID) throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/station/sensors/" + stationID);
     }
 
@@ -41,7 +41,7 @@ public class JsonFetcher {
      * @throws IOException exception
      * @see AirPollution.model.SensorData
      */
-    public String getSensorData(int sensorID) throws IOException {
+    String getSensorData(int sensorID) throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/data/getData/" + sensorID);
     }
 
@@ -55,7 +55,7 @@ public class JsonFetcher {
      * @throws IOException exception
      * @see AirPollution.model.AirIndex
      */
-    public String getQualityIndex(int stationID) throws IOException {
+    String getQualityIndex(int stationID) throws IOException {
         return URLReader.getJSON("http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/" + stationID);
     }
 }

@@ -19,8 +19,7 @@ public class Factory {
      * @return Array of stations parsed from given String
      */
     public Station[] createStations(String stationsString) {
-        Gson gson = new Gson();
-        return gson.fromJson(stationsString, Station[].class);
+        return new Gson().fromJson(stationsString, Station[].class);
     }
 
     /**
@@ -31,8 +30,7 @@ public class Factory {
      * @return Array of sensors parsed from given String
      */
     public Sensor[] createSensors(String stationsString) {
-        Gson gson = new Gson();
-        return gson.fromJson(stationsString, Sensor[].class);
+        return new Gson().fromJson(stationsString, Sensor[].class);
     }
 
     /**
@@ -43,8 +41,7 @@ public class Factory {
      * @return SensorData object parsed from given String
      */
     public SensorData createSensorData(String stationsString) {
-        Gson gson = new Gson();
-        return gson.fromJson(stationsString, SensorData.class);
+        return new Gson().fromJson(stationsString, SensorData.class);
     }
 
     /**
@@ -55,7 +52,6 @@ public class Factory {
      * @return AirIndex object parsed from given String
      */
     public AirIndex createAirIndex(String stationsString) {
-        Gson gson = new Gson();
-        return gson.fromJson(stationsString, AirIndex.class);
+        return new Gson().fromJson(stationsString, AirIndex.class);
     }
 }

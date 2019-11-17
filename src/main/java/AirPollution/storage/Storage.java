@@ -7,11 +7,10 @@ import AirPollution.model.SensorData;
 import AirPollution.model.Station;
 import AirPollution.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Class that is responsible for storing fetched data
@@ -19,10 +18,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Storage {
     public Date lastLoadDate;
 
-    private ConcurrentHashMap<Integer, AirIndex> airIndexMemory = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Station> stationMemory = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, CopyOnWriteArrayList<Sensor>> sensorMemory = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, SensorData> sensorDataMemory = new ConcurrentHashMap<>();
+    private Map<Integer, AirIndex> airIndexMemory = new ConcurrentHashMap<>();
+    private Map<String, Station> stationMemory = new ConcurrentHashMap<>();
+    private Map<Integer, CopyOnWriteArrayList<Sensor>> sensorMemory = new ConcurrentHashMap<>();
+    private Map<Integer, SensorData> sensorDataMemory = new ConcurrentHashMap<>();
 
     private transient DataReceiver dataReceiver;
 
@@ -34,23 +33,20 @@ public class Storage {
      * Loads all available data
      */
     public void loadAllData() {
-        ArrayList<Station> stations = getAllStations();
+        List<Station> stations = getAllStations();
 
-        LinkedList<Thread> threads = new LinkedList<>();
+        LinkedList<Thread> threads = stations.stream()
+                .map(station -> new Thread(() -> {
+                    CopyOnWriteArrayList<Sensor> sensors
+                            = getAllSensorsForSpecificStation(station.getId());
 
-        for (Station station : stations) {
-            Thread thread = new Thread(() -> {
-                CopyOnWriteArrayList<Sensor> sensors = getAllSensorsForSpecificStation(station.getId());
+                    sensors.stream()
+                            .mapToInt(Sensor::getId)
+                            .forEach(this::getSensorDataForSpecificSensor);
 
-                for (Sensor sensor : sensors) {
-                    getSensorDataForSpecificSensor(sensor.getId());
-                }
-
-                getAirIndexOfSpecificStation(station.getId());
-            });
-
-            threads.add(thread);
-        }
+                    getAirIndexOfSpecificStation(station.getId());
+                }))
+                .collect(Collectors.toCollection(LinkedList::new));
 
         System.out.println("Starting " + threads.size() + " threads");
         Utils.getInstance().startAndJoinThreads(threads);
@@ -63,19 +59,16 @@ public class Storage {
      *
      * @return ArrayList with all stations currently available in the system
      */
-    public ArrayList<Station> getAllStations() {
+    public List<Station> getAllStations() {
         if (stationMemory.size() == 0) {
-            ArrayList<Station> allStations = dataReceiver.getAllStations(0);
+            List<Station> allStations = dataReceiver.getAllStations(0);
 
             if (allStations == null) {
                 System.out.println("There are no stations available at the moment");
                 return null;
             }
 
-            for (Station station : allStations) {
-                stationMemory.put(station.getStationName(), station);
-            }
-
+            allStations.forEach(station -> stationMemory.put(station.getStationName(), station));
         }
 
         return new ArrayList<>(stationMemory.values());
@@ -97,6 +90,7 @@ public class Storage {
             System.out.println("Sensors for " + stationID + " are not available at the moment or do not exist");
             return null;
         }
+
         sensorMemory.put(stationID, allSensors);
         return getAllSensorsForSpecificStation(stationID);
     }
@@ -143,6 +137,4 @@ public class Storage {
         airIndexMemory.put(stationID, airIndex);
         return getAirIndexOfSpecificStation(stationID);
     }
-
-
 }

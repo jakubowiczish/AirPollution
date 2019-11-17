@@ -1,11 +1,19 @@
 package AirPollution.model;
 
-import java.util.ArrayList;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Class used to store parsed information about station
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class Station {
+
     private int id;
     private String stationName;
     private double gegrLat;
@@ -13,14 +21,39 @@ public class Station {
     private City city;
     private String addressStreet;
 
-    public Station() {}
-
     public Station(int id, String stationName) {
         this.id = id;
         this.stationName = stationName;
     }
 
-    class City {
+    public static int returnIdOfGivenStation(List<Station> stations, String stationName) {
+        int result = -1;
+        int stationCounter = 0;
+        for (Station station : stations) {
+            if (station.stationName.equals(stationName)) {
+                if (stationCounter == 0) {
+                    result = station.id;
+                }
+
+                stationCounter++;
+
+                if (stationCounter > 1) {
+                    System.out.println("There is more than one station that name is: " + stationName + "\n");
+                }
+            }
+        }
+
+        if (stationCounter == 0) {
+            throw new IllegalArgumentException("Given station does not exist");
+        }
+
+        return result;
+    }
+
+    @Getter
+    @Setter
+    static class City {
+
         private int id;
         private String name;
         private Commune commune;
@@ -33,7 +66,10 @@ public class Station {
                     "       }";
         }
 
-        class Commune {
+        @Getter
+        @Setter
+        static class Commune {
+
             private String communeName;
             private String districtName;
             private String provinceName;
@@ -48,26 +84,6 @@ public class Station {
         }
     }
 
-    public static int returnIdOfGivenStation(ArrayList<Station> stations, String stationName) {
-        int result = -1;
-        int stationCounter = 0;
-        for (Station station : stations) {
-            if (station.stationName.equals(stationName)) {
-                if (stationCounter == 0) {
-                    result = station.id;
-                }
-                stationCounter++;
-                if (stationCounter > 1) {
-                    System.out.println("There is more than one station that name is: " + stationName + "\n");
-                }
-            }
-        }
-        if (stationCounter == 0) {
-            throw new IllegalArgumentException("Given station does not exist");
-        }
-        return result;
-    }
-
     @Override
     public String toString() {
         return "Station {" + "\n" +
@@ -79,21 +95,4 @@ public class Station {
                 "       addressStreet:'" + addressStreet + '\'' + "\n" +
                 '}';
     }
-
-    public String getStationName() {
-        return stationName;
-    }
-
-    public void setStationName(String stationName) {
-        this.stationName = stationName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
 }

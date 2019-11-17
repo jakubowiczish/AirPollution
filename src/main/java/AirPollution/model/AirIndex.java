@@ -1,9 +1,15 @@
 package AirPollution.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Class used to store information about air index
  */
+@Getter
+@Setter
 public class AirIndex {
+
     private int id;
 
     private IndexLevel stIndexLevel;
@@ -69,7 +75,9 @@ public class AirIndex {
                 '}';
     }
 
-    public class IndexLevel {
+    @Getter
+    @Setter
+    public static class IndexLevel {
         private int id;
         private String indexLevelName;
 
@@ -80,213 +88,5 @@ public class AirIndex {
                     "       indexLevelName:'" + indexLevelName + '\'' + "\n" +
                     "   }";
         }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getIndexLevelName() {
-            return indexLevelName;
-        }
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public IndexLevel getStIndexLevel() {
-        return stIndexLevel;
-    }
-
-    public void setStIndexLevel(IndexLevel stIndexLevel) {
-        this.stIndexLevel = stIndexLevel;
-    }
-
-    public String getStCalcDate() {
-        return stCalcDate;
-    }
-
-    public void setStCalcDate(String stCalcDate) {
-        this.stCalcDate = stCalcDate;
-    }
-
-    public String getStSourceDataDate() {
-        return stSourceDataDate;
-    }
-
-    public void setStSourceDataDate(String stSourceDataDate) {
-        this.stSourceDataDate = stSourceDataDate;
-    }
-
-    public IndexLevel getSo2IndexLevel() {
-        return so2IndexLevel;
-    }
-
-    public void setSo2IndexLevel(IndexLevel so2IndexLevel) {
-        this.so2IndexLevel = so2IndexLevel;
-    }
-
-    public String getSo2CalcDate() {
-        return so2CalcDate;
-    }
-
-    public void setSo2CalcDate(String so2CalcDate) {
-        this.so2CalcDate = so2CalcDate;
-    }
-
-    public String getSo2SourceDataDate() {
-        return so2SourceDataDate;
-    }
-
-    public void setSo2SourceDataDate(String so2SourceDataDate) {
-        this.so2SourceDataDate = so2SourceDataDate;
-    }
-
-    public IndexLevel getNo2IndexLevel() {
-        return no2IndexLevel;
-    }
-
-    public void setNo2IndexLevel(IndexLevel no2IndexLevel) {
-        this.no2IndexLevel = no2IndexLevel;
-    }
-
-    public String getNo2CalcDate() {
-        return no2CalcDate;
-    }
-
-    public void setNo2CalcDate(String no2CalcDate) {
-        this.no2CalcDate = no2CalcDate;
-    }
-
-    public String getNo2SourceDataDate() {
-        return no2SourceDataDate;
-    }
-
-    public void setNo2SourceDataDate(String no2SourceDataDate) {
-        this.no2SourceDataDate = no2SourceDataDate;
-    }
-
-    public IndexLevel getCoIndexLevel() {
-        return coIndexLevel;
-    }
-
-    public void setCoIndexLevel(IndexLevel coIndexLevel) {
-        this.coIndexLevel = coIndexLevel;
-    }
-
-    public String getCoCalcDate() {
-        return coCalcDate;
-    }
-
-    public void setCoCalcDate(String coCalcDate) {
-        this.coCalcDate = coCalcDate;
-    }
-
-    public String getCoSourceDataDate() {
-        return coSourceDataDate;
-    }
-
-    public void setCoSourceDataDate(String coSourceDataDate) {
-        this.coSourceDataDate = coSourceDataDate;
-    }
-
-    public IndexLevel getPm10IndexLevel() {
-        return pm10IndexLevel;
-    }
-
-    public void setPm10IndexLevel(IndexLevel pm10IndexLevel) {
-        this.pm10IndexLevel = pm10IndexLevel;
-    }
-
-    public String getPm10CalcDate() {
-        return pm10CalcDate;
-    }
-
-    public void setPm10CalcDate(String pm10CalcDate) {
-        this.pm10CalcDate = pm10CalcDate;
-    }
-
-    public String getPm10SourceDataDate() {
-        return pm10SourceDataDate;
-    }
-
-    public void setPm10SourceDataDate(String pm10SourceDataDate) {
-        this.pm10SourceDataDate = pm10SourceDataDate;
-    }
-
-    public IndexLevel getPm25IndexLevel() {
-        return pm25IndexLevel;
-    }
-
-    public void setPm25IndexLevel(IndexLevel pm25IndexLevel) {
-        this.pm25IndexLevel = pm25IndexLevel;
-    }
-
-    public String getPm25CalcDate() {
-        return pm25CalcDate;
-    }
-
-    public void setPm25CalcDate(String pm25CalcDate) {
-        this.pm25CalcDate = pm25CalcDate;
-    }
-
-    public String getPm25SourceDataDate() {
-        return pm25SourceDataDate;
-    }
-
-    public void setPm25SourceDataDate(String pm25SourceDataDate) {
-        this.pm25SourceDataDate = pm25SourceDataDate;
-    }
-
-    public IndexLevel getO3IndexLevel() {
-        return o3IndexLevel;
-    }
-
-    public void setO3IndexLevel(IndexLevel o3IndexLevel) {
-        this.o3IndexLevel = o3IndexLevel;
-    }
-
-    public String getO3CalcDate() {
-        return o3CalcDate;
-    }
-
-    public void setO3CalcDate(String o3CalcDate) {
-        this.o3CalcDate = o3CalcDate;
-    }
-
-    public String getO3SourceDataDate() {
-        return o3SourceDataDate;
-    }
-
-    public void setO3SourceDataDate(String o3SourceDataDate) {
-        this.o3SourceDataDate = o3SourceDataDate;
-    }
-
-    public IndexLevel getC6h6IndexLevel() {
-        return c6h6IndexLevel;
-    }
-
-    public void setC6h6IndexLevel(IndexLevel c6h6IndexLevel) {
-        this.c6h6IndexLevel = c6h6IndexLevel;
-    }
-
-    public String getC6h6CalcDate() {
-        return c6h6CalcDate;
-    }
-
-    public void setC6h6CalcDate(String c6h6CalcDate) {
-        this.c6h6CalcDate = c6h6CalcDate;
-    }
-
-    public String getC6h6SourceDataDate() {
-        return c6h6SourceDataDate;
-    }
-
-    public void setC6h6SourceDataDate(String c6h6SourceDataDate) {
-        this.c6h6SourceDataDate = c6h6SourceDataDate;
     }
 }

@@ -1,11 +1,11 @@
 package AirPollution.optionHandler;
 
-import AirPollution.storage.Storage;
 import AirPollution.model.AirIndex;
 import AirPollution.model.Station;
+import AirPollution.storage.Storage;
 import AirPollution.utils.Utils;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that is used to provide information about air index
@@ -23,10 +23,10 @@ public class AirIndexOptionHandler {
      * @param listOfStations list of names of stations which air indices we want to be shown
      * @return String representation of air indices for given stations
      */
-    public String airIndicesOfGivenStations(ArrayList<String> listOfStations) {
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
+    public String airIndicesOfGivenStations(List<String> listOfStations) {
+        List<Station> allStations = storageReceiver.getAllStations();
 
-        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        List<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
         allStations = Utils.getInstance().assignAllStations(allStations, validStations);
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -39,6 +39,7 @@ public class AirIndexOptionHandler {
             stringBuilder.append("AIR INDEX FOR STATION: \"").
                     append(station.getStationName()).append("\"\n").append(airIndex.toString()).append("\n");
         }
+
         return stringBuilder.toString();
     }
 

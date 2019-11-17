@@ -29,24 +29,27 @@ public class Utils {
     /**
      * List of parameters used in the system
      */
-    public final ArrayList<String> parameters = new ArrayList<>() {{
-        add("NO2");
-        add("O3");
-        add("PM10");
-        add("SO2");
-        add("C6H6");
-        add("CO");
-        add("PM2.5");
-    }};
+    public final ArrayList<String> parameters = new ArrayList<>();
+    public final Map<String, Double> standardPollutionValuesForParameters = new TreeMap<>();
 
-    public final Map<String, Double> standardPollutionValuesForParameters = new TreeMap<>() {{
-        put("C6H6", 5.0);
-        put("NO2", 200.0);
-        put("SO2", 350.0);
-        put("CO", 10000.0);
-        put("PM10", 50.0);
-        put("PM2.5", 25.0);
-    }};
+    {
+        parameters.add("PM2.5");
+        parameters.add("CO");
+        parameters.add("C6H6");
+        parameters.add("SO2");
+        parameters.add("PM10");
+        parameters.add("O3");
+        parameters.add("NO2");
+    }
+
+    {
+        standardPollutionValuesForParameters.put("PM2.5", 25.0);
+        standardPollutionValuesForParameters.put("PM10", 50.0);
+        standardPollutionValuesForParameters.put("CO", 10000.0);
+        standardPollutionValuesForParameters.put("SO2", 350.0);
+        standardPollutionValuesForParameters.put("NO2", 200.0);
+        standardPollutionValuesForParameters.put("C6H6", 5.0);
+    }
 
     private static final SimpleDateFormat usedDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat usedHourDateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -89,8 +92,8 @@ public class Utils {
      * @param value   value
      */
     @SuppressWarnings("Duplicates")
-    public synchronized void addToTreeWithDoubleAndString(TreeMap<Double, ArrayList<String>> treeMap, Double key, String value) {
-        ArrayList<String> list = treeMap.get(key);
+    public synchronized void addToTreeWithDoubleAndString(TreeMap<Double, List<String>> treeMap, Double key, String value) {
+        List<String> list = treeMap.get(key);
 
         if (list == null) {
             list = new ArrayList<>();
@@ -112,8 +115,8 @@ public class Utils {
      * @param value   value
      */
     @SuppressWarnings("Duplicates")
-    public synchronized void addToTreeWithDateAndString(TreeMap<Date, ArrayList<String>> treeMap, Date key, String value) {
-        ArrayList<String> list = treeMap.get(key);
+    public synchronized void addToTreeWithDateAndString(TreeMap<Date, List<String>> treeMap, Date key, String value) {
+        List<String> list = treeMap.get(key);
 
         if (list == null) {
             list = new ArrayList<>();
@@ -134,13 +137,10 @@ public class Utils {
      * @param stationName station name that is to be checked
      * @return true if stationName exists in the system, false otherwise
      */
-    public boolean checkWhetherStationExists(ArrayList<Station> allStations, String stationName) {
-        for (Station station : allStations) {
-            if (station.getStationName().equals(stationName)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean checkWhetherStationExists(List<Station> allStations, String stationName) {
+        return allStations.stream()
+                .anyMatch(station -> station.getStationName()
+                        .equals(stationName));
     }
 
     /**
@@ -150,8 +150,8 @@ public class Utils {
      * @param allStations    list of all stations currently available in the system
      * @return ArrayList of stations that contains all stations with valid names that occur in the system
      */
-    public ArrayList<Station> checkValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
-        ArrayList<Station> validStations = new ArrayList<>();
+    public List<Station> checkValidStations(List<String> listOfStations, List<Station> allStations) {
+        List<Station> validStations = new ArrayList<>();
 
         if (listOfStations.size() > 0) {
             for (String stationName : listOfStations) {
@@ -162,11 +162,13 @@ public class Utils {
                         stationNameFound = true;
                     }
                 }
+
                 if (!stationNameFound) {
                     System.out.println("There is no such station in the system as: " + stationName);
                 }
             }
         }
+
         return validStations;
     }
 
@@ -177,19 +179,20 @@ public class Utils {
      * @param allStations    list of all stations currently available in the system
      * @return list of valid stations
      */
-    public ArrayList<Station> assignValidStations(ArrayList<String> listOfStations, ArrayList<Station> allStations) {
-        ArrayList<Station> validStations = null;
+    public List<Station> assignValidStations(List<String> listOfStations, List<Station> allStations) {
+        List<Station> validStations = null;
+
         if (listOfStations != null && listOfStations.size() > 0) {
             validStations = checkValidStations(listOfStations, allStations);
         }
+
         return validStations;
     }
 
-    public ArrayList<Station> assignAllStations(ArrayList<Station> allStations, ArrayList<Station> validStations) {
-        if (validStations != null && validStations.size() > 0) {
-            return validStations;
-        }
-        return allStations;
+    public List<Station> assignAllStations(List<Station> allStations, List<Station> validStations) {
+        return validStations != null && validStations.size() > 0
+                ? validStations
+                : allStations;
     }
 
 
@@ -209,8 +212,8 @@ public class Utils {
         } catch (ParseException e) {
             System.out.println("The date: " + date + " could not be parsed");
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
 

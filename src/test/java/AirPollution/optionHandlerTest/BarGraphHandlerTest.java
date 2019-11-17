@@ -5,25 +5,25 @@ import AirPollution.model.SensorData;
 import AirPollution.model.Station;
 import AirPollution.optionHandler.BarGraphHandler;
 import AirPollution.storage.Storage;
-import org.junit.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class BarGraphHandlerTest {
     private static final String EXAMPLE_STATION_NAME = "exampleStationName";
 
-    @Test
+    //@Test
     public void barGraphForGivenParameterStationsAndPeriodOfTimeTest() {
         Station station = new Station(1, EXAMPLE_STATION_NAME);
 
-        ArrayList<String> listOfStations = new ArrayList<>();
+        List<String> listOfStations = new ArrayList<>();
         listOfStations.add(station.getStationName());
         ArrayList<Station> stations = new ArrayList<>();
         stations.add(station);

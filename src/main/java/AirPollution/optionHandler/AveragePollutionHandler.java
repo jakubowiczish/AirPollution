@@ -1,13 +1,14 @@
 package AirPollution.optionHandler;
 
-import AirPollution.storage.Storage;
 import AirPollution.model.Sensor;
 import AirPollution.model.SensorData;
 import AirPollution.model.Station;
+import AirPollution.storage.Storage;
 import AirPollution.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -36,8 +37,8 @@ public class AveragePollutionHandler {
         Date realBeginDate = Utils.getInstance().parseAndCheckDate(beginDate);
         Date realEndDate = Utils.getInstance().parseAndCheckDate(endDate);
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        List<Station> allStations = storageReceiver.getAllStations();
+        List<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
         allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
 

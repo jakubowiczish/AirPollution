@@ -1,12 +1,11 @@
 package AirPollution.optionHandler;
 
 import AirPollution.model.Sensor;
-import AirPollution.storage.Storage;
 import AirPollution.model.Station;
+import AirPollution.storage.Storage;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 /**
  * Class that is used to print some information provided by api
@@ -37,6 +36,7 @@ public class PrintApiInformationOptionHandler {
                 .forEach(station -> {
                     if (station != null) {
                         System.out.println("\nSTATION NAME: " + station.getStationName() + "\nSensors for this station:");
+
                         CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
                         if (sensors != null) {
                             sensors.forEach(sensor -> {
@@ -57,13 +57,16 @@ public class PrintApiInformationOptionHandler {
      */
     public void printNamesOfAllStationsContainingGivenString(String stationAddressFragment) {
         boolean found = false;
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
+
+        List<Station> allStations = storageReceiver.getAllStations();
+
         for (Station station : allStations) {
             if (station.getStationName().contains(stationAddressFragment)) {
                 System.out.println(station.getStationName());
                 found = true;
             }
         }
+
         if (!found) {
             System.out.println("There is no station that contains \"" + stationAddressFragment + "\" in her name");
         }

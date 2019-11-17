@@ -9,6 +9,7 @@ import java.io.*;
  * Class that is responsible for loading and saving fetched data to .json file
  */
 public class PhysicalStorage {
+
     private static final String filePath = "/home/plotnikowski/IdeaProjects/AirPollution/src/PhysicalStorage.json";
 
     /**
@@ -19,12 +20,14 @@ public class PhysicalStorage {
     public Storage loadStorageFromFile() {
         Storage storage;
         Gson gson = new Gson();
+
         try {
             storage = gson.fromJson(receiveFile(new File(filePath)), Storage.class);
         } catch (Exception e) {
             System.out.println("Error while loading storage from file: " + e);
             return null;
         }
+
         return storage;
     }
 

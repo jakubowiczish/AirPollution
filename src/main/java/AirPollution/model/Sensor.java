@@ -1,14 +1,20 @@
 package AirPollution.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * Class used to store parsed information about sensor
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class Sensor {
+
     private int id;
     private int stationId;
-    public Param param;
-
-    public Sensor() {}
+    private Param param;
 
     public Sensor(int id) {
         this.id = id;
@@ -23,9 +29,12 @@ public class Sensor {
                 "}";
     }
 
-    public class Param {
+    @Getter
+    @Setter
+    public static class Param {
+
         String paramName;
-        public String paramFormula;
+        String paramFormula;
         String paramCode;
         int idParam;
 
@@ -38,13 +47,5 @@ public class Sensor {
                     "idParam:" + idParam +
                     "}";
         }
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

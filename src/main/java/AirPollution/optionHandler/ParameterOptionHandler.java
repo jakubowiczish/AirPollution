@@ -1,7 +1,9 @@
 package AirPollution.optionHandler;
 
+import AirPollution.model.Sensor;
+import AirPollution.model.SensorData;
+import AirPollution.model.Station;
 import AirPollution.storage.Storage;
-import AirPollution.model.*;
 import AirPollution.utils.Utils;
 
 import java.util.*;
@@ -34,16 +36,16 @@ public class ParameterOptionHandler {
             return null;
         }
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        List<Station> allStations = storageReceiver.getAllStations();
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        List<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
         allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
         stringBuilder.append("For Date: ").append(date).append("\n");
 
-        TreeMap<Double, ArrayList<String>> valuesOfParameterForGivenStationsAndDate = new TreeMap<>();
+        TreeMap<Double, List<String>> valuesOfParameterForGivenStationsAndDate = new TreeMap<>();
 
         boolean foundDate = false;
         for (Station station : allStations) {
@@ -88,7 +90,7 @@ public class ParameterOptionHandler {
             return null;
         }
 
-        for (Map.Entry<Double, ArrayList<String>> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
+        for (Map.Entry<Double, List<String>> entry : valuesOfParameterForGivenStationsAndDate.entrySet()) {
             stringBuilder.append(Utils.getInstance().getDecimalFormat().format(entry.getKey())).append(entry.getValue());
         }
 
@@ -138,8 +140,8 @@ public class ParameterOptionHandler {
             return null;
         }
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        List<Station> allStations = storageReceiver.getAllStations();
+        List<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
         allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
         String resultParameter = null;
@@ -236,7 +238,7 @@ public class ParameterOptionHandler {
     public String parametersWithLowestAndHighestValuesAtSpecificTime(String date) {
         Date specificDate = Utils.getInstance().parseAndCheckDate(date);
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        List<Station> allStations = storageReceiver.getAllStations();
 
         String lowestParameterName = null, highestParameterName = null;
         String lowestStationName = null, highestStationName = null;
@@ -309,7 +311,7 @@ public class ParameterOptionHandler {
      * @return String containing sorted stations in ascending order
      */
     @SuppressWarnings("Duplicates")
-    public String sortedStations(ArrayList<String> listOfStations, String date, String parameterName, int N) {
+    public String sortedStations(List<String> listOfStations, String date, String parameterName, int N) {
         Date realDate = Utils.getInstance().parseAndCheckDate(date);
 
         if (!Utils.getInstance().checkWhetherParameterNameIsValid(parameterName)) {
@@ -317,11 +319,11 @@ public class ParameterOptionHandler {
             return null;
         }
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        List<Station> allStations = storageReceiver.getAllStations();
+        List<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
         allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
-        TreeMap<Double, ArrayList<String>> parameterDataAtSpecificTime = new TreeMap<>();
+        TreeMap<Double, List<String>> parameterDataAtSpecificTime = new TreeMap<>();
 
         boolean foundDate = false;
         for (Station station : allStations) {
@@ -362,7 +364,7 @@ public class ParameterOptionHandler {
                 append(" stations with highest pollution of parameter \"").
                 append(parameterName).append("\" on \"").append(date).append("\"\n");
 
-        for (Map.Entry<Double, ArrayList<String>> entry : parameterDataAtSpecificTime.entrySet()) {
+        for (Map.Entry<Double, List<String>> entry : parameterDataAtSpecificTime.entrySet()) {
             N++;
             if (parameterDataAtSpecificTime.entrySet().size() - N < 0) {
                 result.append(entry.getValue()).append(" Value of parameter ").
@@ -374,14 +376,14 @@ public class ParameterOptionHandler {
 
 
     @SuppressWarnings("Duplicates")
-    public String stationsAboveStandardPollutionValue(ArrayList<String> listOfStations, String date, int N) {
+    public String stationsAboveStandardPollutionValue(List<String> listOfStations, String date, int N) {
         Date realDate = Utils.getInstance().parseAndCheckDate(date);
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        List<Station> allStations = storageReceiver.getAllStations();
+        List<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
         allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
-        TreeMap<Double, ArrayList<String>> parametersAboveStandardValues = new TreeMap<>();
+        TreeMap<Double, List<String>> parametersAboveStandardValues = new TreeMap<>();
 
         boolean foundDate = false;
 
@@ -432,7 +434,7 @@ public class ParameterOptionHandler {
 
         StringBuilder result = new StringBuilder();
         result.append("Top ").append(N).append(" sensors which pollution is above normal value:").append("\n");
-        for (Map.Entry<Double, ArrayList<String>> entry : parametersAboveStandardValues.entrySet()) {
+        for (Map.Entry<Double, List<String>> entry : parametersAboveStandardValues.entrySet()) {
             N++;
             if (parametersAboveStandardValues.entrySet().size() - N < 0) {
                 result.append(Utils.getInstance().getDecimalFormat().format(entry.getKey())).
@@ -462,7 +464,7 @@ public class ParameterOptionHandler {
         Station minStation = new Station();
         Station maxStation = new Station();
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
+        List<Station> allStations = storageReceiver.getAllStations();
 
         double maxValue = 0;
         double minValue = 10000;
@@ -518,20 +520,19 @@ public class ParameterOptionHandler {
      *
      * @return list of all parameters present in the system
      */
-    public ArrayList<String> parameterNames() {
-        ArrayList<String> parameters = new ArrayList<>();
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        for (Station station : allStations) {
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
-            if (sensors == null) continue;
-            for (Sensor sensor : sensors) {
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
-                if (sensorData == null) continue;
-                if (!parameters.contains(sensorData.getKey())) {
-                    parameters.add(sensorData.getKey());
-                }
-            }
-        }
+    public List<String> parameterNames() {
+        List<String> parameters = new ArrayList<>();
+        List<Station> allStations = storageReceiver.getAllStations();
+
+        allStations.stream()
+                .map(station -> storageReceiver.getAllSensorsForSpecificStation(station.getId()))
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .map(sensor -> storageReceiver.getSensorDataForSpecificSensor(sensor.getId()))
+                .filter(Objects::nonNull)
+                .filter(sensorData -> !parameters.contains(sensorData.getKey()))
+                .forEach(sensorData -> parameters.add(sensorData.getKey()));
+
         return parameters;
     }
 }

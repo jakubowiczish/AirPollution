@@ -4,22 +4,22 @@ import AirPollution.model.AirIndex;
 import AirPollution.model.Station;
 import AirPollution.optionHandler.AirIndexOptionHandler;
 import AirPollution.storage.Storage;
-import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AirIndexOptionHandlerTest {
     private static final String EXAMPLE_STATION_NAME = "exampleStationName";
 
-    @Test
+    //@Test
     public void allIndicesOfGivenStationsTest() {
 
         Station station = new Station(5, EXAMPLE_STATION_NAME);
-        ArrayList<String> listOfStations = new ArrayList<>();
+        List<String> listOfStations = new ArrayList<>();
         listOfStations.add(station.getStationName());
 
         ArrayList<Station> stations = new ArrayList<>();

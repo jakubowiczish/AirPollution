@@ -1,9 +1,8 @@
 package AirPollution.optionHandler;
 
-import AirPollution.storage.Storage;
 import AirPollution.model.Sensor;
-import AirPollution.model.SensorData;
 import AirPollution.model.Station;
+import AirPollution.storage.Storage;
 import AirPollution.utils.Utils;
 import com.google.common.base.Strings;
 
@@ -11,6 +10,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Provides method that can be used to print graph which presents information about pollution, its date and place
@@ -43,8 +43,12 @@ public class BarGraphHandler {
      * @param listOfStations names of the stations for which you want the graph to be created
      * @return String that is a graph that contains information about pollution, dates of measurement and names of the stations
      */
-    public String barGraphForGivenParameterStationsAndPeriodOfTime
-    (String beginHour, String endHour, String parameterName, ArrayList<String> listOfStations, LocalDate localDate) {
+    public String barGraphForGivenParameterStationsAndPeriodOfTime(String beginHour,
+                                                                   String endHour,
+                                                                   String parameterName,
+                                                                   List<String> listOfStations,
+                                                                   LocalDate localDate) {
+
         Date hourBeginDate = Utils.getInstance().parseStringToHour(beginHour);
         Date hourEndDate = Utils.getInstance().parseStringToHour(endHour);
 
@@ -53,8 +57,8 @@ public class BarGraphHandler {
             return null;
         }
 
-        ArrayList<Station> allStations = storageReceiver.getAllStations();
-        ArrayList<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
+        List<Station> allStations = storageReceiver.getAllStations();
+        List<Station> validStations = Utils.getInstance().assignValidStations(listOfStations, allStations);
         allStations = Utils.getInstance().assignAllStations(allStations, validStations);
 
         int maxLengthOfLine = 110;
@@ -62,105 +66,92 @@ public class BarGraphHandler {
 
         double maxValue = findMaximumValueOfGivenParameter(allStations, parameterName);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        String stringBuilder;
 
-        TreeMap<Date, ArrayList<String>> graphSortedByHours = new TreeMap<>();
+        TreeMap<Date, List<String>> graphSortedByHours = new TreeMap<>();
 
-        for (Station station : allStations) {
-            if (station == null) continue;
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
-            if (sensors == null) continue;
-            for (Sensor sensor : sensors) {
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
-                if (sensorData == null || sensorData.getValues().length == 0 || !sensorData.getKey().equals(parameterName))
-                    continue;
+        allStations.stream()
+                .filter(Objects::nonNull)
+                .forEach(station -> {
+                    CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
+                    if (sensors == null) return;
+                    sensors.stream().map(sensor -> storageReceiver.getSensorDataForSpecificSensor(sensor.getId())).filter(sensorData -> sensorData != null && sensorData.getValues().length != 0 && sensorData.getKey().equals(parameterName)).flatMap(sensorData -> Arrays.stream(sensorData.getValues())).filter(value -> value.date.contains("-")).filter(value -> value.value != null).forEach(value -> {
 
-                for (SensorData.Value value : sensorData.getValues()) {
-                    if (!value.date.contains("-")) continue;
-                    if (value.value == null) continue;
-                    Date actualDate = Utils.getInstance().multiThreadParseStringToDate(value.date);
+                        Date actualDate = Utils.getInstance().multiThreadParseStringToDate(value.date);
+                        String[] dateParts = value.date.split(" ");
+                        Date actualHourDate = Utils.getInstance().parseStringToHour(dateParts[1]);
 
-                    String[] dateParts = value.date.split(" ");
-                    Date actualHourDate = Utils.getInstance().parseStringToHour(dateParts[1]);
-                    if (!Utils.getInstance().checkDateInterval(hourBeginDate, hourEndDate, actualHourDate)) continue;
+                        if (!Utils.getInstance().checkDateInterval(hourBeginDate, hourEndDate, actualHourDate)) return;
 
-                    int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
-                    String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "\u25a0");
-                    int blankSpaceLength = longestStationNameLength - station.getStationName().length() + 1;
+                        int lengthOfGraphLine = (int) ((value.value / maxValue) * maxLengthOfLine);
 
+                        String graphLine = createStringOfGivenLengthAndCharacter(lengthOfGraphLine, "\u25a0");
 
-                    if (isToday(localDate, actualDate)) {
-                        Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
-                        String valueString = "\r" + dateParts[1] +
-                                " TODAY               " + " (" + station.getStationName() + ")" +
-                                createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
-                                "\n";
-                        Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
+                        int blankSpaceLength = longestStationNameLength - station.getStationName().length() + 1;
 
-                    } else if (wasYesterday(localDate, actualDate)) {
-                        Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
-                        String valueString = "\r" + dateParts[1] +
-                                " YESTERDAY           " + " (" + station.getStationName() + ")" +
-                                createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
-                                "\n";
-                        Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
+                        if (isToday(localDate, actualDate)) {
+                            Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
+                            String valueString = "\r" + dateParts[1] +
+                                    " TODAY               " + " (" + station.getStationName() + ")" +
+                                    createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
+                                    graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
+                                    "\n";
+                            Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
-                    } else if (wasDayBeforeYesterday(localDate, actualDate)) {
-                        Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
-                        String valueString = "\r" + dateParts[1] +
-                                " DAY BEFORE YESTERDAY" + " (" + station.getStationName() + ")" +
-                                createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
-                                graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
-                                "\n";
-                        Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
-                    }
-                }
-            }
-        }
+                        } else if (wasYesterday(localDate, actualDate)) {
+                            Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
+                            String valueString = "\r" + dateParts[1] +
+                                    " YESTERDAY           " + " (" + station.getStationName() + ")" +
+                                    createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
+                                    graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
+                                    "\n";
+                            Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
 
-        for (Map.Entry<Date, ArrayList<String>> entry : graphSortedByHours.entrySet()) {
-            stringBuilder.append(entry.getValue());
-        }
+                        } else if (wasDayBeforeYesterday(localDate, actualDate)) {
+                            Date keyDate = Utils.getInstance().parseStringToHour(dateParts[1]);
+                            String valueString = "\r" + dateParts[1] +
+                                    " DAY BEFORE YESTERDAY" + " (" + station.getStationName() + ")" +
+                                    createStringOfGivenLengthAndCharacter(blankSpaceLength, " ") +
+                                    graphLine + " " + Utils.getInstance().getDecimalFormat().format(value.value) +
+                                    "\n";
+                            Utils.getInstance().addToTreeWithDateAndString(graphSortedByHours, keyDate, valueString);
+                        }
+                    });
+                });
 
-        String resultString = stringBuilder.toString();
+        stringBuilder = graphSortedByHours.values().stream().map(String::valueOf).collect(Collectors.joining());
+
+        String resultString = stringBuilder;
         resultString = Utils.getInstance().cleanUpString(resultString);
 
         return resultString;
     }
 
 
-    private double findMaximumValueOfGivenParameter(ArrayList<Station> allStations, String parameterName) {
-        double maxValue = -1.0;
-        for (Station station : allStations) {
-            if (station == null) continue;
-            CopyOnWriteArrayList<Sensor> sensors = storageReceiver.getAllSensorsForSpecificStation(station.getId());
-            if (sensors == null) continue;
-            for (Sensor sensor : sensors) {
-                SensorData sensorData = storageReceiver.getSensorDataForSpecificSensor(sensor.getId());
-                if (sensorData == null || sensorData.getValues().length == 0 || !sensorData.getKey().equals(parameterName))
-                    continue;
-
-                for (SensorData.Value value : sensorData.getValues()) {
-                    if (value.value == null) continue;
-                    if (value.value > maxValue) {
-                        maxValue = value.value;
-                    }
-                }
-            }
-        }
-        return maxValue;
+    private double findMaximumValueOfGivenParameter(List<Station> allStations, String parameterName) {
+        return allStations.stream()
+                .filter(Objects::nonNull)
+                .map(station -> storageReceiver.getAllSensorsForSpecificStation(station.getId()))
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .map(sensor -> storageReceiver.getSensorDataForSpecificSensor(sensor.getId()))
+                .filter(sensorData -> sensorData != null
+                        && sensorData.getValues().length != 0
+                        && sensorData.getKey().equals(parameterName))
+                .flatMap(sensorData -> Arrays.stream(sensorData.getValues()))
+                .filter(value -> value.value != null)
+                .map(value -> value.value)
+                .mapToDouble(value -> value)
+                .filter(value -> value >= -1.0)
+                .max()
+                .orElse(-1.0);
     }
 
-    private int findLongestStationName(ArrayList<Station> allStations) {
-        int maxLength = -1;
-        for (Station station : allStations) {
-            if (station.getStationName().length() > maxLength) {
-                maxLength = station.getStationName().length();
-            }
-        }
-        return maxLength;
+    private int findLongestStationName(List<Station> allStations) {
+        return allStations.stream()
+                .mapToInt(station -> station.getStationName().length())
+                .max()
+                .orElse(-1);
     }
 
     private String createStringOfGivenLengthAndCharacter(int length, String character) {
@@ -173,7 +164,7 @@ public class BarGraphHandler {
      * @param actualDate date to check
      * @return boolean value, 1 - if the given date was yesterday, 0 - if it was not
      */
-    public boolean wasYesterday(LocalDate localDate, Date actualDate) {
+    private boolean wasYesterday(LocalDate localDate, Date actualDate) {
         LocalDate yesterday = localDate.minusDays(1);
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return yesterday.equals(realDate);
@@ -185,10 +176,9 @@ public class BarGraphHandler {
      * @param actualDate date to check
      * @return boolean value, 1 - if the given date is today, 0 - if it is not
      */
-    public boolean isToday(LocalDate localDate, Date actualDate) {
-        LocalDate today = localDate; // 2018-12-27
+    private boolean isToday(LocalDate localDate, Date actualDate) {
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return today.equals(realDate);
+        return localDate.equals(realDate);
     }
 
     /**
@@ -197,11 +187,9 @@ public class BarGraphHandler {
      * @param actualDate date to check
      * @return boolean value, 1 - if the given date was the day before yesterday, 0 - if it was not
      */
-    public boolean wasDayBeforeYesterday(LocalDate localDate, Date actualDate) {
+    private boolean wasDayBeforeYesterday(LocalDate localDate, Date actualDate) {
         LocalDate dayBeforeYesterday = localDate.minusDays(2);
         LocalDate realDate = actualDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return dayBeforeYesterday.equals(realDate);
     }
-
-
 }
