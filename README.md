@@ -2,6 +2,12 @@
 
 # AirPollution
 
+#
+
+Be aware of the fact that this is one of my very first Java projects, so amount of bad and disgusting code here is pretty big.
+
+#
+
 Command-line application that provides user with various information about air quality in Poland,
 uses http://powietrze.gios.gov.pl/pjp/content/api
 
