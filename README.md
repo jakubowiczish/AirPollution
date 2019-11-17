@@ -1,3 +1,5 @@
+<img src="https://github.com/jakubowiczish/AirPollution/workflows/Java CI/badge.svg" width="200">
+
 # AirPollution
 
 Command-line application that provides user with various information about air quality in Poland,
