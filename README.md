@@ -1,3 +1,8 @@
+<img src="https://img.shields.io/github/languages/code-size/jakubowiczish/AirPollution?style=for-the-badge"> <img src="https://img.shields.io/github/repo-size/jakubowiczish/AirPollution?color=purple&style=for-the-badge"> 
+<img src="https://img.shields.io/github/languages/count/jakubowiczish/AirPollution?color=green&style=for-the-badge"> 
+<img src="https://img.shields.io/github/languages/top/jakubowiczish/AirPollution?color=orange&style=for-the-badge">
+<img src="https://img.shields.io/github/commit-activity/m/jakubowiczish/AirPollution?color=lime&style=for-the-badge">
+<img src="https://img.shields.io/github/last-commit/jakubowiczish/AirPollution?color=darkgreen&style=for-the-badge">
 <img src="https://github.com/jakubowiczish/AirPollution/workflows/Java CI/badge.svg" width="200">
 
 # AirPollution
