@@ -3,7 +3,10 @@
 <img src="https://img.shields.io/github/languages/top/jakubowiczish/AirPollution?color=orange&style=for-the-badge">
 <img src="https://img.shields.io/github/commit-activity/m/jakubowiczish/AirPollution?color=lime&style=for-the-badge">
 <img src="https://img.shields.io/github/last-commit/jakubowiczish/AirPollution?color=darkgreen&style=for-the-badge">
-<img src="https://github.com/jakubowiczish/AirPollution/workflows/Java CI/badge.svg" width="200">
+
+<img src="https://github.com/jakubowiczish/AirPollution/workflows/Java CI/badge.svg" width="200"> <img src="https://tokei.rs/b1/github/jakubowiczish/AirPollution?category=code" width="200"> 
+<img src="https://tokei.rs/b1/github/jakubowiczish/AirPollution?category=lines" width="175">
+<img src="https://tokei.rs/b1/github/jakubowiczish/AirPollution?category=files" width="90">
 
 # AirPollution
 
